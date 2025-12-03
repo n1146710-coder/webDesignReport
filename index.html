@@ -136,6 +136,14 @@
     color: white;
     padding-left: 20px; 
   }
+  
+  /* 針對 Sidebar 內的連結樣式調整 */
+  .sub-list a {
+    color: inherit;
+    text-decoration: none;
+    width: 100%; /* 讓點擊範圍變大 */
+    display: block;
+  }
 
   /* --- 右上區塊樣式 --- */
   .main-top {
@@ -195,11 +203,12 @@
   /* 底部組員頭像列 (高度縮減調整) */
   .member-row {
     display: flex;
+    /* 增加寬度，減少壓迫感 */
     width: 90%;
     justify-content: space-evenly;
     
     background: rgba(255,255,255,0.15);
-    /* 減少 padding 來降低高度 (原 25px -> 12px) */
+    /* 減少 padding 來降低高度 */
     padding: 12px 20px; 
     border-radius: 50px; 
     backdrop-filter: blur(5px); 
@@ -268,12 +277,12 @@
   /* 作品列表容器 */
   .portfolio-list {
     display: flex;
-    /* 卡片之間的間隔增加 (原 40px -> 60px) */
+    /* 卡片之間的間隔增加 */
     gap: 60px; 
     height: 100%; 
     padding-bottom: 20px;
     
-    /* 減少左右內距，讓寬度增加 (原 16% -> 8%) */
+    /* 左右內距設定 8% */
     padding-left: 8%;
     padding-right: 8%;
   }
@@ -288,10 +297,20 @@
     flex-direction: column; 
     gap: 50px; 
     transition: transform 0.2s;
+    
+    /* 連結樣式修正 */
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
   }
 
+  /* 連結與非連結 hover 效果 */
   .portfolio-item:hover {
     transform: translateY(-5px);
+  }
+  
+  a.portfolio-item:hover {
+    opacity: 0.9;
   }
 
   /* 縮圖區域 (獨立懸浮) - 比例 3:2 */
@@ -357,7 +376,8 @@
       <ul class="sub-list">
         <li>P1: 專案企劃</li>
         <li>P2: 進度追蹤</li>
-        <li>P3: 書面報告</li>
+        <!-- ★★★ 修改處：直接在 Sidebar 加入超連結 ★★★ -->
+        <li><a href="N1146710/p3.html">P3: 書面報告</a></li>
       </ul>
     </details>
 
@@ -454,9 +474,10 @@
       bg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80",
       avatar: "https://ui-avatars.com/api/?name=A&background=0D8ABC&color=fff&size=256",
       works: [
-        { title: "專案企劃書", tag: "P1", img: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=500&q=60", desc: "制定完整專案時程表、甘特圖與規格需求文件。" },
+        { title: "專案企劃書", tag: "P1", img: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=500&q=60", desc: "制定完整專案時程表、甘特圖與規格需求文件。", link: "index.html" },
         { title: "進度追蹤", tag: "P2", img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=500&q=60", desc: "每週召開會議確認開發進度，排除團隊障礙。" },
-        { title: "結案報告", tag: "P3", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60", desc: "彙整所有成果，製作最終成果發表簡報與書面報告。" }
+        // ★★★ 改回標準做法：只要有 link 屬性，生成時會用 <a> 標籤 ★★★
+        { title: "結案報告", tag: "P3", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60", desc: "彙整所有成果，製作最終成果發表簡報與書面報告。", link: "N1146710/p3.html" }
       ]
     },
     'B': {
@@ -558,15 +579,21 @@
       // 生成作品卡片 HTML
       let cardsHtml = '';
       data.works.forEach(work => {
+        // ★★★ 關鍵：改回標準 <a> 標籤邏輯 ★★★
+        // 判斷是否有連結，若有則使用 <a> 標籤，否則使用 <div>
+        const tagType = work.link ? 'a' : 'div';
+        // 因為是本地端跳轉，不需要 target="_blank"
+        const hrefAttr = work.link ? `href="${work.link}"` : '';
+        
         cardsHtml += `
-          <div class="portfolio-item">
+          <${tagType} ${hrefAttr} class="portfolio-item">
             <div class="thumb-box" style="background-image: url('${work.img}');"></div>
             <div class="info-box">
               <span class="info-tag">${work.tag}</span>
               <h4 class="info-title">${work.title}</h4>
               <p class="info-desc">${work.desc}</p>
             </div>
-          </div>
+          </${tagType}>
         `;
       });
       portfolioList.innerHTML = cardsHtml;
