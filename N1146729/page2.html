@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hololive World | 成員介紹</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* ==========================
+           全局樣式
+           - 修改字體、背景或整體風格在這裡
+        ========================== */
+        body { font-family: 'Arial', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
+
+        /* ==========================
+           導覽列
+           - 修改 logo 或快速篩選按鈕風格在這裡
+           - 新增組別時，在 quick-filter 增加按鈕
+        ========================== */
+        .navbar { background:#222; color:white; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;}
+        .navbar a { color:white; text-decoration:none; margin-right:15px;}
+        .navbar .logo span { color:#ffcc00; font-weight:bold;}
+        .nav-menu { list-style:none; display:flex; margin:0; padding:0;}
+        .nav-menu li { margin:0 5px;}
+        .nav-menu .active { border-bottom:2px solid #ffcc00;}
+        .quick-filter { display:flex; gap:10px; margin-left:20px; }
+        .quick-filter button { padding:5px 10px; border-radius:5px; border:none; cursor:pointer; background:#555; color:white; font-size:0.85rem; transition:0.3s; }
+        .quick-filter button:hover, .quick-filter button.active { background:#ffcc00; color:#222; }
+        .search-box { margin-left:20px;}
+        .search-box input { padding:5px 10px; border-radius:5px; border:none; font-size:0.85rem; }
+
+        /* ==========================
+           Section 樣式
+        ========================== */
+        .section { padding:60px 20px; text-align:center;}
+        .section-title { font-size:2.2rem; margin-bottom:10px; }
+        .section-title span { color:#ffcc00; }
+        .section-subtitle { color:#555; margin-bottom:40px; font-size:1rem; }
+        .filters { margin-bottom:30px; }
+        .filter-btn { padding:8px 15px; border:none; cursor:pointer; margin:0 5px; border-radius:5px; background:#ddd; transition:0.3s; }
+        .filter-btn.active, .filter-btn:hover { background:#ffcc00; color:#222; }
+        .sort-btn { padding:8px 15px; border:none; cursor:pointer; margin:0 5px; border-radius:5px; background:#bbb; transition:0.3s; }
+        .sort-btn:hover, .sort-btn.active { background:#ffcc00; color:#222; }
+
+        /* 卡片網格 */
+        .talent-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:25px; justify-items:center;}
+        .talent-card { width:180px; perspective:1000px; }
+        .flip-card-inner { position:relative; width:100%; height:280px; text-align:center; transition:transform 0.6s; transform-style:preserve-3d; }
+        .talent-card:hover .flip-card-inner { transform:rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
+        .flip-card-front { background:white; display:flex; flex-direction:column; align-items:center; padding:10px; transition:0.3s; }
+
+        /* ==========================
+           圖片樣式修改（新增）
+           - object-fit: cover 保證填滿卡片
+           - 保持比例，不會失真
+           - 圖片自動裁切多餘部分，避免空白
+        ========================== */
+        .flip-card-front img {
+            width:100%;
+            height:100%; /* 高度填滿卡片 */
+            object-fit:cover; /* 自動裁切以保持比例填滿 */
+            border-radius:10px;
+            transition:transform 0.3s;
+        }
+        .flip-card-front:hover img { transform:scale(1.05); }
+
+        .flip-card-front h3 { margin:10px 0 5px 0; font-size:1rem; }
+        .flip-card-front span { color:#888; font-size:0.85rem; }
+
+        /* 卡片背面 - 修改成員背景故事就在這裡 <p> 文字 */
+        .flip-card-back { background:#ffcc00; color:#222; transform:rotateY(180deg); display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px; font-size:0.85rem; }
+        .flip-card-back p { margin:5px 0; }
+
+        /* 互動式統計圖表 */
+        .stats { margin:50px auto; max-width:600px; text-align:left; }
+        .bar { display:flex; align-items:center; margin:5px 0; cursor:pointer; transition:0.3s; }
+        .bar:hover { opacity:0.7; }
+        .bar-name { width:80px; }
+        .bar-value { height:20px; background:#ffcc00; margin-left:10px; text-align:right; padding-right:5px; color:#222; border-radius:5px; }
+
+        /* Footer */
+        footer { background:#222; color:#ccc; padding:20px 0; text-align:center; margin-top:40px; }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================
+         導覽列
+    ========================== -->
+    <nav class="navbar">
+        <a href="page1.html" class="logo"><i class="fa-solid fa-star"></i> HOLO<span>WORLD</span></a>
+        <ul class="nav-menu">
+            <li><a href="../index.html" class="nav-link">首頁</a></li>
+            <li><a href="https://hololive.hololivepro.com/" target="_blank" class="nav-link">官方網站</a></li>
+        </ul>
+        <div style="display:flex; align-items:center;">
+            <div class="quick-filter">
+                <button class="active" onclick="filterTalents('all', this)">All Stars</button>
+                <button onclick="filterTalents('jp', this)">Hololive JP</button>
+                <button onclick="filterTalents('en', this)">Hololive EN</button>
+                <button onclick="filterTalents('id', this)">Hololive ID</button>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜尋成員..." onkeyup="searchTalent()" />
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================
+         Section: 篩選 + 卡片
+         - 新增成員 → 複製 .talent-card，修改 data-category / data-birthday / img / h3 / span / flip-card-back <p> 文字
+    ========================== -->
+    <section class="section">
+        <h2 class="section-title">Our <span>Talents</span></h2>
+        <p class="section-subtitle">篩選組別 / 搜尋名字 / 按生日排序 / 點擊統計圖表快速篩選</p>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTalents('all', this)">All Stars</button>
+            <button class="filter-btn" onclick="filterTalents('jp', this)">Hololive JP</button>
+            <button class="filter-btn" onclick="filterTalents('en', this)">Hololive EN</button>
+            <button class="filter-btn" onclick="filterTalents('id', this)">Hololive ID</button>
+            <button class="sort-btn" onclick="sortByBirthday()">生日排序</button>
+        </div>
+
+        <div class="talent-grid" id="talentGrid">
+            <!-- JP 成員 -->
+            <div class="talent-card" data-category="jp" data-birthday="8-4">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Sakura Miko.png" alt="Sakura Miko" />
+                        <h3>Sakura Miko</h3>
+                        <span>さくらみこ</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 0</p>
+                        <p>生日：3/5</p>
+                        <p>身高：152cm</p>
+                        <p>體重:45kg</p>
+                        <p>星座:雙魚座</p>
+                        <p>被電腦神社派往電腦世界的廢柴系巫女，自稱「精英」，熱愛遊戲與鯛魚燒和可愛的女孩子。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="10-5">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Shirakami Fubuki.png" alt="Shirakami Fubuki" />
+                        <h3>Shirakami Fubuki</h3>
+                        <span>白上 フブキ</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 1</p>
+                        <p>生日：10/5</p>
+                        <p>身高：160cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:天秤座</p>
+                        <p>白髮，長著獸耳的女高中生。性格害羞安靜，但內心裡喜歡和人們聊天，並樂於被他人注意。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="12-13">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Nakiri Ayame.png" alt="Nakiri Ayame" />
+                        <h3>Nakiri Ayame</h3>
+                        <span>百鬼あやめ</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 2</p>
+                        <p>生日：12/13</p>
+                        <p>身高：152cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:射手座</p>
+                        <p>魔界學校所屬的和服鬼神女孩，喜歡惡作劇，常常放出鬼火戲弄他人。雖然如此實際上是學生會長。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="7-30">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Houshou Marine.png" alt="Houshou Marine" />
+                        <h3>Houshou Marine</h3>
+                        <span>宝鐘マリン</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 3</p>
+                        <p>生日：7/30</p>
+                        <p>身高：150cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:獅子座</p>
+                        <p>暱稱為「船長」，愛好金錢及寶石，夢想是成為四處尋寶的海賊，並以購買海賊船作目標。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="6-6">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Tsunomaki Watame.jpg" alt="Tsunomaki Watame" />
+                        <h3>Tsunomaki Watame</h3>
+                        <span>角巻わため</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 4</p>
+                        <p>生日：6/6</p>
+                        <p>身高：151cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:雙子座</p>
+                        <p>身任吟唱詩人的羊，喜歡唱歌，毛絨絨的形象深受粉絲喜愛。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="3-2">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Momosuzu Nene.png" alt="Momosuzu Nene" />
+                        <h3>Momosuzu Nene</h3>
+                        <span>桃鈴ねね</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 5</p>
+                        <p>生日：3/2</p>
+                        <p>身高：159cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:雙魚座</p>
+                        <p>渴望成為偶像的少女，喜歡唱歌跳舞與繪畫，為了被更多人喜愛不斷努力。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="jp" data-birthday="3-15">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Hakui Koyori.png" alt="Hakui Koyori" />
+                        <h3>Hakui Koyori</h3>
+                        <span>博衣こより</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>JP Gen 6</p>
+                        <p>生日：3/15</p>
+                        <p>身高：153cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:雙魚座</p>
+                        <p>《秘密結社holoX》的研究家，好奇心旺盛，常以觀察人類行為的方式進行研究與惡作劇。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EN 成員 -->
+            <div class="talent-card" data-category="en" data-birthday="4-4">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Mori Calliope.jpg" alt="Mori Calliope" />
+                        <h3>Mori Calliope</h3>
+                        <span>森カリオペ</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>EN Myth</p>
+                        <p>生日：4月4日</p>
+                        <p>身高：167cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:白羊座</p>
+                        <p>死神的大弟子，形象以收割靈魂的歌手形象為主題，音樂相關活動廣受好評。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="en" data-birthday="3-7">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/IRyS.jpg" alt="IRyS" />
+                        <h3>IRyS</h3>
+                        <span>アイリス</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>EN VSinger－Project:HOPE</p>
+                        <p>生日：3/7</p>
+                        <p>身高：166cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:雙魚座</p>
+                        <p>以歌聲帶來希望的 VSinger，音樂活動為主軸。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="en" data-birthday="2-29">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Hakos Baelz.jpg" alt="Hakos Baelz" />
+                        <h3>Hakos Baelz</h3>
+                        <span>ハコス・ベールズ</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>EN Council</p>
+                        <p>生日：2/29</p>
+                        <p>身高：149cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:雙魚座</p>
+                        <p>代表「混沌」概念的成員，個性放任但充滿魅力。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="en" data-birthday="11-21">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Nerissa Ravencroft.jpg" alt="Nerissa Ravencroft" />
+                        <h3>Nerissa Ravencroft</h3>
+                        <span>ネリッサ・レイヴンクロフト</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>EN Advent</p>
+                        <p>生日：11/21</p>
+                        <p>身高：175cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:天蠍座</p>
+                        <p>熱愛音樂的歌手型角色，歌聲充滿魔力。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="en" data-birthday="10-18">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Gigi Murin.jpg" alt="Gigi Murin" />
+                        <h3>Gigi Murin</h3>
+                        <span>ジジ・ムリン</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>EN Justice</p>
+                        <p>生日：10/18</p>
+                        <p>身高：153cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:天秤座</p>
+                        <p>個性自由奔放，喜歡惡作劇與互動。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ID 成員 -->
+            <div class="talent-card" data-category="id" data-birthday="1-15">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Ayunda Risu.jpg" alt="Ayunda Risu" />
+                        <h3>Ayunda Risu</h3>
+                        <span>アユンダ・リス</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>ID GArea15</p>
+                        <p>生日：1/15</p>
+                        <p>身高：153cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:摩羯座</p>
+                        <p>來自魔法森林的栗鼠少女，個性溫柔且充滿活力。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="id" data-birthday="10-13">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Kureiji Ollie.jpg" alt="Kureiji Ollie" />
+                        <h3>Kureiji Ollie</h3>
+                        <span>クレイジー・オリー</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>ID holoro</p>
+                        <p>生日：10/13</p>
+                        <p>身高：162cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:天秤座</p>
+                        <p>從墳墓中復活的殭屍少女，個性開朗又搞怪。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="talent-card" data-category="id" data-birthday="12-12">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="media/images/Kobo Kanaeru.jpg" alt="Kobo Kanaeru" />
+                        <h3>Kobo Kanaeru</h3>
+                        <span>こぼ・かなえる</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <p>ID holoh3roes</p>
+                        <p>生日：12/12</p>
+                        <p>身高：150cm</p>
+                        <p>體重:未公開</p>
+                        <p>星座:射手座</p>
+                        <p>住在燈塔的慵懶少女，擁有操控雨水的能力，但個性隨性不喜被指使。</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /.talent-grid -->
+
+        <!-- 統計圖表容器 -->
+        <div class="stats" id="statsContainer">
+            <h3>成員數量統計 (點擊快速篩選)</h3>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Hololive Fan Site.</p>
+    </footer>
+
+    <script>
+        // 篩選
+        function filterTalents(category, btn){
+            const cards = document.querySelectorAll('.talent-card');
+            const btns = document.querySelectorAll('.filter-btn, .quick-filter button');
+            btns.forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+            cards.forEach(card=> card.style.display=(category==='all'||card.dataset.category===category)?'block':'none');
+        }
+
+        // 搜尋
+        function searchTalent(){
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.talent-card').forEach(card=>{
+                const name = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = name.includes(input)? 'block':'none';
+            });
+        }
+
+        // 生日排序
+        function sortByBirthday(){
+            const grid = document.getElementById('talentGrid');
+            Array.from(grid.querySelectorAll('.talent-card'))
+                .sort((a,b)=>parseInt(a.dataset.birthday.split('-')[0])-parseInt(b.dataset.birthday.split('-')[0]))
+                .forEach(card=>grid.appendChild(card));
+        }
+
+        // 統計圖表自動更新
+        function updateStats(){
+            const statsContainer = document.getElementById('statsContainer');
+            const cards = document.querySelectorAll('.talent-card');
+            const categories = {};
+            cards.forEach(card=>{ const cat=card.dataset.category; categories[cat]=(categories[cat]||0)+1; });
+            const total = cards.length;
+            statsContainer.innerHTML='<h3>成員數量統計 (點擊快速篩選)</h3>';
+            Object.keys(categories).forEach((cat,index)=>{
+                const bar=document.createElement('div'); bar.className='bar';
+                const btn=document.querySelectorAll('.filter-btn')[index+1] || document.querySelectorAll('.quick-filter button')[index+1];
+                bar.onclick=()=>filterTalents(cat,btn);
+                const nameSpan=document.createElement('span'); nameSpan.className='bar-name'; nameSpan.innerText=cat.toUpperCase();
+                const valueSpan=document.createElement('span'); valueSpan.className='bar-value';
+                const widthPercent=Math.round(categories[cat]/total*100);
+                valueSpan.style.width=widthPercent+'%';
+                valueSpan.innerText=categories[cat];
+                bar.appendChild(nameSpan);
+                bar.appendChild(valueSpan);
+                statsContainer.appendChild(bar);
+            });
+        }
+        updateStats();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
