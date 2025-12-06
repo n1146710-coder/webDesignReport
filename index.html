@@ -372,12 +372,12 @@
     
     <!-- 組員 A -->
     <details id="details-A" open>
-      <summary onclick="changeMember('A'); return false;">組員 A (組長)</summary>
+      <summary onclick="changeMember('A'); return false;">N1146710_陳柏維</summary>
       <ul class="sub-list">
-        <li><a href="index.html">P1: 專案企劃</a></li>
-        <li><a href="N1146710/p2.html">P2: 進度追蹤</a></li>
+        <!-- <li><a href="index.html">P1: 專案企劃</a></li> -->
+        <li><a href="N1146710/p2.html">p2</a></li>
         <!-- ★★★ 修改處：直接在 Sidebar 加入超連結 ★★★ -->
-        <li><a href="N1146710/p3.html">P3: 書面報告</a></li>
+        <li><a href="N1146710/p3.html">p3</a></li>
       </ul>
     </details>
 
@@ -436,7 +436,7 @@
   <main class="box main-top" id="main-top-box">
     <!-- 上方：文字標題 -->
     <div class="title-group">
-      <h1 class="main-title">網頁設計實務</h1>
+      <h1 class="main-title">網站應用程式設計-學期小組報告</h1>      
       <p class="sub-title" id="member-subtitle">第三組 - 飛天小女警 (全體)</p>
     </div>
 
@@ -445,10 +445,10 @@
 
     <!-- 下方：組員方塊頭像 -->
     <div class="member-row">
-      <div id="btn-A" class="member-icon active" onclick="changeMember('A')" style="background-image: url('https://ui-avatars.com/api/?name=A&background=0D8ABC&color=fff');" title="組員 A"></div>
+      <div id="btn-A" class="member-icon active" onclick="changeMember('A')" style="background-image: url('https://ui-avatars.com/api/?name=柏維&background=0D8ABC&color=fff');" title="組員 A"></div>
       <div id="btn-B" class="member-icon" onclick="changeMember('B')" style="background-image: url('https://ui-avatars.com/api/?name=B&background=e67e22&color=fff');" title="組員 B"></div>
       <div id="btn-C" class="member-icon" onclick="changeMember('C')" style="background-image: url('https://ui-avatars.com/api/?name=C&background=27ae60&color=fff');" title="組員 C"></div>
-      <div id="btn-D" class="member-icon" onclick="changeMember('D')" style="background-image: url('https://ui-avatars.com/api/?name=D&background=8e44ad&color=fff');" title="組員 D"></div>
+      <div id="btn-D" class="member-icon" onclick="changeMember('D')" style="background-image: url('https://ui-avatars.com/api/?name=威融&background=8e44ad&color=fff');" title="組員 D"></div>
       <div id="btn-E" class="member-icon" onclick="changeMember('E')" style="background-image: url('https://ui-avatars.com/api/?name=E&background=c0392b&color=fff');" title="組員 E"></div>
       <div id="btn-F" class="member-icon" onclick="changeMember('F')" style="background-image: url('https://ui-avatars.com/api/?name=F&background=34495e&color=fff');" title="組員 F"></div>
     </div>
@@ -470,14 +470,14 @@
   // 定義組員資料庫 (包含作品集資料 works)
   const memberData = {
     'A': {
-      subtitle: "組員 A - 專案企劃 (組長)",
+      subtitle: "組長:陳柏維",
       bg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80",
       avatar: "https://ui-avatars.com/api/?name=A&background=0D8ABC&color=fff&size=256",
       works: [
-        { title: "專案企劃書", tag: "P1", img: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=500&q=60", desc: "制定完整專案時程表、甘特圖與規格需求文件。", link: "index.html" },
-        { title: "進度追蹤", tag: "P2", img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=500&q=60", desc: "每週召開會議確認開發進度，排除團隊障礙。",link: "N1146710/p2.html" },
+        //{ title: "專案企劃書", tag: "P1", img: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=500&q=60", desc: "制定完整專案時程表、甘特圖與規格需求文件。", link: "index.html" },
+        { title: "p2", tag: "P2", img: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=500&q=60", desc: "每週召開會議確認開發進度，排除團隊障礙。",link: "N1146710/p2.html" },
         // ★★★ 改回標準做法：只要有 link 屬性，生成時會用 <a> 標籤 ★★★
-        { title: "結案報告", tag: "P3", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60", desc: "彙整所有成果，製作最終成果發表簡報與書面報告。", link: "N1146710/p3.html" }
+        { title: "p3", tag: "P3", img: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=500&q=60", desc: "彙整所有成果，製作最終成果發表簡報與書面報告。", link: "N1146710/p3.html" }
       ]
     },
     'B': {
@@ -501,7 +501,7 @@
       ]
     },
     'D': {
-      subtitle: "組員 D - 資料分析與收集",
+      subtitle: "組員:黃威融",
       bg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1350&q=80",
       avatar: "https://ui-avatars.com/api/?name=D&background=8e44ad&color=fff&size=256",
       works: [
