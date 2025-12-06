@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>期末報告 - 晨光早午餐 (滿版輪播圖與RWD優化)</title>
+        <!-- 
+        中文註解：
+        核心排版技術：display (flex/grid), position (定位)
+        特色：animation (動畫), @keyframes (關鍵影格), transition (過渡), border-radius (圓角), box-shadow (陰影)
+        JS 互動：輪播圖、菜單頁籤 (openMenu)、購物車 (addToCart/removeItem/clearCart/checkout)、
+                Email模擬->實際Mailto、五星評價(含Email通知)、Toast提示、RWD下拉選單(toggleMenu)
+        **菜單分類與購物車邏輯已完整保留並美化**
+        -->
+        <style>
+            /* --- 1. 全域與基本設定 (使用清單上的 CSS) --- */
+            :root {
+                --primary-color: #0e71b3;
+                /* 活力藍 */
+                --secondary-color: #ffaa1d;
+                /* 陽光橘 */
+                --accent-color: #e74c3c;
+                /* 紅色強調 */
+                --bg-light: #f8f9fa;
+                /* 淺灰背景 */
+                --bg-dark: #343a40;
+                /* 深色背景 */
+                --text-light: #ffffff;
+                --text-dark: #212529;
+                --header-height: 70px;
+                --main-padding: 20px;
+                /* 定義 main 的左右內距 */
+            }
+
+            * {
+                box-sizing: border-box;
+                font-family: 'Inter', 'Microsoft JhengHei', 'sans-serif';
+            }
+
+            body {
+                margin: 0;
+                padding-top: var(--header-height);
+                background-color: var(--bg-light);
+                color: var(--text-dark);
+                line-height: 1.6;
+            }
+
+            /* --- 2. 標題與導覽列 (使用 Flexbox 強化選單設計) --- */
+            header {
+                /* 強化樣式: 漸變背景與更強陰影 */
+                background: linear-gradient(90deg, #0077c2 0%, #0099e5 100%);
+                color: var(--text-light);
+                padding: 0 var(--main-padding);
+                position: fixed;
+                /* 固定在頂部 */
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+
+                /* Flexbox for alignment */
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: var(--header-height);
+            }
+
+            .logo {
+                font-size: 32px;
+                font-weight: 800;
+                line-height: 1;
+                transition: color 0.3s;
+            }
+
+            .logo:hover {
+                color: var(--secondary-color);
+            }
+
+            /* 漢堡選單按鈕 (預設隱藏 - 桌面版) */
+            .hamburger-btn {
+                display: none;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 10px;
+            }
+
+            .hamburger-btn span {
+                display: block;
+                width: 25px;
+                height: 3px;
+                background: var(--text-light);
+                margin: 4px 0;
+                transition: all 0.3s ease;
+                border-radius: 2px;
+            }
+
+            nav ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                /* 桌面版使用 Flexbox 橫向排列 */
+                gap: 15px;
+            }
+
+            nav ul li a {
+                color: var(--text-light);
+                text-decoration: none;
+                padding: 8px 15px;
+                transition: all 0.3s ease;
+                font-weight: 500;
+                border-radius: 8px;
+            }
+
+            nav ul li a:hover {
+                color: var(--primary-color);
+                background-color: var(--secondary-color);
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+
+            /* 清除浮動 */
+            .clearfix::after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            /* --- 3. 主要內容區塊 --- */
+            main {
+                padding: var(--main-padding);
+                /* 使用定義的變數 */
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            section {
+                margin-bottom: 40px;
+                padding: 25px;
+                background-color: #ffffff;
+                border-radius: 15px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+                /* === 滾動特效基礎設定 (Scroll Reveal) === */
+                opacity: 0;
+                /* 預設隱藏 */
+                transform: translateY(30px);
+                /* 初始位置在下方 */
+                animation: scrollReveal 1s ease-out forwards;
+                /* 應用動畫，保持最終狀態 */
+            }
+
+            h2 {
+                color: var(--primary-color);
+                border-bottom: 3px solid var(--secondary-color);
+                padding-bottom: 15px;
+                margin-top: 0;
+                font-size: 28px;
+                font-weight: 700;
+            }
+
+            /* 菜單與購物車的容器：使用 Flexbox 讓兩欄並排 */
+            .menu-cart-container {
+                display: flex;
+                gap: 30px;
+                margin-top: 20px;
+            }
+
+            #menu-section {
+                flex: 3;
+                /* 佔 3 份空間 */
+                padding: 25px;
+            }
+
+            /* ---------------------------------------------------- */
+            /* --- 4. 輪播圖樣式 (滿版調整) --- */
+            /* 讓 #home 區塊衝出 main 的內距，達成視覺上的滿版 */
+            #home {
+                /* 衝出 main 的 20px 內距 */
+                margin-left: calc(-1 * var(--main-padding));
+                margin-right: calc(-1 * var(--main-padding));
+                width: calc(100% + (2 * var(--main-padding)));
+
+                /* 移除 section 預設的背景/陰影/圓角/內距 */
+                background-color: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+            }
+
+            /* 調整 #home 內的 H2 標題，使其恢復 main 的 20px 邊距對齊 */
+            #home h2 {
+                /* 恢復標題的 20px 內距 */
+                padding-left: var(--main-padding);
+                padding-right: var(--main-padding);
+                /* 由於 section 拿掉了 padding: 25px，需要自己加回來 */
+                padding-top: 25px;
+                padding-bottom: 15px;
+                border-bottom: 3px solid var(--secondary-color);
+                margin-top: 0;
+            }
+
+            #slideshow-container {
+                position: relative;
+                margin: 0;
+                /* 滿版後移除 auto margin */
+                overflow: hidden;
+                border-radius: 0;
+                /* 滿版後移除圓角 */
+                box-shadow: none;
+                /* 滿版後移除陰影 */
+                /* 輪播圖內容與頁面邊緣對齊 */
+            }
+
+            /* 新增：輪播圖標題顯示區塊 */
+            #slide-title-display {
+                text-align: center;
+                padding: 15px 20px;
+                margin-top: 15px;
+                background-color: var(--secondary-color);
+                /* 陽光橘背景 */
+                color: var(--text-dark);
+                font-size: 24px;
+                font-weight: 700;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                letter-spacing: 1px;
+
+                /* 調整邊距，使其與主內容對齊 */
+                margin-left: var(--main-padding);
+                margin-right: var(--main-padding);
+            }
+
+            .slide {
+                display: none;
+                width: 100%;
+                height: 1250px;
+                /* <--- 輪播圖【桌面版】高度設定 */
+                animation: slideFade 1.0s;
+            }
+
+            .slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            @keyframes slideFade {
+                from {
+                    opacity: 0.7
+                }
+
+                to {
+                    opacity: 1
+                }
+            }
+
+            /* 導航箭頭 */
+            .prev,
+            .next {
+                cursor: pointer;
+                position: absolute;
+                top: 50%;
+                width: auto;
+                padding: 20px;
+                margin-top: -30px;
+                color: white;
+                font-weight: bold;
+                font-size: 24px;
+                transition: background-color 0.4s ease;
+                border-radius: 0 8px 8px 0;
+                user-select: none;
+                background-color: rgba(0, 0, 0, 0.4);
+            }
+
+            .next {
+                right: 0;
+                border-radius: 8px 0 0 8px;
+            }
+
+            .prev:hover,
+            .next:hover {
+                background-color: rgba(0, 0, 0, 0.7);
+            }
+
+            /* ---------------------------------------------------- */
+
+
+            /* --- 5. 菜單與頁籤 (Tabs) --- */
+            .tab-buttons {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .tab-btn {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                border-radius: 10px;
+                margin: 8px 8px;
+                font-weight: 600;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .tab-btn:hover {
+                background-color: var(--secondary-color);
+                transform: translateY(-2px);
+            }
+
+            .tab-btn.active {
+                background-color: var(--accent-color);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                transform: translateY(0);
+            }
+
+            /* 菜單項目網格 */
+            #menu-content-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                /* 響應式網格 */
+                gap: 25px;
+            }
+
+            .menu-item {
+                background-color: var(--text-light);
+                border: 1px solid #e0e0e0;
+                border-radius: 12px;
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.4s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .menu-item:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .item-image {
+                width: 100%;
+                height: 220px;
+                overflow: hidden;
+            }
+
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s;
+            }
+
+            .menu-item:hover .item-image img {
+                transform: scale(1.1);
+            }
+
+            .item-details {
+                padding: 10px;
+                flex-grow: 1;
+                /* 讓所有卡片高度一致 */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .item-details h3 {
+                margin-top: 0;
+                color: var(--primary-color);
+                font-size: 20px;
+                font-weight: 600;
+            }
+
+            .item-details p {
+                margin: 5px 0 15px 0;
+                font-size: 15px;
+                color: #6c757d;
+                flex-grow: 1;
+            }
+
+            .item-details span {
+                font-size: 22px;
+                font-weight: 700;
+                color: var(--accent-color);
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            .add-to-cart-btn {
+                width: 100%;
+                background-color: var(--secondary-color);
+                color: var(--text-dark);
+                border: none;
+                padding: 12px;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: background-color 0.3s ease, box-shadow 0.2s ease;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .add-to-cart-btn:hover {
+                background-color: #e69514;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            /* 競品參考子頁籤樣式 */
+            .sub-menu-tabs {
+                border-bottom: 2px solid #ddd;
+                margin-bottom: 20px;
+            }
+
+            .sub-tab-btn {
+                background-color: #f0f0f0;
+                color: var(--text-dark);
+                border: none;
+                padding: 10px 18px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                border-radius: 8px 8px 0 0;
+                margin-right: 5px;
+                font-weight: 500;
+            }
+
+            .sub-tab-btn:hover,
+            .sub-tab-btn.sub-active {
+                background-color: var(--primary-color);
+                color: var(--text-light);
+            }
+
+            .sub-menu-content {
+                display: none;
+            }
+
+            .sub-menu-content.sub-active {
+                display: block;
+            }
+
+            .menu-card {
+                background-color: #fffaf0;
+                /* 奶油色背景 */
+                border-left: 5px solid var(--secondary-color);
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            }
+
+            .menu-info h4 {
+                float: left;
+                margin: 0;
+                color: var(--primary-color);
+                font-size: 18px;
+            }
+
+            .menu-price {
+                float: right;
+                font-weight: bold;
+                color: var(--accent-color);
+                font-size: 18px;
+            }
+
+            /* --- 6. 購物車樣式 --- */
+            #cart-section {
+                flex: 1;
+                /* 佔 1 份空間 */
+                padding: 25px;
+                border: 1px solid #f0f0f0;
+                border-radius: 12px;
+                background-color: #ffffff;
+            }
+
+            #cart-items {
+                list-style: none;
+                padding: 0;
+                margin-top: 15px;
+            }
+
+            #cart-items li {
+                border-bottom: 1px solid #f0f0f0;
+                padding: 10px 0;
+                font-size: 16px;
+                line-height: 1.4;
+                color: var(--text-dark);
+                overflow: hidden;
+            }
+
+            .remove-item-btn {
+                float: right;
+                background: none;
+                border: 1px solid var(--accent-color);
+                color: var(--accent-color);
+                cursor: pointer;
+                font-size: 14px;
+                line-height: 1;
+                padding: 4px 8px;
+                border-radius: 5px;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+            .remove-item-btn:hover {
+                background-color: var(--accent-color);
+                color: var(--text-light);
+            }
+
+            #total-price {
+                font-size: 24px;
+                font-weight: bold;
+                margin-top: 20px;
+                padding-top: 15px;
+                border-top: 2px solid var(--secondary-color);
+                color: var(--primary-color);
+            }
+
+            /* 結帳按鈕樣式 */
+            #cart-section .checkout-btn {
+                background-color: var(--primary-color);
+                color: var(--text-light);
+            }
+
+            #cart-section .checkout-btn:hover {
+                background-color: #0056a0;
+            }
+
+            /* 清空購物車按鈕樣式 */
+            .clear-cart-btn {
+                background-color: var(--accent-color);
+                color: var(--text-light);
+                border: none;
+                padding: 12px;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: background-color 0.3s ease, box-shadow 0.2s ease;
+                font-weight: bold;
+                font-size: 16px;
+            }
+
+            .clear-cart-btn:hover {
+                background-color: #c0392b;
+                /* Darker red */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+
+            /* --- 7. 評價區塊 (五星評價) --- */
+            .rating-stars {
+                display: inline-block;
+                cursor: pointer;
+                font-size: 36px;
+                letter-spacing: 5px;
+            }
+
+            .rating-stars .star {
+                color: #ccc;
+                transition: color 0.3s;
+            }
+
+            .rating-stars .star.active {
+                color: gold;
+                text-shadow: 0 0 8px var(--secondary-color);
+            }
+
+            #submit-rating {
+                margin-left: 20px;
+                width: auto !important;
+                padding: 10px 20px !important;
+                font-size: 15px !important;
+                background-color: #28a745;
+                /* 綠色 */
+                color: white;
+            }
+
+            #submit-rating:hover {
+                background-color: #1e7e34;
+            }
+
+            #rating-feedback {
+                margin-top: 15px;
+                padding: 15px;
+                border-radius: 8px;
+                background-color: #d4edda;
+                /* 綠色淡背景 */
+                color: #155724;
+                border: 1px solid #c3e6cb;
+                display: none;
+                font-weight: 500;
+            }
+
+            /* --- 8. Toast 訊息 (position & animation) --- */
+            #toast {
+                visibility: hidden;
+                min-width: 280px;
+                background-color: var(--bg-dark);
+                color: var(--text-light);
+                text-align: center;
+                border-radius: 8px;
+                padding: 18px;
+                position: fixed;
+                z-index: 1001;
+                left: 50%;
+                top: 50px;
+                transform: translateX(-50%);
+                font-size: 18px;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            }
+
+            #toast.show {
+                visibility: visible;
+                animation: fadeIn 0.4s, fadeOut 0.4s 2.6s;
+            }
+
+            /* Toast 進場動畫 (使用 transition) */
+            @keyframes fadeIn {
+                from {
+                    top: 0px;
+                    opacity: 0;
+                }
+
+                to {
+                    top: 50px;
+                    opacity: 1;
+                }
+            }
+
+            /* Toast 退場動畫 */
+            @keyframes fadeOut {
+                from {
+                    opacity: 1;
+                }
+
+                to {
+                    opacity: 0;
+                }
+            }
+
+            /* --- 9. 底部與響應式設計 (RWD) --- */
+            footer {
+                background-color: var(--bg-dark);
+                color: var(--text-light);
+                text-align: center;
+                padding: 20px;
+                margin-top: 40px;
+            }
+
+            /* RWD 響應式設計：小於 1024px 時 (垂直堆疊) */
+            @media (max-width: 1024px) {
+                .menu-cart-container {
+                    flex-direction: column;
+                    /* 轉為垂直堆疊 */
+                }
+
+                #menu-section,
+                #cart-section {
+                    flex: none;
+                    width: 100%;
+                }
+            }
+
+            /* RWD 響應式設計：小於 768px 時 (手機版下拉選單) */
+            @media (max-width: 768px) {
+
+                /* 確保手機版輪播圖仍是滿版 */
+                #home {
+                    margin-left: calc(-1 * var(--main-padding));
+                    margin-right: calc(-1 * var(--main-padding));
+                    width: calc(100% + (2 * var(--main-padding)));
+                }
+
+                header {
+                    flex-direction: column;
+                    height: auto;
+                    padding-top: 10px;
+                    padding-bottom: 0;
+                    position: relative;
+                    /* RWD 時取消固定導覽列 */
+                }
+
+                body {
+                    padding-top: 0;
+                    /* 移除原本固定的 padding */
+                }
+
+                /* 讓 logo 和 hamburger 處於同一行 */
+                .header-content {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0 10px 10px 10px;
+                }
+
+                .logo {
+                    font-size: 28px;
+                }
+
+                /* 顯示漢堡按鈕 */
+                .hamburger-btn {
+                    display: block;
+                    transition: transform 0.3s;
+                }
+
+                /* 導航區塊：控制下拉選單的顯示/隱藏 */
+                nav {
+                    width: 100%;
+                    max-height: 0;
+                    /* 預設隱藏，高度為 0 */
+                    overflow: hidden;
+                    transition: max-height 0.4s ease-in-out;
+                    background-color: rgba(0, 0, 0, 0.2);
+                }
+
+                nav.show-menu {
+                    max-height: 300px;
+                    /* 展開選單 */
+                    padding-bottom: 10px;
+                }
+
+                /* 導航列表：垂直堆疊 */
+                nav ul {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0;
+                }
+
+                nav ul li {
+                    display: block;
+                    width: 90%;
+                    text-align: center;
+                }
+
+                nav ul li a {
+                    display: block;
+                    padding: 12px 20px;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    margin-bottom: 5px;
+                    /* 移除向上微移效果 */
+                    transform: none;
+                }
+
+
+                .slide {
+                    height: 250px;
+                    /* <--- 輪播圖【手機版】高度設定 */
+                }
+
+                #slide-title-display {
+                    font-size: 18px;
+                    /* 手機上縮小字體 */
+                    padding: 12px 15px;
+                }
+
+                .tab-btn {
+                    padding: 10px 15px;
+                    margin: 5px 3px;
+                }
+
+                /* 調整菜單網格在手機上的顯示 */
+                #menu-content-container {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* --- 10. 滾動特效 (Scroll Reveal) --- */
+            @keyframes scrollReveal {
+                0% {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* 依序套用延遲動畫到主要區塊 */
+            #home {
+                animation-delay: 0s;
+            }
+
+            .menu-cart-container #menu-section {
+                animation-delay: 0.2s;
+            }
+
+            .menu-cart-container #cart-section {
+                animation-delay: 0.4s;
+            }
+
+            .menu-cart-container+section {
+                animation-delay: 0.6s;
+            }
+
+            /* 競品參考 */
+            .menu-cart-container+section+section {
+                animation-delay: 0.9s;
+            }
+
+            /* YouTube */
+            #contact-section {
+                animation-delay: 1.2s;
+            }
+
+            #rating-section {
+                animation-delay: 1.5s;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <header>
+            <div class="header-content">
+                <div class="logo">晨光早午餐</div>
+                <!-- 漢堡選單按鈕，僅在手機版顯示 -->
+                <button class="hamburger-btn" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+
+            <nav id="main-nav">
+                <ul id="main-nav-list">
+                    <li><a href="#home" onclick="toggleMenu(true)">首頁</a></li>
+                    <li><a href="#menu-section" onclick="toggleMenu(true)">菜單</a></li>
+                    <li><a href="#contact-section" onclick="toggleMenu(true)">聯絡我們</a></li>
+                    <li><a href="#rating-section" onclick="toggleMenu(true)">評價</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 輪播圖 (Slideshow) -->
+            <section id="home">
+                <!-- H2 標題已調整樣式，使其與 main 內容對齊 -->
+                <h2>🌞 今日特選</h2>
+                <div id="slideshow-container">
+                    <div class="slide">
+                        <img src="images(晨光美食)/韓式風味新品.jpg" alt="韓式風味新品">
+                    </div>
+
+                    <div class="slide">
+                        <img src="images(晨光美食)/經典台味鍋燒麵★溫暖上桌.jpg" alt="經典台味鍋燒麵★溫暖上桌">
+                    </div>
+
+                    <div class="slide">
+                        <img src="images(晨光美食)/活力套餐.jpg" alt="活力套餐">
+                    </div>
+
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+                </div>
+
+                <!-- 新品名稱顯示位置 (已調整邊距，使其與 main 內容對齊) -->
+                <div id="slide-title-display"></div>
+            </section>
+
+            <!-- 菜單與購物車容器 -->
+            <div class="menu-cart-container">
+
+                <section id="menu-section">
+                    <h2>🍽️ 美味菜單</h2>
+
+                    <!-- 頁籤按鈕 -->
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="openMenu(event, 'C0_ALL')">全部 (27項)</button>
+                        <button class="tab-btn" onclick="openMenu(event, 'C1_MAIN_DISH')">主餐/麵食 (6項)</button>
+                        <button class="tab-btn" onclick="openMenu(event, 'C2_EGG_TOAST')">蛋餅/漢堡 (12項)</button>
+                        <button class="tab-btn" onclick="openMenu(event, 'C4_SWEET_TOAST')">果醬/甜味吐司 (2項)</button>
+                        <button class="tab-btn" onclick="openMenu(event, 'C3_DRINKS_SNACKS')">飲品/點心 (7項)</button>
+                    </div>
+
+                    <!-- 菜單內容容器 -->
+                    <div id="menu-content-container">
+                        <!-- 菜單卡片將被 JavaScript 插入此處 -->
+                    </div>
+                </section>
+
+                <!-- 購物車 -->
+                <section id="cart-section">
+                    <h2>🛒 您的訂單</h2>
+                    <ul id="cart-items">
+                        <!-- 購物車項目將在此處動態插入 -->
+                    </ul>
+                    <div id="total-price">總計: NT$ 0</div>
+
+                    <!-- 清空/結帳按鈕群組 -->
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="add-to-cart-btn checkout-btn" onclick="checkout()" style="flex: 1;">立即結帳</button>
+                        <button class="clear-cart-btn" onclick="clearCart()" style="flex: 1;">清空購物車</button>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- 競品參考區塊 -->
+            <section>
+                <h2>📋 競品菜單參考 (Qburger/La Morning)</h2>
+
+                <!-- 菜單分類按鈕 -->
+                <div class="sub-menu-tabs">
+                    <button class="sub-tab-btn sub-active"
+                        onclick="openSubCategory(event, 'sub-set-menu')">經典套餐</button>
+                    <button class="sub-tab-btn" onclick="openSubCategory(event, 'sub-sandwich')">吐司/漢堡</button>
+                    <button class="sub-tab-btn" onclick="openSubCategory(event, 'sub-egg-wrap')">蛋餅/抓餅</button>
+                    <button class="sub-tab-btn" onclick="openSubCategory(event, 'sub-drink')">飲品</button>
+                </div>
+
+                <!-- 1. 經典套餐 -->
+                <div id="sub-set-menu" class="sub-menu-content sub-active">
+                    <h3>經典套餐 (SET MENU)</h3>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>Qburger 活力組合餐</h4><span class="menu-price">NT$ 75-89</span>
+                            <p>（Qburger 參考）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>La Morning 歐姆蛋捲套餐</h4><span class="menu-price">NT$ 95</span>
+                            <p>（La Morning 參考）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>法式吐司經典套餐</h4><span class="menu-price">NT$ 45-60</span>
+                            <p>（兩者皆有類似）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 吐司/漢堡 -->
+                <div id="sub-sandwich" class="sub-menu-content">
+                    <h3>吐司/漢堡 (TOAST/BURGER)</h3>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>招牌總匯三明治</h4><span class="menu-price">NT$ 50-65</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>經典豬肉漢堡/吐司</h4><span class="menu-price">NT$ 40-55</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>烤肉蛋吐司/漢堡</h4><span class="menu-price">NT$ 50-65</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 蛋餅/抓餅 -->
+                <div id="sub-egg-wrap" class="sub-menu-content">
+                    <h3>蛋餅/抓餅 (EGG PANCAKE/WRAP)</h3>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>原味/玉米蛋餅</h4><span class="menu-price">NT$ 30-45</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>培根蛋餅/抓餅</h4><span class="menu-price">NT$ 45-50</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>蘿蔔糕/鍋燒麵</h4><span class="menu-price">NT$ 35-90</span>
+                            <p>（Qburger, La Morning 都有相似）</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 飲品 -->
+                <div id="sub-drink" class="sub-menu-content">
+                    <h3>飲品 (DRINKS)</h3>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>經典紅茶/奶茶</h4><span class="menu-price">NT$ 25-40</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>研磨咖啡/拿鐵</h4><span class="menu-price">NT$ 45-70</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                    <div class="menu-card clearfix">
+                        <div class="menu-info clearfix">
+                            <h4>鮮奶/豆漿/米漿</h4><span class="menu-price">NT$ 35-50</span>
+                            <p>（兩者皆有）</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🎥 競品參考影片</h2>
+                <p style="text-align: center; color: #6c757d; font-style: italic;">--- 參考 晨間廚房早餐店介紹 (MP4 示範) ---</p>
+                <div class="video-container" style="margin-top: 20px;">
+                    <video controls loop
+                        style="width: 100%; height: auto; display: block; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);"
+                        title="競品參考 MP4 影片">
+
+                        <source src="media(晨光美食)/晨間廚房 .mp4" type="video/mp4">
+
+                    </video>
+                </div>
+            </section>
+
+            <!-- 聯絡我們 (Email 模擬 -> 實際 Mailto) -->
+            <section id="contact-section">
+                <h2>📧 聯絡我們</h2>
+                <form id="contact-form">
+                    <label for="name" style="display: block; margin-bottom: 5px; font-weight: 500;">姓名:</label>
+                    <input type="text" id="name" name="name" required
+                        style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+
+                    <label for="email" style="display: block; margin-bottom: 5px; font-weight: 500;">Email:</label>
+                    <input type="email" id="email" name="email" required
+                        style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+
+                    <label for="message" style="display: block; margin-bottom: 5px; font-weight: 500;">訊息:</label>
+                    <textarea id="message" name="message" required
+                        style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 6px; height: 120px; font-size: 16px;"></textarea>
+
+                    <button type="submit" class="add-to-cart-btn"
+                        style="background-color: var(--primary-color); color: white;">送出訊息 (寄Email)</button>
+                </form>
+            </section>
+
+            <!-- 評價區塊 -->
+            <section id="rating-section">
+                <h2>⭐️ 顧客評價</h2>
+                <p style="color: #6c757d; margin-bottom: 15px;">請為我們的服務和產品評分：</p>
+                <div style="display: flex; align-items: center;">
+                    <div class="rating-stars" id="rating-stars">
+                        <span class="star" data-score="1">&#9733;</span>
+                        <span class="star" data-score="2">&#9733;</span>
+                        <span class="star" data-score="3">&#9733;</span>
+                        <span class="star" data-score="4">&#9733;</span>
+                        <span class="star" data-score="5">&#9733;</span>
+                    </div>
+                    <input type="hidden" id="rating-input" value="0">
+                    <button class="add-to-cart-btn" id="submit-rating">送出評分</button>
+                </div>
+                <div id="rating-feedback"></div>
+            </section>
+
+        </main>
+
+        <footer>
+            &copy; 2025 晨光早午餐 | 期末報告專案
+        </footer>
+
+        <!-- Toast 提示訊息框 -->
+        <div id="toast"></div>
+
+        <script>
+            // 定義菜單產品數據 (共27項，已分類到 C1, C2, C3, C4)
+            const menuItems = [{
+                id: 1,
+                name: "經典香草豬肉堡",
+                price: 55,
+                description: "經典漢堡，搭配香草豬肉排與滑嫩煎蛋。",
+                imgSrc: "images(晨光美食)/經典香草豬肉堡.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 2,
+                name: "厚切牛肉起司丹麥堡",
+                price: 75,
+                description: "招牌必點！厚切牛肉搭配濃郁起司片。",
+                imgSrc: "images(晨光美食)/厚切牛肉起司丹麥堡.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 3,
+                name: "義式香料雞腿堡",
+                price: 80,
+                description: "鮮嫩雞腿肉以義式香料醃製，風味絕佳。",
+                imgSrc: "images(晨光美食)/義式香料雞腿堡.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 4,
+                name: "黃金卡拉雞腿堡",
+                price: 70,
+                description: "外酥內嫩的卡拉雞腿排，可選微辣。",
+                imgSrc: "images(晨光美食)/黃金卡拉雞腿堡.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 5,
+                name: "阿拉斯加鱈魚堡",
+                price: 65,
+                description: "清爽鮪魚沙拉搭，健康選擇。",
+                imgSrc: "images(晨光美食)/阿拉斯加鱈魚堡.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 6,
+                name: "里肌豬排總匯吐司",
+                price: 85,
+                description: "三層豪華，含里肌豬排、火腿、生菜、蛋。",
+                imgSrc: "images(晨光美食)/里肌豬排總匯吐司.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 7,
+                name: "招牌肉鬆蛋吐司",
+                price: 45,
+                description: "台灣傳統美味，鬆軟肉鬆搭配煎蛋。",
+                imgSrc: "images(晨光美食)/招牌肉鬆蛋吐司.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 8,
+                name: "香雞排吐司",
+                price: 55,
+                description: "大塊香雞排夾入吐司，飽足感十足。",
+                imgSrc: "images(晨光美食)/香雞排吐司.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 9,
+                name: "經典原味蛋餅",
+                price: 25,
+                description: "最基本的美味，酥脆餅皮與蛋香。",
+                imgSrc: "images(晨光美食)/經典原味蛋餅.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 10,
+                name: "黃金玉米蛋餅",
+                price: 40,
+                description: "香甜玉米粒，小朋友的最愛。",
+                imgSrc: "images(晨光美食)/黃金玉米蛋餅.jpg",
+                category: "C2_EGG_TOAST"
+            },
+            {
+                id: 11,
+                name: "鮪魚玉米蛋餅",
+                price: 55,
+                description: "經典鮪魚內餡，搭配香濃起司。",
+                imgSrc: "images(晨光美食)/鮪魚玉米蛋餅.jpg",
+                category: "C2_EGG_TOAST"
+            },
+
+
+            {
+                id: 12,
+                name: "九層塔香抓餅",
+                price: 60,
+                description: "濃郁九層塔香氣，餅皮Q彈有嚼勁。",
+                imgSrc: "images(晨光美食)/九層塔香抓餅.jpg",
+                category: "C2_EGG_TOAST"
+            },
+
+            {
+                id: 13,
+                name: "經典蘑菇鐵板麵",
+                price: 60,
+                description: "鐵板麵首選，滑順蘑菇醬，附煎蛋。",
+                imgSrc: "images(晨光美食)/經典蘑菇鐵板麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+            {
+                id: 14,
+                name: "黑胡椒里肌鐵板麵",
+                price: 75,
+                description: "香辣黑胡椒醬，搭配厚切里肌肉排。",
+                imgSrc: "images(晨光美食)/黑胡椒里肌鐵板麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+            {
+                id: 15,
+                name: "番茄肉醬義大利麵",
+                price: 80,
+                description: "酸甜番茄紅醬，經典肉醬風味。",
+                imgSrc: "images(晨光美食)/番茄肉醬義大利麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+            {
+                id: 16,
+                name: "奶油培根義大利麵",
+                price: 80,
+                description: "濃郁白醬，搭配香煎培根。",
+                imgSrc: "images(晨光美食)/奶油培根義大利麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+            {
+                id: 17,
+                name: "鮮蔬鍋燒麵",
+                price: 70,
+                description: "主廚把整座冬日的陽光熬進高湯，鰹魚鮮香霧氣撲鼻而來。",
+                imgSrc: "images(晨光美食)/鮮蔬鍋燒麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+            {
+                id: 18,
+                name: "里肌豬排鍋燒麵",
+                price: 85,
+                description: "以鮮蔬為底，豪邁投下完整原塊里肌豬排，內嫩的肉汁瞬間融進湯裡，滑嫩雞蛋輕輕包裹，輔以火鍋料Q彈點綴.",
+                imgSrc: "images(晨光美食)/里肌豬排鍋燒麵.jpg",
+                category: "C1_MAIN_DISH"
+            },
+
+            {
+                id: 19,
+                name: "酥烤花生煉乳厚片",
+                price: 40,
+                description: "甜味厚片，濃郁花生醬淋上香甜煉乳。",
+                imgSrc: "images(晨光美食)/酥烤花生煉乳厚片.jpg",
+                category: "C4_SWEET_TOAST"
+            },
+            {
+                id: 20,
+                name: "法式蜂蜜吐司",
+                price: 50,
+                description: "柔軟法式吐司煎烤至金黃，淋上蜂蜜。",
+                imgSrc: "images(晨光美食)/法式蜂蜜吐司.jpg",
+                category: "C4_SWEET_TOAST"
+            },
+
+            {
+                id: 21,
+                name: "手工蘿蔔糕",
+                price: 40,
+                description: "傳統風味，外酥內軟。",
+                imgSrc: "images(晨光美食)/手工蘿蔔糕.jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+
+
+            {
+                id: 22,
+                name: "美式脆薯",
+                price: 45,
+                description: "現炸酥脆，附番茄醬。",
+                imgSrc: "images(晨光美食)/美式脆薯.jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+            {
+                id: 23,
+                name: "黃金雞塊 (4塊)",
+                price: 50,
+                description: "酥脆多汁，點心經典。",
+                imgSrc: "images(晨光美食)/黃金雞塊 (4塊).jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+
+
+            {
+                id: 24,
+                name: "經典冰／熱奶茶",
+                price: 30,
+                description: "早午餐店必備，香濃滑順。",
+                imgSrc: "images(晨光美食)/經典冰／熱奶茶.jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+            {
+                id: 25,
+                name: "古早味紅茶",
+                price: 25,
+                description: "獨特麥香，台灣傳統風味。",
+                imgSrc: "images(晨光美食)/古早味紅茶.jpg",
+                category: "C3_DRINKS_SNACKS"
+            }, {
+                id: 26,
+                name: "美式冰咖啡",
+                price: 45,
+                description: "清爽提神，無糖。",
+                imgSrc: "images(晨光美食)/美式冰咖啡.jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+
+            {
+                id: 27,
+                name: "鮮榨柳橙汁",
+                price: 50,
+                description: "冰鎮鮮榨，清爽果香。",
+                imgSrc: "images(晨光美食)/鮮榨柳橙汁.jpg",
+                category: "C3_DRINKS_SNACKS"
+            },
+            ];
+
+            // 新增：輪播圖對應的標題列表
+            const slideTitles = [
+                "韓式風味新品",
+                "經典台味鍋燒麵★溫暖上桌",
+                "人氣推薦: 活力套餐"
+            ];
+
+            // 購物車狀態與輪播圖索引
+            let cart = [];
+            let slideIndex = 1;
+            let slideTimer;
+
+            // --- Toast 提示功能 ---
+            function showToast(message) {
+                const toast = document.getElementById("toast");
+                toast.innerText = message;
+                toast.className = "show"; // 觸發 CSS 動畫
+                // 3 秒後移除 show class (配合 CSS fadeOut 動畫)
+                setTimeout(() => toast.className = toast.className.replace("show", ""), 3000);
+            }
+
+            // --- 漢堡選單切換邏輯 (RWD 手機版) ---
+            function toggleMenu(isLinkClick = false) {
+                const navElement = document.getElementById('main-nav');
+                // 檢查是否為手機版
+                if (window.innerWidth <= 768) {
+                    // 如果是點擊選單內的連結或已經展開，則關閉
+                    if (isLinkClick || navElement.classList.contains('show-menu')) {
+                        navElement.classList.remove('show-menu');
+                    } else {
+                        // 點擊漢堡按鈕，則切換選單狀態
+                        navElement.classList.toggle('show-menu');
+                    }
+                }
+            }
+
+
+            // --- 菜單頁籤邏輯：切換顯示類別 ---
+            function openMenu(event, category) {
+                // 1. 更新按鈕 active class
+                document.querySelectorAll('.tab-buttons .tab-btn').forEach(btn => btn.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+
+                // 2. 渲染菜單內容
+                renderMenu(category);
+            }
+
+            // --- 動態渲染菜單項目 ---
+            function renderMenu(category = 'C0_ALL') {
+                const menuContent = document.getElementById('menu-content-container');
+                menuContent.innerHTML = ''; // 清空現有內容
+
+                // 根據類別篩選產品
+                const filteredItems = category === 'C0_ALL' ?
+                    menuItems :
+                    menuItems.filter(item => item.category === category);
+
+                if (filteredItems.length === 0) {
+                    menuContent.innerHTML =
+                        '<p style="text-align: center; grid-column: 1 / -1; color: #666; padding: 30px;">此分類目前沒有產品。</p>';
+                    return;
+                }
+
+                // 遍歷篩選後的產品並生成 HTML 結構 (使用簡潔的 map/join)
+                filteredItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'menu-item';
+                    // 使用樣板字串建立產品卡片 HTML
+                    // 根據使用者要求，已移除 onerror 圖片缺失備用機制
+                    itemDiv.innerHTML = `
+                        <div class="item-image">
+                            <img src="${item.imgSrc}" 
+                                 alt="${item.name}">
+                        </div>
+                        <div class="item-details">
+                            <h3>${item.name}</h3>
+                            <p>${item.description}</p>
+                            <span>NT$ ${item.price}</span>
+                            <button class="add-to-cart-btn" onclick="addToCart(${item.id})">加入購物車</button>
+                        </div>
+                    `;
+                    menuContent.appendChild(itemDiv);
+                });
+            }
+
+            // --- 競品參考子頁籤邏輯 ---
+            function openSubCategory(evt, subCategoryName) {
+                // 隱藏所有內容，並移除所有按鈕的 active 狀態
+                document.querySelectorAll(".sub-menu-content").forEach(el => el.classList.remove('sub-active'));
+                document.querySelectorAll(".sub-tab-btn").forEach(btn => btn.classList.remove('sub-active'));
+
+                // 顯示當前頁籤內容並激活按鈕
+                document.getElementById(subCategoryName).classList.add('sub-active');
+                evt.currentTarget.classList.add('sub-active');
+            }
+
+
+            // --- 購物車邏輯：加入商品 ---
+            function addToCart(itemId) {
+                const item = menuItems.find(i => i.id === itemId);
+                if (!item) return;
+
+                const existingItem = cart.find(c => c.id === itemId);
+
+                // 檢查商品是否已存在，若存在則數量+1，否則加入新項目
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({
+                        ...item,
+                        quantity: 1
+                    });
+                }
+
+                updateCartUI();
+                showToast(`已將 ${item.name} 加入購物車!`);
+            }
+
+            // --- 購物車邏輯：移除單一商品 ---
+            function removeItem(itemId) {
+                const index = cart.findIndex(c => c.id === itemId);
+                if (index !== -1) {
+                    const itemName = cart[index].name;
+                    cart.splice(index, 1);
+                    updateCartUI();
+                    showToast(`已移除 ${itemName}。`);
+                }
+            }
+
+            // --- 購物車邏輯：清空購物車 ---
+            function clearCart() {
+                if (cart.length === 0) {
+                    showToast("購物車已經是空的囉！");
+                    return;
+                }
+
+                cart = []; // 清空購物車陣列
+                updateCartUI(); // 更新介面
+                showToast("購物車已清空！");
+            }
+
+            // --- 更新購物車介面與計算總價 ---
+            function updateCartUI() {
+                const cartList = document.getElementById('cart-items');
+                const totalPriceDisplay = document.getElementById('total-price');
+                let total = 0;
+
+                // 使用 map/join 簡化列表渲染
+                const cartItemsHtml = cart.map(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    return `
+                        <li>
+                            ${item.name} <span style="color: var(--accent-color); font-weight: 700; margin-left: 5px;">x ${item.quantity}</span> - NT$ ${itemTotal}
+                            <button class="remove-item-btn" onclick="removeItem(${item.id})" title="移除">&#10005;</button>
+                        </li>
+                    `;
+                }).join(''); // 將陣列元素連接成單一字串
+
+                // 檢查購物車是否為空，並渲染內容
+                cartList.innerHTML = cart.length === 0 ?
+                    '<li style="text-align: center; color: #888;">購物車是空的</li>' :
+                    cartItemsHtml;
+
+                totalPriceDisplay.innerText = `總計: NT$ ${total}`;
+            }
+
+            // --- 購物車邏輯：結帳 ---
+            function checkout() {
+                if (cart.length === 0) {
+                    showToast("購物車是空的，請先加入產品！");
+                    return;
+                }
+                // 模擬結帳流程
+                showToast(`成功結帳！總金額: ${document.getElementById('total-price').innerText.replace('總計: ', '')}，感謝您的光臨！`);
+                cart = [];
+                updateCartUI();
+            }
+
+
+            // --- Email 表單 (實際 Mailto 寄信功能) ---
+            const contactForm = document.getElementById('contact-form');
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // 阻止表單預設提交
+
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+
+                const recipient = 'brunch@sunshine.com'; // 店家 Email
+                const subject = '【晨光早午餐】客戶聯絡訊息';
+
+                // 組合信件內容
+                const body = `姓名: ${name}\nEmail: ${email}\n\n訊息內容:\n${message}`;
+
+                // 構建 mailto 連結
+                const mailtoLink =
+                    `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                // 觸發開啟預設 Email 客戶端
+                window.location.href = mailtoLink;
+
+                showToast("已成功開啟您的 Email 應用程式，請點擊'寄出'完成發送。");
+                contactForm.reset();
+            });
+
+            // --- 五星評價邏輯：點擊星星 ---
+            const stars = document.querySelectorAll('.rating-stars .star');
+            const ratingInput = document.getElementById('rating-input');
+            const submitRatingBtn = document.getElementById('submit-rating');
+            const ratingFeedback = document.getElementById('rating-feedback');
+
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const score = parseInt(this.getAttribute('data-score'));
+                    ratingInput.value = score;
+
+                    // 點擊後更新星星 active 狀態
+                    stars.forEach((s, index) => {
+                        if (index < score) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // --- 五星評價邏輯：送出評分 (含Email通知) ---
+            submitRatingBtn.addEventListener('click', function () {
+                const score = parseInt(ratingInput.value);
+                if (score === 0) {
+                    showToast("請先點擊星星評分喔！");
+                    return;
+                }
+
+                // --- 新增：Mailto 寄送評價通知 ---
+                const recipient = 'brunch@sunshine.com'; // 店家 Email
+                const subject = `【晨光早午餐】客戶五星評分: ${score} 星`;
+                const body = `顧客送出 ${score} 星評分。請至您的Email程式完成發送。`;
+
+                const mailtoLink =
+                    `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+                // --- Mailto 結束 ---
+
+                // 顯示 Toast 提示和反饋訊息
+                ratingFeedback.style.display = "block";
+                ratingFeedback.innerText = `已送出 ${score} 星評價郵件通知！請至您的Email程式完成發送。`;
+
+                // 5 秒後清除評價狀態
+                setTimeout(() => {
+                    stars.forEach(s => s.classList.remove("active"));
+                    ratingInput.value = 0;
+                    ratingFeedback.style.display = "none";
+                }, 5000);
+            });
+
+            // --- 輪播圖邏輯：切換圖片 ---
+            function plusSlides(n) {
+                clearTimeout(slideTimer); // 清除舊的自動播放計時器
+                showSlides(slideIndex += n);
+            }
+
+            // --- 輪播圖邏輯：顯示圖片與設定自動播放 (已包含標題更新) ---
+            function showSlides(n) {
+                let slides = document.getElementsByClassName("slide");
+                const titleDisplay = document.getElementById('slide-title-display'); // 取得標題顯示元素
+
+                // 循環邏輯
+                if (n > slides.length) {
+                    slideIndex = 1
+                }
+                if (n < 1) {
+                    slideIndex = slides.length
+                }
+
+                // 隱藏所有圖片
+                for (let i = 0; i < slides.length; i++) {
+                    slides[i].style.display = "none";
+                }
+
+                // 顯示當前圖片
+                if (slides.length > 0) {
+                    slides[slideIndex - 1].style.display = "block";
+
+                    // --- 更新標題顯示 ---
+                    if (titleDisplay && slideTitles.length >= slideIndex) {
+                        titleDisplay.innerText = slideTitles[slideIndex - 1];
+                    }
+                } else {
+                    // 如果沒有圖片，清空標題
+                    if (titleDisplay) {
+                        titleDisplay.innerText = "目前無精選推薦";
+                    }
+                }
+
+                // 設定新的自動播放計時器 (5 秒)
+                slideTimer = setTimeout(() => showSlides(slideIndex += 1), 3000);
+            }
+
+            // --- 網頁載入完成後執行 ---
+            window.onload = function () {
+                // 初始化菜單顯示（顯示所有）
+                renderMenu('C0_ALL');
+
+                // 初始化購物車 UI
+                updateCartUI();
+
+                // 初始化輪播圖
+                if (document.getElementsByClassName("slide").length > 0) {
+                    showSlides(slideIndex);
+                } else {
+                    // 如果沒有輪播圖，確保標題顯示區塊為空
+                    const titleDisplay = document.getElementById('slide-title-display');
+                    if (titleDisplay) {
+                        titleDisplay.innerText = "目前無精選推薦";
+                    }
+                }
+            };
+
+            // 讓 JS 函數可以在 HTML 中被調用
+            window.openMenu = openMenu;
+            window.openSubCategory = openSubCategory;
+            window.addToCart = addToCart;
+            window.removeItem = removeItem;
+            window.clearCart = clearCart;
+            window.checkout = checkout;
+            window.plusSlides = plusSlides;
+            window.showSlides = showSlides;
+            window.toggleMenu = toggleMenu;
+        </script>
+    </body>
+
+</html>

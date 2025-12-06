@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>輕奢探索之旅 - 精選主題行程一覽</title>
+        <!-- 遵守規範：不使用外部連結。字體將使用系統預設的中文字體。 -->
+        <style>
+            /* ==================== 顏色與基礎設定 (Elegant Light Theme) ==================== */
+            :root {
+                /* 淺色漸變主色 */
+                --bg-start: #E0F7FA;
+                /* 極淺青 */
+                --bg-end: #FFFFFF;
+                /* 純白 */
+
+                /* 品牌強調色 */
+                --primary-medium: #00897B;
+                /* 薄荷青 (主要強調色) */
+                --primary-dark: #004D40;
+                /* 深青 (Logo/標題文字) */
+                --accent-color: #FFB300;
+                /* 暖黃 (亮點/價格) */
+
+                /* 文字與背景色 */
+                --text-dark: #263238;
+                /* 深灰 (主要文字) */
+                --text-muted: #78909C;
+                /* 次要文字 */
+                --card-bg: #FFFFFF;
+                /* 卡片背景 */
+                --border-color: #B2DFDB;
+                /* 淺青邊框 */
+                --highlight-bg: #F0FDF4;
+                /* 輕微突出背景 */
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                /* 使用系統字體，優先選擇支援繁體中文的字體 */
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+                box-sizing: border-box;
+            }
+
+            body {
+                /* 淺色漸變背景 */
+                background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+                color: var(--text-dark);
+                line-height: 1.7;
+                min-height: 100vh;
+            }
+
+            a {
+                text-decoration: none;
+                color: var(--primary-medium);
+                transition: color 0.3s;
+            }
+
+            a:hover {
+                color: var(--primary-dark);
+            }
+
+            .container {
+                width: 95%;
+                max-width: 1300px;
+                margin: 0 auto;
+                padding-top: 20px;
+                clear: both;
+            }
+
+            /* ==================== 頂部導覽列 (Header) ==================== */
+            .header {
+                background-color: var(--card-bg);
+                padding: 15px 0;
+                border-bottom: 3px solid var(--primary-medium);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+
+            .logo {
+                float: left;
+                font-weight: 700;
+                font-size: 2.2em;
+                color: var(--primary-dark);
+                line-height: 30px;
+            }
+
+            /* ==================== 跑馬燈 (Marquee) Style (新增) ==================== */
+            .marquee-wrapper {
+                background-color: var(--accent-color);
+                /* 暖黃背景 */
+                color: var(--text-dark);
+                padding: 10px 0;
+                overflow: hidden;
+                /* 確保內容超出時被隱藏 */
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                white-space: nowrap;
+                /* 確保內容不換行 */
+            }
+
+            .marquee-content {
+                display: flex;
+                /* 使用 flexbox 處理內容重複與對齊 */
+                width: 200%;
+                /* 設置寬度為兩倍，以實現無縫循環 */
+                animation: scroll-left 25s linear infinite;
+                /* 線性、無限循環捲動 */
+                font-weight: 700;
+                font-size: 1.1em;
+                align-items: center;
+            }
+
+            .marquee-content span {
+                width: 50%;
+                /* 每個內容副本佔據 50% 寬度 */
+                text-align: center;
+                padding: 0 30px;
+                /* 增加內容間距 */
+            }
+
+            @keyframes scroll-left {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    /* 移動內容寬度的一半 (即一個 span 的寬度) */
+                    transform: translateX(-50%);
+                }
+            }
+
+            /* ==================== 標題與佈局 ==================== */
+            .page-header {
+                padding: 25px 0 10px 0;
+            }
+
+            .main-title {
+                font-size: 2.8em;
+                font-weight: 700;
+                color: var(--primary-dark);
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+                color: var(--text-muted);
+                margin-bottom: 25px;
+            }
+
+            /* 兩欄式佈局 */
+            #main-content {
+                padding: 10px 0;
+            }
+
+            #sidebar {
+                float: left;
+                width: 260px;
+                margin-right: 30px;
+                padding: 20px;
+                background-color: var(--card-bg);
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                border: 1px solid var(--border-color);
+            }
+
+            #itinerary-area {
+                margin-left: 290px;
+            }
+
+            .clearfix::after {
+                content: "";
+                clear: both;
+                display: table;
+            }
+
+            /* ==================== 側邊欄元件樣式 ==================== */
+            .filter-group {
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 1px dashed var(--border-color);
+            }
+
+            .filter-group h4 {
+                font-size: 1.4em;
+                color: var(--primary-medium);
+                margin-bottom: 15px;
+                font-weight: 500;
+                border-left: 4px solid var(--accent-color);
+                padding-left: 10px;
+            }
+
+            .filter-option {
+                font-size: 1em;
+                color: var(--text-dark);
+                padding: 10px 10px;
+                cursor: pointer;
+                transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+                border-radius: 8px;
+                margin: 5px 0;
+                border: 1px solid transparent;
+            }
+
+            .filter-option:hover {
+                background-color: var(--bg-start);
+                color: var(--primary-dark);
+                font-weight: 500;
+                transform: translateX(5px);
+                border-color: var(--primary-medium);
+                box-shadow: 0 2px 5px rgba(0, 137, 123, 0.2);
+            }
+
+            /* YouTube 影片區塊 */
+            .video-container {
+                position: relative;
+                width: 100%;
+                padding-bottom: 56.25%;
+                /* 16:9 比例 */
+                height: 0;
+                overflow: hidden;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .video-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            /* ==================== 行程卡片 (Card) & Grid Style ==================== */
+            .itinerary-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+                gap: 25px;
+            }
+
+            /* 隱藏詳細行程時顯示卡片網格 */
+            #itinerary-list.hidden {
+                display: none;
+            }
+
+            .itinerary-card {
+                background-color: var(--card-bg);
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s;
+                border: 1px solid var(--border-color);
+                position: relative;
+                cursor: pointer;
+                /* 加上點擊手勢 */
+            }
+
+            .itinerary-card:hover {
+                transform: translateY(-10px) scale(1.02);
+                box-shadow: 0 15px 40px rgba(0, 137, 123, 0.3);
+                border-color: var(--primary-medium);
+            }
+
+            /* 卡片內部樣式 */
+            .card-image-section {
+                width: 100%;
+                height: 250px;
+                /* 統一圖片高度 */
+                overflow: hidden;
+            }
+
+            .card-image-section img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                /* 保持圖片比例並填滿空間 */
+                transition: transform 0.5s;
+            }
+
+            .itinerary-card:hover .card-image-section img {
+                transform: scale(1.05);
+            }
+
+            .rating-tag {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background-color: var(--primary-medium);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 999px;
+                font-weight: bold;
+                font-size: 0.9em;
+                z-index: 10;
+            }
+
+            .card-info-section {
+                padding: 20px;
+            }
+
+            .card-info-section h3 {
+                font-size: 1.5em;
+                color: var(--primary-dark);
+                margin-bottom: 10px;
+                line-height: 1.4;
+            }
+
+            .card-meta {
+                font-size: 0.9em;
+                color: var(--text-muted);
+                margin-bottom: 10px;
+            }
+
+            .card-description {
+                font-size: 1em;
+                color: var(--text-dark);
+                height: 50px;
+                /* 固定描述高度 */
+                overflow: hidden;
+                margin-bottom: 15px;
+            }
+
+            .price-group {
+                border-top: 1px solid var(--border-color);
+                padding-top: 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .price-label {
+                font-size: 0.9em;
+                color: var(--text-muted);
+            }
+
+            .price {
+                font-size: 1.6em;
+                font-weight: 700;
+                color: var(--accent-color);
+            }
+
+            /* ==================== 詳細行程 (Detail View) Style ==================== */
+            #itinerary-detail {
+                display: none;
+                /* 預設隱藏 */
+                padding: 30px;
+                background-color: var(--card-bg);
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                border: 1px solid var(--border-color);
+            }
+
+            #itinerary-detail.active {
+                display: block;
+            }
+
+            .detail-header {
+                border-bottom: 3px solid var(--primary-medium);
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .detail-header h2 {
+                font-size: 2em;
+                color: var(--primary-dark);
+                margin: 0;
+            }
+
+            #back-to-list {
+                background-color: var(--accent-color);
+                color: var(--text-dark);
+                padding: 10px 18px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background-color 0.3s;
+            }
+
+            #back-to-list:hover {
+                background-color: #FDD835;
+                /* 淺一點的黃色 */
+            }
+
+            /* 每日行程列表 */
+            .day-list {
+                list-style: none;
+            }
+
+            .day-item {
+                background-color: var(--highlight-bg);
+                /* 淺綠色突出背景 */
+                border-left: 5px solid var(--primary-medium);
+                border-radius: 8px;
+                padding: 18px 25px;
+                margin-bottom: 15px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+
+            .day-item h4 {
+                font-size: 1.3em;
+                color: var(--primary-dark);
+                margin-bottom: 8px;
+            }
+
+            .day-item p {
+                color: var(--text-dark);
+                margin: 0;
+            }
+
+            /* ==================== 響應式設計 (Mobile Adaption) ==================== */
+            @media (max-width: 900px) {
+
+                /* 兩欄變一欄 */
+                #sidebar {
+                    float: none;
+                    width: 100%;
+                    margin-right: 0;
+                    margin-bottom: 20px;
+                }
+
+                #itinerary-area {
+                    margin-left: 0;
+                }
+
+                /* 卡片調整為一欄，並調整最小寬度 */
+                .itinerary-grid {
+                    grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+
+                .card-image-section {
+                    height: 200px;
+                }
+
+                .main-title {
+                    font-size: 2em;
+                }
+            }
+
+            /* ==================== 腳註區塊 (Footer) ==================== */
+            .footer {
+                background-color: var(--primary-medium);
+                color: white;
+                text-align: center;
+                padding: 20px 0;
+                margin-top: 50px;
+                clear: both;
+            }
+
+            /* 彈窗樣式 (與前一個版本相同) */
+            #message-modal {
+                transition: opacity 0.3s, visibility 0.3s;
+                opacity: 0;
+                visibility: hidden;
+                background-color: rgba(0, 0, 0, 0.5);
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 2000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #message-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .modal-content {
+                background-color: var(--card-bg) !important;
+                padding: 30px;
+                border-radius: 12px;
+                width: 85%;
+                max-width: 550px;
+                text-align: center;
+                box-shadow: 0 0 25px rgba(0, 137, 123, 0.4);
+            }
+
+            .modal-content h4 {
+                color: var(--primary-dark) !important;
+                border-bottom: 2px solid var(--accent-color);
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                font-size: 1.6em;
+            }
+
+            .modal-content p {
+                color: var(--text-dark) !important;
+                margin-bottom: 25px;
+                white-space: pre-wrap;
+                text-align: left;
+                line-height: 1.8;
+            }
+
+            .modal-content button {
+                background-color: var(--primary-medium) !important;
+                color: white !important;
+                transition: background-color 0.3s;
+                padding: 10px 25px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+
+            .modal-content button:hover {
+                background-color: var(--primary-dark) !important;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <!-- 頂部導覽列 -->
+        <header class="header">
+            <div class="container clearfix">
+                <h2 class="logo">🍃 輕奢探索之旅 Elite Explorer</h2>
+            </div>
+        </header>
+
+        <!-- 新增：跑馬燈區塊 (Marquee) -->
+        <div class="marquee-wrapper">
+            <div class="marquee-content">
+                <!-- 內容重複兩次以實現無縫循環效果 -->
+                <span>🎉 限時促銷：所有國際線路享第二人半價！立刻搶購！諮詢專線：0800-XXX-XXX 🎉 &nbsp; &nbsp; &nbsp; &nbsp; </span>
+                <span>🎉 限時促銷：所有國際線路享第二人半價！立刻搶購！諮詢專線：0800-XXX-XXX 🎉 &nbsp; &nbsp; &nbsp; &nbsp; </span>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- 頁面標題 -->
+            <section class="page-header">
+                <h1 class="main-title">全球深度路線與特色主題</h1>
+                <p class="subtitle">— 專業策劃，帶您體驗與眾不同的高品質旅程 —</p>
+            </section>
+
+            <!-- 主內容區塊：側邊欄 + 行程列表 -->
+            <div id="main-content" class="clearfix">
+
+                <!-- 左側篩選與特色導覽 (Sidebar) -->
+                <aside id="sidebar">
+
+                    <!-- 關於我們：旅行社介紹影片 (YouTube Embed) -->
+                    <div class="filter-group"
+                        style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                        <h4>📺 認識我們 - 輕奢探索之旅</h4>
+                        <p style="font-size: 0.95em; color: var(--text-dark); margin-bottom: 15px;">
+                            觀看我們的品牌影片，了解我們如何為您創造獨特且高品質的旅遊體驗。
+                        </p>
+                        <div class="video-container">
+                            <video width="640" height="360" controls>
+                                <source src="media(輕奢探索之旅)/雄獅旅行社.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+
+                    <!-- 篩選區塊 -->
+                    <div class="filter-group">
+                        <h4>📂 路線分類</h4>
+                        <div class="filter-option" data-filter="all">所有精選路線</div>
+                        <div class="filter-option" data-filter="international">國際深度體驗 (國外)</div>
+                        <div class="filter-option" data-filter="domestic">島嶼在地慢遊 (國內)</div>
+                    </div>
+
+                    <!-- 互動式熱門景點導覽 (TOP 10) -->
+                    <div class="filter-group" style="border-bottom: none; padding-bottom: 0;">
+                        <h4>🌟 年度熱門主題景點 TOP 10</h4>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('1', '冰島極光', 'https://zh.wikipedia.org/zh-tw/冰島')"><a
+                                href="javascript:void(0);">No.1 冰島極光秘境</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('2', '土耳其卡帕多奇亞', 'https://zh.wikipedia.org/zh-tw/卡帕多奇亞')"><a
+                                href="javascript:void(0);">No.2 土耳其熱氣球</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('3', '秘魯馬丘比丘', 'https://zh.wikipedia.org/zh-tw/馬丘比丘')"><a
+                                href="javascript:void(0);">No.3 秘魯天空之城</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('4', '瑞士少女峰', 'https://zh.wikipedia.org/zh-tw/少女峰')"><a
+                                href="javascript:void(0);">No.4 瑞士阿爾卑斯</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('5', '日本京都嵐山', 'https://zh.wikipedia.org/zh-tw/嵐山')"><a
+                                href="javascript:void(0);">No.5 京都竹林禪意</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('6', '美國大峽谷', 'https://zh.wikipedia.org/zh-tw/大峽谷國家公園')"><a
+                                href="javascript:void(0);">No.6 美國大峽谷</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('7', '紐西蘭米爾福德峽灣', 'https://zh.wikipedia.org/zh-tw/米爾福德峽灣')"><a
+                                href="javascript:void(0);">No.7 紐西蘭峽灣</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('8', '台灣太魯閣', 'https://zh.wikipedia.org/zh-tw/太魯閣國家公園')"><a
+                                href="javascript:void(0);">No.8 台灣太魯閣</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('9', '希臘聖托里尼', 'https://zh.wikipedia.org/zh-tw/聖托里尼')"><a
+                                href="javascript:void(0);">No.9 希臘愛琴海</a></div>
+                        <div class="filter-option"
+                            onclick="showTopicDetails('10', '澎湖花火節', 'https://zh.wikipedia.org/zh-tw/澎湖國際海上花火節')"><a
+                                href="javascript:void(0);">No.10 澎湖海上花火</a></div>
+                    </div>
+                </aside>
+
+                <!-- 右側行程列表 / 詳細行程區塊 -->
+                <section id="itinerary-area">
+
+                    <!-- 1. 行程列表 (預設顯示) -->
+                    <div id="list-view-controls">
+                        <div id="itinerary-count"
+                            style="margin-bottom: 20px; font-size: 1.1em; color: var(--primary-medium); font-weight: 500;">
+                            正在為您顯示 <span id="current-count"
+                                style="font-size: 1.3em; color: var(--accent-color); font-weight: bold;">0</span> 條精選路線
+                        </div>
+                    </div>
+
+                    <div id="itinerary-list" class="itinerary-grid">
+                        <!-- JavaScript 將在此處生成所有行程 -->
+                    </div>
+
+                    <!-- 2. 詳細行程區塊 (點擊特定行程後顯示) -->
+                    <div id="itinerary-detail">
+                        <div class="detail-header">
+                            <h2 id="detail-title"></h2>
+                            <button id="back-to-list">⮜ 返回行程列表</button>
+                        </div>
+
+                        <p style="color: var(--text-muted); margin-bottom: 25px;">
+                            此為 **<span id="detail-days"></span>** 天的行程細節，為您呈現每日的精華活動與住宿安排。
+                        </p>
+
+                        <ul class="day-list" id="day-itinerary-list">
+                            <!-- 每日行程細節將由 JS 填充 -->
+                        </ul>
+                    </div>
+
+                </section>
+            </div>
+
+        </div>
+
+        <!-- 腳註區塊 -->
+        <footer class="footer">
+            <p>© 2025 Elite Explorer 輕奢探索之旅 | 深度旅遊資訊展示</p>
+        </footer>
+
+        <!-- 自定義訊息彈窗 (取代 alert) -->
+        <div id="message-modal"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: flex; justify-content: center; align-items: center;">
+            <div class="modal-content">
+                <h4 id="modal-title"></h4>
+                <p id="modal-content-text"></p>
+                <a id="modal-link" target="_blank"
+                    style="text-decoration: underline; display: block; margin-bottom: 20px; font-weight: 500;">
+                    點擊前往維基百科深入了解
+                </a>
+                <button id="modal-close-btn">
+                    我知道了
+                </button>
+            </div>
+        </div>
+
+        <script>
+            // 模擬的行程數據 (擴充到 20 個)
+            const travelData = [
+                // 國內路線 (Domestic - 10 條)
+                { id: 1, title: '【環島之星】臺灣山海連線五日 | 池上、太魯閣輕奢列車行', days: 5, price: 28000, destination: '臺灣', category: 'domestic', rating: 9.9, image: 'https://placehold.co/400x220/A7FFEB/004D40?text=Taiwan+Rail+Tour', description: '搭乘豪華觀光列車，從台北啟程，沿途欣賞東海岸山景。抵達花蓮後，專車前往太魯閣國家公園。' },
+                { id: 11, title: '阿里山日出雲海四日 | 小火車森林鐵道深度體驗', days: 4, price: 15000, destination: '嘉義', category: 'domestic', rating: 9.5, image: 'https://placehold.co/400x220/FFE082/004D40?text=Alishan+Sunrise+4D', description: '乘坐復古小火車，迎接壯闊的日出與波瀾壯闊的雲海，感受高山森林的清新療癒。' },
+                { id: 5, title: '花東縱谷三天兩夜 | 鹿野熱氣球、伯朗大道騎行', days: 3, price: 12000, destination: '花蓮/台東', category: 'domestic', rating: 9.7, image: 'https://placehold.co/400x220/64DD17/004D40?text=Hualien+Valley+3D', description: '探索鬼斧神工的峽谷奇景與一望無際的稻田綠浪，享受東台灣的純淨與寧靜。' },
+                { id: 14, title: '日月潭湖光山色輕旅行 | 文武廟、九族文化村兩日', days: 2, price: 8500, destination: '南投', category: 'domestic', rating: 9.2, image: 'https://placehold.co/400x220/FF8A65/004D40?text=Sun+Moon+Lake+2D', description: '乘船遊覽台灣最美的高山湖泊，體驗邵族文化，感受山水交映的詩意畫境。' },
+                { id: 7, title: '澎湖花火節三日遊 | 跳島浮潛、海鮮盛宴、夢幻花火', days: 3, price: 13500, destination: '澎湖', category: 'domestic', rating: 9.0, image: 'https://placehold.co/400x220/26A69A/FFFFFF?text=Penghu+Fireworks+3D', description: '夏季限定！在蔚藍海面上欣賞盛大的國際花火節，享受跳島浮潛和海鮮美食的盛宴。' },
+                { id: 16, title: '金門戰地文化巡禮 | 閩南古厝、坑道探索三日', days: 3, price: 10500, destination: '金門', category: 'domestic', rating: 8.8, image: 'https://placehold.co/400x220/D4E157/004D40?text=Kinmen+3D', description: '深入戰地史蹟，漫步閩南古厝群，感受金門獨有的歷史氛圍與風情。' },
+                { id: 17, title: '蘭嶼達悟族文化體驗 | 拼板舟、地下屋、海洋生態四日', days: 4, price: 16500, destination: '蘭嶼', category: 'domestic', rating: 9.3, image: 'https://placehold.co/400x220/69F0AE/004D40?text=Lanyu+4D', description: '體驗達悟族傳統文化，親近飛魚季，探索火山島的神秘與美麗的海洋生態。' },
+                { id: 18, title: '北部海岸線秘境探險 | 野柳、九份、基隆夜市兩日', days: 2, price: 6800, destination: '北部', category: 'domestic', rating: 8.9, image: 'https://placehold.co/400x220/00ACC1/004D40?text=North+Coast+2D', description: '探訪女王頭與奇岩怪石，漫遊九份山城，品嚐基隆廟口夜市的經典小吃。' },
+                { id: 19, title: '馬祖藍眼淚追尋之旅 | 東引、南竿、芹壁五日', days: 5, price: 18800, destination: '馬祖', category: 'domestic', rating: 9.6, image: 'https://placehold.co/400x220/4FC3F7/004D40?text=Matsu+5D', description: '夜間追尋夢幻的藍眼淚，參觀軍事設施，入住充滿地中海風格的芹壁村。' },
+                { id: 20, title: '宜蘭田園輕旅與溫泉療癒 | 傳藝中心、礁溪兩日', days: 2, price: 7900, destination: '宜蘭', category: 'domestic', rating: 9.1, image: 'https://placehold.co/400x220/4DB6AC/004D40?text=Yilan+2D', description: '在宜蘭的田園風光中放鬆身心，體驗傳統藝術之美，並在礁溪享受碳酸氫鈉溫泉。' },
+
+                // 國外路線 (International - 10 條)
+                { id: 2, title: '京都楓紅六日 | 嵐山、清水寺、奈良鹿群的古都巡禮', days: 6, price: 42000, destination: '日本', category: 'international', rating: 9.6, image: 'https://placehold.co/400x220/FFC947/004D40?text=Japan+Kyoto+6D', description: '在紅葉滿山的秋季，造訪古都京都與繁華的大阪，體驗最優雅的日式風情。' },
+                { id: 3, title: '冰島極光深度探險 | 藍湖、黃金圈、追光七日小團', days: 7, price: 150000, destination: '冰島', category: 'international', rating: 9.8, image: 'https://placehold.co/400x220/80DEEA/004D40?text=Iceland+Aurora+7D', description: '追逐歐若拉女神的綠色光芒，探索冰與火的魔幻國度，入住極光小屋。' },
+                { id: 4, title: '土耳其熱氣球夢幻行 | 卡帕多奇亞、伊斯坦堡七日', days: 7, price: 59000, destination: '土耳其', category: 'international', rating: 9.4, image: 'https://placehold.co/400x220/B2DFDB/004D40?text=Turkey+Balloon+7D', description: '搭乘熱氣球俯瞰月球地貌，親臨古老文明遺址，感受東西文化的交融。' },
+                { id: 6, title: '美西國家公園自駕遊 | 大峽谷、優勝美地、黃石公園', days: 12, price: 180000, destination: '美國', category: 'international', rating: 8.5, image: 'https://placehold.co/400x220/B0BEC5/004D40?text=USA+Parks+12D', description: '探索大峽谷、優勝美地等國家公園的壯麗，一趟自由奔放的公路之旅。' },
+                { id: 8, title: '希臘愛琴海跳島之旅 | 聖托里尼、米克諾斯八日', days: 8, price: 90000, destination: '希臘', category: 'international', rating: 8.9, image: 'https://placehold.co/400x220/FFD54F/004D40?text=Greece+Islands+8D', description: '造訪聖托里尼的藍白世界與米克諾斯的風車海灘，享受地中海的陽光與浪漫風情。' },
+                { id: 9, title: '秘魯馬丘比丘古文明 | 印加古道、天空之城九日', days: 9, price: 135000, destination: '秘魯', category: 'international', rating: 8.7, image: 'https://placehold.co/400x220/FFF9C4/004D40?text=Peru+Machu+9D', description: '追尋印加帝國的腳步，登上失落的古城馬丘比丘，探索神祕而悠久的南美文明。' },
+                { id: 10, title: '瑞士少女峰火車之旅 | 阿爾卑斯山冰宮、六日團', days: 6, price: 110000, destination: '瑞士', category: 'international', rating: 9.2, image: 'https://placehold.co/400x220/81D4FA/004D40?text=Swiss+Mountain+6D', description: '搭乘歐洲最高的齒輪火車，登上少女峰，欣賞阿爾卑斯山的壯麗雪景。' },
+                { id: 12, title: '日本東京五日 | 富士山、淺草寺、潮流與傳統的交會', days: 5, price: 35000, destination: '日本', category: 'international', rating: 9.3, image: 'https://placehold.co/400x220/1A237E/FFFFFF?text=Japan+Tokyo+5D', description: '造訪時尚的澀谷與原宿，感受古老的淺草文化，並在富士山下享受湖光山色。' },
+                { id: 13, title: '泰國曼谷五星假期 | 豪華飯店、高空酒吧、水上市場四日', days: 4, price: 18000, destination: '泰國', category: 'international', rating: 9.1, image: 'https://placehold.co/400x220/E0E0E0/004D40?text=Thailand+BKK+4D', description: '入住頂級飯店，享受泰式按摩，品嚐街頭美食，享受奢華假期。' },
+                { id: 15, title: '澳洲雪梨跨年煙火 | 歌劇院、大堡礁、九日限定團', days: 9, price: 95000, destination: '澳洲', category: 'international', rating: 8.9, image: 'https://placehold.co/400x220/64B5F6/004D40?text=Australia+NYE+9D', description: '親臨雪梨歌劇院，在港灣見證盛大跨年煙火，全程含澳洲內陸機票。' }
+            ];
+
+            // 專門為第一個行程 ID: 1 準備的 5 天詳細內容
+            const detailedItinerary = {
+                1: [
+                    { day: 1, title: '啟程：台北 - 花蓮峽谷震撼', details: '搭乘輕奢觀光列車，從台北啟程，沿途欣賞東海岸山景。抵達花蓮後，專車前往太魯閣國家公園，探訪燕子口與長春祠。夜宿花蓮市區五星級飯店。' },
+                    { day: 2, title: '山線縱谷：池上慢活與伯朗大道', details: '搭乘專車沿花東縱谷南下，造訪「伯朗大道」，享受單車騎行的悠閒時光。午餐於池上享用在地米食便當。下午前往鹿野高台，遠眺縱谷全景。夜宿台東溫泉飯店。' },
+                    { day: 3, title: '海線風光：三仙台與東海岸公路', details: '上午體驗台東知本溫泉。下午沿著絕美東海岸公路北上，經過三仙台，欣賞海天一線的壯闊景色。晚上在海邊小鎮享用海鮮大餐。夜宿東海岸特色民宿。' },
+                    { day: 4, title: '重返鐵道：玉里車站與北返', details: '上午參觀玉里車站附近的花蓮農場，品嚐新鮮農產品。下午在玉里搭乘列車返回花蓮市區，享受自由活動時間，可逛東大門夜市。夜宿花蓮市區飯店。' },
+                    { day: 5, title: '賦歸：七星潭晨曦與返回台北', details: '清晨前往七星潭海邊，欣賞日出與礫灘美景。享用飯店早餐後，搭乘觀光列車返回台北，結束五日輕奢之旅。' }
+                ]
+            };
+
+            let currentFilter = 'all'; // 初始篩選條件
+
+            // 函式：產生單一行程卡片的 HTML 結構
+            function createItineraryCardHTML(item) {
+                const isDomestic = item.category === 'domestic';
+                const categoryText = isDomestic ? '🇹🇼 台灣在地' : '🌍 國際探索';
+                const formattedRating = item.rating.toFixed(1);
+
+                return `
+                <div class="itinerary-card" data-id="${item.id}" data-category="${item.category}" onclick="showItineraryDetails(this)">
+                    <div class="rating-tag">✨ ${formattedRating}</div>
+                    <div class="card-image-section">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.onerror=null; this.src='https://placehold.co/400x220/CFD8DC/455A64?text=圖片載入中...';">
+                    </div>
+                    <div class="card-info-section">
+                        <h3>${item.title}</h3>
+                        <div class="card-meta">
+                            ${categoryText} | 天數：${item.days} 天 | 目的地：${item.destination} 
+                        </div>
+                        <p class="card-description">${item.description}</p>
+                        <div class="price-group">
+                            <span class="price-label">探索最低價 (TWD)</span>
+                            <span class="price">NT$ ${item.price.toLocaleString()} 起</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            }
+
+            // 函式：渲染並篩選行程
+            function renderItineraries(filter = 'all') {
+                const itineraryList = document.getElementById('itinerary-list');
+                const currentCountSpan = document.getElementById('current-count');
+                let html = '';
+                let filteredData = [];
+
+                // 1. 根據 rating 排序 (降冪)
+                const sortedData = [...travelData].sort((a, b) => b.rating - a.rating);
+
+                // 2. 進行篩選
+                if (filter === 'all') {
+                    filteredData = sortedData;
+                } else {
+                    filteredData = sortedData.filter(item => item.category === filter);
+                }
+
+                // 3. 生成 HTML
+                filteredData.forEach(item => {
+                    html += createItineraryCardHTML(item);
+                });
+
+                itineraryList.innerHTML = html;
+                currentCountSpan.textContent = filteredData.length;
+
+                // 更新側邊欄按鈕的狀態
+                document.querySelectorAll('.filter-group .filter-option').forEach(btn => {
+                    btn.style.fontWeight = 'normal';
+                    btn.style.backgroundColor = 'transparent';
+                    btn.style.border = '1px solid transparent';
+
+                    if (btn.dataset.filter === filter) {
+                        btn.style.fontWeight = 'bold';
+                        btn.style.backgroundColor = 'var(--bg-start)';
+                        btn.style.border = '1px solid var(--primary-medium)';
+                    }
+                });
+
+                currentFilter = filter;
+            }
+
+            // 函式：設置篩選監聽器
+            function setupFilterListeners() {
+                document.querySelectorAll('.filter-group .filter-option').forEach(element => {
+                    const filter = element.dataset.filter;
+                    if (filter) {
+                        element.addEventListener('click', () => {
+                            showListView(); // 確保回到列表模式
+                            renderItineraries(filter);
+                        });
+                    }
+                });
+            }
+
+            // 函式：顯示列表視圖並隱藏詳細視圖
+            function showListView() {
+                document.getElementById('itinerary-detail').classList.remove('active');
+                document.getElementById('itinerary-list').classList.remove('hidden');
+                document.getElementById('list-view-controls').style.display = 'block';
+            }
+
+            // 函式：顯示詳細視圖並隱藏列表視圖
+            function showDetailView(item) {
+                const detailContainer = document.getElementById('itinerary-detail');
+                const dayList = document.getElementById('day-itinerary-list');
+
+                document.getElementById('detail-title').textContent = item.title;
+                document.getElementById('detail-days').textContent = item.days;
+                dayList.innerHTML = '';
+
+                const daysData = detailedItinerary[item.id] || [];
+
+                daysData.forEach(day => {
+                    const li = document.createElement('li');
+                    li.className = 'day-item';
+                    li.innerHTML = `
+                    <h4>Day ${day.day} - ${day.title}</h4>
+                    <p>${day.details}</p>
+                `;
+                    dayList.appendChild(li);
+                });
+
+                document.getElementById('itinerary-list').classList.add('hidden');
+                document.getElementById('list-view-controls').style.display = 'none';
+                detailContainer.classList.add('active');
+            }
+
+
+            // 函式：點擊卡片時顯示詳細訊息 (邏輯：ID=1 的行程顯示 Day 1-5 詳細列表)
+            function showItineraryDetails(element) {
+                const itemId = parseInt(element.dataset.id);
+                const item = travelData.find(d => d.id === itemId);
+
+                if (!item) {
+                    console.error("找不到行程資料:", itemId);
+                    showModal('錯誤', '找不到對應的探索路線資訊。');
+                    return;
+                }
+
+                // 特別處理 ID=1 (【環島之星】臺灣山海連線五日) 的行程，顯示 Day 1-5 詳細列表
+                if (itemId === 1 && detailedItinerary[itemId]) {
+                    showDetailView(item);
+                } else {
+                    // 其他行程仍顯示概要彈窗
+                    showModal(
+                        `【${item.title}】精選路線簡介`,
+                        `這趟旅程將帶您前往 **${item.destination}**，共計 **${item.days} 天**。\n\n**路線精華：**\n${item.description}\n\n**探索費用 (起)：** NT$ ${item.price.toLocaleString()}\n\n此路線評分為 ${item.rating.toFixed(1)}，是深度探索的絕佳選擇。`,
+                        null
+                    );
+                }
+            }
+
+            // 函式：顯示熱門主題景點的詳細訊息 (TOP 10 專用)
+            function showTopicDetails(rank, title, link) {
+                showModal(
+                    `[TOP ${rank}] ${title} 主題探索`,
+                    `這是一個充滿魅力的年度熱門主題景點。\n\n**路線描述:** 深入探索此地，感受獨特的文化與自然景觀。\n\n點擊下方連結，您可以前往維基百科，深入了解 **${title}** 的背景資訊，協助您規劃更完美的旅程。`,
+                    link
+                );
+            }
+
+            // 函式：顯示/關閉自定義訊息彈窗
+            function showModal(title, content, link = null) {
+                const modal = document.getElementById('message-modal');
+                const modalLink = document.getElementById('modal-link');
+
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-content-text').innerText = content;
+
+                if (link) {
+                    modalLink.href = link;
+                    modalLink.style.display = 'block';
+                } else {
+                    modalLink.style.display = 'none';
+                }
+
+                modal.classList.add('active');
+            }
+
+            function closeModal() {
+                document.getElementById('message-modal').classList.remove('active');
+            }
+
+            // 網頁載入完成後執行渲染與設置監聽器
+            window.onload = function () {
+                renderItineraries('all');
+                setupFilterListeners();
+
+                // 監聽關閉彈窗按鈕
+                document.getElementById('modal-close-btn').onclick = closeModal;
+
+                // 監聽詳細行程返回按鈕
+                document.getElementById('back-to-list').onclick = showListView;
+            };
+
+        </script>
+    </body>
+
+</html>

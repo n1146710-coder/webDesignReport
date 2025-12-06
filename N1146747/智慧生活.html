@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+    <head>
+        <meta charset="UTF-8">
+        <!-- 設定視口，確保在行動裝置上正確縮放 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>智能生活期末報告 - iLife</title>
+        <style>
+            /* --- CSS 變數設定 (方便統一管理顏色與尺寸) --- */
+            :root {
+                --primary: #1a202c;
+                /* 主色調：深灰藍 (用於文字與標題) */
+                --accent: #3b82f6;
+                /* 強調色：科技藍 (用於按鈕與連結) */
+                --light-bg: #f7f9fc;
+                /* 淺色背景：用於卡片或次要區塊 */
+                --header-h: 55px;
+                /* 導覽列高度固定變數 */
+                --radius: 8px;
+                /* 圓角統一設定 */
+            }
+
+            /* --- 全域重置與基本樣式 --- */
+            * {
+                box-sizing: border-box;
+                /* 讓 padding 與 border 不會撐大元素寬度 */
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                background: #fff;
+                color: var(--primary);
+                line-height: 1.6;
+                padding-top: var(--header-h);
+                /* 預留導覽列的高度，避免內容被遮擋 */
+            }
+
+            /* 通用容器：限制最大寬度並置中 */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 40px 15px;
+            }
+
+            /* --- 清除浮動工具類別 (Clearfix) --- */
+            /* 重要：用於父元素，當子元素都使用 float 時，確保父元素能撐開高度 */
+            .clearfix::after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            /* --- 圖片、連結與按鈕元件 --- */
+            img {
+                max-width: 100%;
+                /* 響應式圖片，不超出父容器 */
+                height: auto;
+                display: block;
+                border-radius: var(--radius);
+            }
+
+            a {
+                color: var(--accent);
+                text-decoration: none;
+                transition: opacity .3s;
+                /* 連結 hover 過渡效果 */
+            }
+
+            a:hover {
+                opacity: 0.8;
+            }
+
+            /* 按鈕樣式 */
+            .btn {
+                background: var(--accent);
+                color: #fff;
+                padding: 10px 24px;
+                border-radius: 50px;
+                font-weight: bold;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+                transition: background .3s, transform .2s;
+            }
+
+            .btn:hover {
+                background: #2563eb;
+                /* hover 時變深色 */
+                transform: translateY(-1px);
+                /* 輕微上浮效果 */
+            }
+
+            /* --- 頂部導覽列 (Fixed Positioning) --- */
+            .main-header {
+                position: fixed;
+                /* 固定在視窗頂部 */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: var(--header-h);
+                background: #fff;
+                z-index: 1000;
+                /* 確保層級最高 */
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .main-header .logo {
+                font-size: 20px;
+                font-weight: bold;
+                padding-left: 15px;
+                color: var(--primary);
+                float: left;
+                /* Logo 靠左 */
+                line-height: var(--header-h);
+            }
+
+            .main-nav {
+                float: right;
+                /* 選單靠右 */
+            }
+
+            .main-nav ul {
+                list-style-type: none;
+            }
+
+            .main-nav li {
+                float: left;
+                /* 選單項目橫排 */
+            }
+
+            .main-nav li a {
+                display: block;
+                padding: 0 14px;
+                line-height: var(--header-h);
+                font-size: 14px;
+                color: #6b7280;
+            }
+
+            .main-nav li a:hover {
+                color: var(--primary);
+                background-color: var(--light-bg);
+            }
+
+            /* 手機版漢堡選單按鈕 (預設隱藏) */
+            .burger-menu {
+                display: none;
+                line-height: var(--header-h);
+                padding-right: 15px;
+                cursor: pointer;
+                float: right;
+                font-size: 24px;
+            }
+
+            /* --- Hero (首頁主視覺) 區塊 --- */
+            .hero-container {
+                position: relative;
+                height: 500px;
+                overflow: hidden;
+                border-radius: 0 0 15px 15px;
+            }
+
+            #background-video {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                object-fit: cover;
+                /* 影片填滿容器 */
+                filter: brightness(0.6);
+                /* 降低亮度以突顯文字 */
+            }
+
+            /* 影片靜音提示浮層 */
+            #video-unmute-overlay {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 4;
+                background: rgba(0, 0, 0, 0.4);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: opacity .5s;
+            }
+
+            #video-unmute-overlay.hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .unmute-message {
+                color: white;
+                padding: 20px 30px;
+                background: rgba(59, 130, 246, 0.8);
+                border-radius: 10px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                text-align: center;
+                border: 2px solid white;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+                line-height: 1.4;
+            }
+
+            /* Hero 文字內容 */
+            .hero {
+                position: relative;
+                z-index: 3;
+                height: 100%;
+                text-align: center;
+                padding-top: 150px;
+                color: #fff;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+                font-weight: 700;
+                margin-bottom: 15px;
+                text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+                max-width: 600px;
+                margin: 0 auto 30px auto;
+            }
+
+            /* --- 滾動進場動畫類別 --- */
+            .animate-scroll {
+                opacity: 0;
+                transform: translateY(20px);
+                /* 初始位置向下偏移 */
+                transition: opacity .8s ease-out, transform .8s ease-out;
+                will-change: opacity, transform;
+            }
+
+            .animate-scroll.active {
+                opacity: 1;
+                transform: translateY(0);
+                /* 回到原位 */
+            }
+
+            /* --- 產品特色區塊 (交錯佈局) --- */
+            .feature-section {
+                margin-bottom: 60px;
+                padding: 30px 0;
+                border-bottom: 1px solid #f3f4f6;
+            }
+
+            /* 左圖右文佈局 */
+            .feature-image {
+                float: left;
+                width: 45%;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .feature-content {
+                float: right;
+                padding-left: 50px;
+                width: 55%;
+            }
+
+            /* 右圖左文佈局 (.alt) */
+            .feature-section.alt .feature-image {
+                float: right;
+            }
+
+            .feature-section.alt .feature-content {
+                float: left;
+                padding: 0 50px 0 0;
+                text-align: right;
+            }
+
+            .feature-content h3 {
+                font-size: 2rem;
+                color: var(--accent);
+                margin: 0 0 10px 0;
+            }
+
+            .feature-content p {
+                color: #4b5563;
+            }
+
+            /* --- 產品網格佈局 (Grid System using Floats) --- */
+            h2 {
+                font-size: 2rem;
+                font-weight: 700;
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            /* 分類標題樣式 */
+            .container h3 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 50px 0 25px 0;
+                padding-bottom: 5px;
+                border-bottom: 2px solid var(--accent);
+                display: inline-block;
+                color: var(--primary);
+            }
+
+            .product-grid {
+                margin: 0;
+                text-align: left;
+            }
+
+            /* 單個產品卡片容器 */
+            .product-card {
+                float: left;
+                /* 核心：使用浮動排列 */
+                width: 25%;
+                /* 一行四個 (100% / 4) */
+                padding: 0 8px;
+                /* 左右間距 */
+                margin-bottom: 16px;
+            }
+
+            /* 產品卡片內部樣式 */
+            .product-inner {
+                background: var(--light-bg);
+                text-align: center;
+                padding: 20px;
+                min-height: 380px;
+                /* 統一最小高度 */
+                border-radius: var(--radius);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                transition: transform .3s, box-shadow .3s;
+            }
+
+            .product-inner:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .product-inner h4 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin: 10px 0;
+                color: var(--primary);
+            }
+
+            .product-inner p {
+                color: #6b7280;
+                font-size: 0.9rem;
+            }
+
+            /* --- 問卷表單區塊 --- */
+            .survey-form-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 30px;
+                background: var(--light-bg);
+                border-radius: var(--radius);
+            }
+
+            .survey-form h3 {
+                font-size: 1.4rem;
+                border-left: 4px solid #10b981;
+                padding-left: 10px;
+                margin: 25px 0 15px 0;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 600;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="email"] {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                transition: border-color .3s;
+            }
+
+            /* === 新增/修改：滿意度選項橫排修正 === */
+            /* 強制 Radio 按鈕顯示為行內區塊 */
+            .form-group input[type="radio"] {
+                display: inline-block;
+                width: auto;
+                margin-right: 5px;
+                vertical-align: middle;
+            }
+
+            /* 針對 Radio 後面的 Label 進行特別設定，覆蓋原本的全寬度 (block) 設定 */
+            .form-group input[type="radio"]+label {
+                display: inline-block;
+                width: auto;
+                margin-right: 20px;
+                margin-bottom: 0;
+                font-weight: normal;
+                vertical-align: middle;
+            }
+
+            /* ================================== */
+
+            .form-group input:focus {
+                border-color: var(--accent);
+                outline: none;
+            }
+
+            /* 產品偏好複選框樣式 (並排顯示) */
+            .product-preference-item {
+                float: left;
+                width: 33.333%;
+                list-style-type: none;
+                padding: 5px 0;
+            }
+
+            /* --- 回頂部按鈕 (Floating Action Button) --- */
+            #back-to-top {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                width: 45px;
+                height: 45px;
+                background: var(--accent);
+                color: #fff;
+                border-radius: 50%;
+                text-align: center;
+                line-height: 45px;
+                font-size: 24px;
+                box-shadow: 0 3px 8px rgba(59, 130, 246, 0.6);
+                opacity: 0;
+                visibility: hidden;
+                /* 預設隱藏 */
+                transition: opacity .3s, transform .3s;
+                cursor: pointer;
+                z-index: 999;
+            }
+
+            #back-to-top:hover {
+                transform: scale(1.05);
+            }
+
+            #back-to-top.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* --- 頁腳 --- */
+            .main-footer {
+                background: var(--primary);
+                color: #9ca3af;
+                text-align: center;
+                padding: 30px 15px;
+                margin-top: 40px;
+            }
+
+            /* --- RWD 響應式設計 (媒體查詢) --- */
+
+            /* 平板尺寸 (最大寬度 1024px) */
+            @media (max-width: 1024px) {
+
+                /* 調整特色區塊寬度 */
+                .feature-image,
+                .feature-content {
+                    width: 50%;
+                    padding: 0 20px;
+                }
+
+                .feature-section.alt .feature-content {
+                    padding: 0 20px 0 0;
+                }
+
+                .feature-section:not(.alt) .feature-content {
+                    padding: 0 0 0 20px;
+                }
+
+                /* 產品卡片改為一行 3 個 */
+                .product-card {
+                    width: 33.333%;
+                }
+
+                .hero h1 {
+                    font-size: 2.5rem;
+                }
+            }
+
+            /* 手機尺寸 (最大寬度 768px) */
+            @media (max-width: 768px) {
+
+                /* 導覽列改為漢堡選單模式 */
+                .main-nav {
+                    display: none;
+                    width: 100%;
+                    position: absolute;
+                    top: var(--header-h);
+                    left: 0;
+                    background: #fff;
+                    border-top: 1px solid #e5e7eb;
+                }
+
+                .main-nav.mobile-active {
+                    display: block;
+                }
+
+                .main-nav li {
+                    float: none;
+                    width: 100%;
+                    border-bottom: 1px solid var(--light-bg);
+                }
+
+                .main-nav li a {
+                    line-height: 40px;
+                    padding: 0 15px;
+                }
+
+                .burger-menu {
+                    display: block;
+                }
+
+                /* 產品特色區塊改為堆疊 (取消左右並排) */
+                .feature-image,
+                .feature-content {
+                    float: none;
+                    width: 100%;
+                    padding: 0;
+                    margin-bottom: 20px;
+                    text-align: center !important;
+                }
+
+                /* 產品卡片改為一行 2 個 */
+                .product-card {
+                    width: 50%;
+                    padding: 0 5px;
+                }
+
+                .product-inner {
+                    min-height: 350px;
+                }
+
+                .product-preference-item {
+                    width: 100%;
+                }
+            }
+
+            /* 極小手機尺寸 (最大寬度 480px) */
+            @media (max-width: 480px) {
+
+                /* 產品卡片改為一行 1 個 (滿寬) */
+                .product-card {
+                    width: 100%;
+                    padding: 0;
+                }
+
+                .hero h1 {
+                    font-size: 2rem;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <!-- 導覽列 Header (固定在頂部) -->
+        <header class="main-header" id="main-header">
+            <a href="#" class="logo">iLife 智能生活</a>
+
+            <!-- 漢堡選單按鈕 (僅在手機版顯示) -->
+            <div class="burger-menu" id="burger-menu">☰</div>
+
+            <!-- 導覽連結清單 -->
+            <nav class="main-nav" id="main-nav-menu">
+                <ul>
+                    <li><a href="#core">核心智能</a></li>
+                    <li><a href="#clean">居家清潔</a></li>
+                    <li><a href="#home">智慧家庭</a></li>
+                    <li><a href="#survey">問卷調查</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+
+            <!-- Hero 區塊 (影片背景 + 主標題) -->
+            <section class="hero-container">
+                <!-- 背景影片設定：自動播放、靜音、循環 -->
+                <video id="background-video" loop playsinline muted autoplay poster="media(智慧生活)/iphone17發表會.mp4">
+                    <source src="media(智慧生活)/iphone17發表會.mp4" type="video/mp4">
+                </video>
+
+                <!-- 影片靜音提示與互動浮層 -->
+                <div id="video-unmute-overlay">
+                    <div class="unmute-message">
+                        影片已自動靜音播放 <br>
+                        <span style="font-size: 1.8rem; display: block; margin-top: 10px;">點擊此處播放聲音 🔊</span>
+                    </div>
+                </div>
+
+                <!-- Hero 文字內容容器 -->
+                <div class="hero container">
+                    <p>iLife 核心產品</p>
+                    <h1>iPhone 17 Pro：智慧新紀元。</h1>
+                    <a href="#core" class="btn">探索更多產品</a>
+                </div>
+
+            </section>
+
+            <!-- 主要內容容器 (限制最大寬度) -->
+            <div class="container">
+                <h2 class="animate-scroll" style="margin-top: 40px;">定義未來的智能科技</h2>
+
+                <!-- 特色產品 1: 左圖右文 (使用 clearfix 清除浮動) -->
+                <section class="feature-section clearfix animate-scroll">
+                    <img src="imges(智慧生活)/HomePod mini.jpg" alt="智能音箱 HomePod mini" class="feature-image">
+                    <div class="feature-content">
+                        <h3>HomePod mini</h3>
+                        <p>滿室瀰漫，好聲音。HomePod mini 體積小巧，卻能帶來令人驚豔的聲音。它現在支援多房間音訊，並可作為 HomeKit 中樞使用。</p>
+                    </div>
+                </section>
+
+                <!-- 特色產品 2: 右圖左文 (加上 .alt class) -->
+                <section class="feature-section alt clearfix animate-scroll">
+                    <img src="imges(智慧生活)/Xiaomi 掃拖機器人 X10+.jpg" alt="掃地機器人 Xiaomi X10+" class="feature-image">
+                    <div class="feature-content">
+                        <h3>Xiaomi 掃拖機器人 X10+</h3>
+                        <p>全自動智慧清潔基地，具備自動清洗拖布、自動集塵、自動補水功能，讓您徹底解放雙手。搭載 AI 視覺導航，能精準避障。</p>
+                    </div>
+                </section>
+
+                <h2 class="animate-scroll" style="margin-top: 40px;">精選產品總覽 (共 20 項)</h2>
+
+                <!-- 分類 1: 核心智能裝置 -->
+                <a id="core"></a>
+                <h3 class="animate-scroll">📱 核心智能裝置 (8 項)</h3>
+                <div class="product-grid clearfix">
+                    <!-- 產品卡片 1 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.1s;">
+                        <div class="product-inner"><a href="#"><img src="imges(智慧生活)/iphone-17-pro.jpg" alt="iphone-17-pro">
+                                <h4>iPhone 17 Pro</h4>
+                                <p>創新動態島設計，配備 A18 Pro 仿生晶片。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 2 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.2s;">
+                        <div class="product-inner"><a href="#"><img src="imges(智慧生活)/ipad pro(M4).jpg" alt="iPad Pro">
+                                <h4>iPad Pro (M4)</h4>
+                                <p>搭載 M4 晶片，極致輕薄的行動生產力工具。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 3 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.3s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/MacBook Pro 14 Apple M4.jpg"
+                                    alt="MacBook Pro">
+                                <h4>MacBook Pro 14"</h4>
+                                <p>配備 M3 Pro 晶片，專為專業人士打造。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 4 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.4s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/S25 Ultra.jpg" alt="S25 Ultra">
+                                <h4>S25 Ultra</h4>
+                                <p>Galaxy AI 實現即時通話翻譯與更多智慧功能。</p>
+                            </a></div>
+                    </div>
+
+                    <!-- 產品卡片 5 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.5s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/Apple Watch Series 11.jpg"
+                                    alt="Apple Watch Series 11">
+                                <h4>Apple Watch Series 11</h4>
+                                <p>極限運動設計，搭載全新健康感應器。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 6 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.6s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/Google  Pixel 10 Pro.jpg"
+                                    alt="Google Pixel 10 Pro">
+                                <h4>Google Pixel 10 Pro</h4>
+                                <p>領先業界的 AI 攝影與原生 Android 體驗。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 7 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.7s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/airpods-pro-3.jpg"
+                                    alt="airpods pro 3">
+                                <h4>airpods pro 3</h4>
+                                <p>優異降噪與沉浸式空間音訊，續航力更持久。</p>
+                            </a></div>
+                    </div>
+                    <!-- 產品卡片 8 -->
+                    <div class="product-card animate-scroll" style="transition-delay: 0.8s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/galaxy z fold 7.jpg"
+                                    alt="Samsung Galaxy Z Fold 7">
+                                <h4>Galaxy Z Fold 7</h4>
+                                <p>更輕薄的摺疊屏，優化多工處理體驗。</p>
+                            </a></div>
+                    </div>
+                </div>
+                <div class="clearfix"></div> <!-- 重要：確保下一區塊不會受上方 float 影響 -->
+
+                <!-- 分類 2: 居家清潔區 -->
+                <a id="clean"></a>
+                <h3 class="animate-scroll">🧹 居家清潔系列 (8 項)</h3>
+                <div class="product-grid clearfix">
+                    <div class="product-card animate-scroll" style="transition-delay: 0.1s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/dyson v15 detect.jpg" alt="Dyson V15">
+                                <h4>Dyson V15 Detect</h4>
+                                <p>雷射光束精準偵測微塵，即時顯示數據。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.2s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/roomba combo j9+.jpg"
+                                    alt="Roomba Combo j9+">
+                                <h4>Roomba Combo j9+</h4>
+                                <p>全自動集塵與補水，深度清潔，解放雙手。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.3s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/HP09 Dyson.jpg" alt="Dyson HP09">
+                                <h4>Dyson Purifier HP09</h4>
+                                <p>分解甲醛，淨化空氣，暖房三合一。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.4s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/小米清淨機4 pro.jpg" alt="小米清淨機 4 Pro">
+                                <h4>小米清淨機 4 Pro</h4>
+                                <p>高效三合一過濾，適用大空間。</p>
+                            </a></div>
+                    </div>
+
+                    <div class="product-card animate-scroll" style="transition-delay: 0.5s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/LG a9 kompressor.jpg"
+                                    alt="LG CordZero A9 Kompressor">
+                                <h4>LG A9 Kompressor</h4>
+                                <p>自動集塵，超強壓縮技術，有效減少傾倒次數。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.6s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/Roborock 石頭科技 G30潛行俠 全能升降極淨王者.jpg"
+                                    alt="Roborock 石頭科技 G30潛行俠 全能升降極淨王者">
+                                <h4>Roborock 石頭科技 G30潛行俠 全能升降極淨王者</h4>
+                                <p>最強 AI 避障，自動烘乾拖布，深度自清潔。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.7s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/Tineco floor one s7.jpg"
+                                    alt="Tineco Floor One S7 Steam">
+                                <h4>Tineco Floor One S7</h4>
+                                <p>智慧感應，熱蒸氣洗地，有效分解頑固污漬。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.8s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/dreame l20 ultra.jpg"
+                                    alt="Dreame L20 Ultra">
+                                <h4>Dreame L20 Ultra</h4>
+                                <p>邊緣清潔技術，拖布自動拆卸，實現完美牆角清潔。</p>
+                            </a></div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+                <!-- 分類 3: 智慧家庭 IoT 區 -->
+                <a id="home"></a>
+                <h3 class="animate-scroll">🏠 智慧家庭 IoT (4 項)</h3>
+                <div class="product-grid clearfix">
+                    <div class="product-card animate-scroll" style="transition-delay: 0.1s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/homepod 2nd gen.jpg"
+                                    alt="HomePod 2nd Gen">
+                                <h4>HomePod 2nd Gen</h4>
+                                <p>高音質揚聲器，Matter 智能家居控制中心。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.2s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/google nest hub max.jpg" alt="Nest Hub">
+                                <h4>Google Nest Hub Max</h4>
+                                <p>視訊通話與語音控制，家庭智能中樞。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.3s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/E27 智慧型燈泡.jpg" alt="Hue">
+                                <h4>Philips Hue 套裝 E27 智慧型燈泡</h4>
+                                <p>創造情境光，自由控制顏色與亮度。</p>
+                            </a></div>
+                    </div>
+                    <div class="product-card animate-scroll" style="transition-delay: 0.4s;">
+                        <div class="product-inner"><a href="#"><img
+                                    src="imges(智慧生活)/Aqara 智能門鎖 A100.jpg" alt="Aqara A100">
+                                <h4>Aqara 智能門鎖 A100</h4>
+                                <p>支援 HomeKit，多重解鎖方式。</p>
+                            </a></div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+
+                <!-- 問卷調查區塊 -->
+                <a id="survey"></a>
+                <h2 class="animate-scroll" style="margin-top: 60px;">💡 智能產品使用意願調查</h2>
+                <div class="survey-form-container animate-scroll">
+                    <!-- 使用 httpbin 作為示範提交端點 -->
+                    <form action="https://httpbin.org/get" method="get" class="survey-form">
+
+                        <h3>1. 您的基本資料</h3>
+                        <div class="form-group clearfix">
+                            <label for="username">姓名/暱稱：</label>
+                            <input type="text" id="username" name="name" placeholder="請輸入姓名或暱稱" required>
+                        </div>
+
+                        <h3>2. 偏好產品分類 (多選)</h3>
+                        <div class="form-group clearfix">
+                            <ul style="list-style-type: none;">
+                                <li class="product-preference-item">
+                                    <input type="checkbox" id="pref_core" name="pref_cat" value="core"><label
+                                        for="pref_core"> 核心智能</label>
+                                </li>
+                                <li class="product-preference-item">
+                                    <input type="checkbox" id="pref_clean" name="pref_cat" value="clean"><label
+                                        for="pref_clean"> 居家清潔</label>
+                                </li>
+                                <li class="product-preference-item">
+                                    <input type="checkbox" id="pref_home" name="pref_cat" value="home"><label
+                                        for="pref_home"> 智慧家庭</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+
+                        <h3>3. 網站設計滿意度</h3>
+                        <div class="form-group">
+                            <label>您對本產品介紹頁面的視覺設計感到：</label><br>
+                            <!-- 
+                                注意：此處使用了 CSS 強制橫排顯示
+                                每個 radio 按鈕與其後的 label 會並排顯示
+                            -->
+                            <input type="radio" id="very_sat" name="satisfaction" value="5" required><label
+                                for="very_sat"> 非常滿意</label>
+                            <input type="radio" id="sat" name="satisfaction" value="4"><label for="sat"> 滿意</label>
+                            <input type="radio" id="neutral" name="satisfaction" value="3"><label for="neutral">
+                                普通</label>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button type="submit" class="btn" style="padding: 12px 30px;">🚀 提交問卷</button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div> <!-- 關閉 <div class="container"> -->
+        </main>
+
+        <!-- 回頂部按鈕 -->
+        <div id="back-to-top" title="回到頂部">↑</div>
+
+        <!-- 頁腳 Footer -->
+        <footer class="main-footer">
+            <p>&copy; 2025 iLife 智能生活. 僅供學術參考使用。</p>
+        </footer>
+
+        <!-- JS 腳本 -->
+        <script>
+            // 1. 漢堡選單 (手機版導覽列開關) 的 JS 邏輯
+            const burgerMenu = document.getElementById('burger-menu');
+            const mainNavMenu = document.getElementById('main-nav-menu');
+
+            if (burgerMenu) {
+                // 點擊漢堡按鈕時，切換選單顯示狀態
+                burgerMenu.addEventListener('click', function () {
+                    mainNavMenu.classList.toggle('mobile-active');
+                });
+
+                // 點擊選單中的連結後，自動關閉選單 (優化使用者體驗)
+                const navLinks = mainNavMenu.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (mainNavMenu.classList.contains('mobile-active')) {
+                            mainNavMenu.classList.remove('mobile-active');
+                        }
+                    });
+                });
+            }
+
+            // 2. 回頂部按鈕的 JS 邏輯
+            const backToTopButton = document.getElementById('back-to-top');
+
+            window.addEventListener('scroll', () => {
+                // 當捲動超過 300px 時顯示按鈕，否則隱藏
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('show');
+                } else {
+                    backToTopButton.classList.remove('show');
+                }
+            });
+
+            // 點擊按鈕後平滑捲動回頂部
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // 3. 導覽列陰影效果
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                // 只要頁面有捲動，就給導覽列加上陰影，增加層次感
+                header.style.boxShadow = window.scrollY > 5 ? '0 1px 4px rgba(0, 0, 0, 0.1)' : 'none';
+            });
+
+            // 4. 滾動動畫效果 (只執行一次動畫)
+            const animatedElements = document.querySelectorAll('.animate-scroll');
+
+            function checkVisibility() {
+                const viewportHeight = window.innerHeight;
+                animatedElements.forEach(element => {
+                    // 如果已經顯示過，就不再重複計算
+                    if (element.classList.contains('active')) {
+                        return;
+                    }
+                    const elementTop = element.getBoundingClientRect().top;
+                    // 當元素頂部距離小於 (視圖高度 - 150px) 時，即認為元素可見
+                    if (elementTop < viewportHeight - 150) {
+                        element.classList.add('active');
+                    }
+                });
+            }
+
+            // 載入時與捲動時都執行檢查
+            window.addEventListener('load', checkVisibility);
+            window.addEventListener('scroll', checkVisibility);
+
+            // 5. 影片靜音/解除靜音邏輯
+            const videoElement = document.getElementById('background-video');
+            const unmuteOverlay = document.getElementById('video-unmute-overlay');
+
+            if (videoElement && unmuteOverlay) {
+                // 點擊遮罩後解除靜音並播放，然後隱藏遮罩
+                unmuteOverlay.addEventListener('click', () => {
+                    videoElement.muted = false;
+                    videoElement.play().catch(error => {
+                        console.error("無法播放影片:", error);
+                    });
+                    unmuteOverlay.classList.add('hidden');
+                });
+            }
+        </script>
+
+    </body>
+
+</html>
