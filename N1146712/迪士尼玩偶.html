@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+        <title>迪士尼玩偶</title>
+        <style>
+            /* 設定了外邊距、中文字體、字體顏色、字體大小 */
+            body {
+                margin: 0;
+                font-family: 'Noto Sans CJK TC', sans-serif;
+                color: #333;
+                line-height: 1.6;
+                
+                /* 黏性頁尾 - 設定容器:Flex、垂直堆疊、容器大小 */
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh; 
+            }
+            /*背景色、底部邊線、內邊距、水平排列、讓LOGO跟導覽分兩邊、垂直置中、固定高度、設定陰影、flex固定高度*/  
+            .header {
+                background-color: #f7f7f7;
+                border-bottom: 1px solid #eee;
+                padding: 15px 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 60px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                flex-shrink: 0; 
+            }
+            /*字體大小、字體加粗、字體顏色*/
+            .header-logo {
+                font-size: 24px;
+                font-weight: bold;
+                color: #d90000;
+            }
+            
+            /* ------------------ 導覽列按鈕樣式優化 ------------------ */
+            /*移除預設底線、字體顏色、字體大小、字體加粗、內邊距、按鈕間距、背景色、圓角弧度、高寬監視*/
+            .header-nav a {
+                text-decoration: none;
+                color: #fff; 
+                font-size: 14px;
+                font-weight: bold; 
+                padding: 8px 15px; 
+                margin-left: 15px; 
+                background-color: #d90000; 
+                border-radius: 5px;
+            display: inline-block;  /*確保 padding 和 margin 生效 */
+            }
+            /* 滑鼠指到時變色 */
+            .header-nav a:hover {
+                background-color: #ff3333; 
+            }
+            ---------------------------------------------------- */
+
+            /* 圖片橫幅樣式 */
+            .banner {
+                width: 100%; 
+                margin-bottom: 20px; 
+                overflow: hidden;
+                flex-shrink: 0; 
+            }
+            /* 設定容器*/
+            .banner-inner {
+                max-width: 1200px; 
+                margin: 0 auto; 
+            }
+            /* 圖片比例、獨佔、完整顯示圖片、 */
+            .banner img {
+                width: 100%; 
+                height: auto; 
+                display: block;
+                object-fit: contain; 
+            }
+
+            /* 主內容區調整、水平並列、最大寬度、間距、垂直空間、大小 */
+            .main-wrapper-flex {
+                display: flex;
+                max-width: 1200px;
+                margin: 20px auto;
+                gap: 20px;
+                flex-grow: 1; 
+                width: 100%; 
+                padding: 0 20px; 
+                box-sizing: border-box; 
+            }
+    
+            /* 左側篩選欄 */
+            /*寬度、收縮大小、背景色、邊框、內邊距、設定陰影、外部間距*/
+            .sidebar.left {
+                width: 250px;
+                flex-shrink: 0;
+                background-color: #ffffff;
+                border: 1px solid #eee;
+                padding: 20px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+                margin-bottom: 20px; 
+            }
+            /*分類標題*/
+            /*間距、字體顏色、字體大小、底部邊條、字體跟邊條間距*/
+            .sidebar.left h3 {
+                margin-top: 0;
+                color: #d90000;
+                font-size: 18px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+            /*分類列表*/
+            /*預設標記、內邊距*/
+            .sidebar.left ul {
+                list-style: none;
+                padding: 0;
+            }
+            /*分類連結*/
+            /*字體底線、字體顏色、水平並列、分散對齊、內邊距、鼠標變化、變色秒數*/
+            .sidebar.left ul li a {
+                text-decoration: none;
+                color: #555;
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
+                cursor: pointer;
+                transition: color 0.2s;
+            }
+            /*滑標指引時*/
+            /*字體顏色、字體底線*/
+            .sidebar.left ul li a:hover {
+                color: #d90000;
+                text-decoration: underline;
+            }
+            /*商品數量*/
+            /*字體加粗、字體顏色*/
+            .sidebar.left ul li a span.count {
+                font-weight: normal;
+                color: #888;
+            }
+
+            /* 主要商品區 */
+            /* 空間延伸、內間距、邊框、設定陰影、外間距 */
+            .main-content {
+                flex-grow: 1;
+                padding: 20px;
+                border: 1px solid #eee;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+                margin-bottom: 20px;
+            }
+            /*Grid 網格系統*/
+            /*網格容器、自動調整欄位數量填滿空間，欄位大小、間距*/
+            .product-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            /*邊框大小顏色、字體置中對齊、內邊距、背景色、設定陰影*/
+            .product-card {           
+                border: 1px solid #eee;
+                text-align: center;
+                padding: 15px;
+                background-color: #fff;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+            
+            /* 核心 CSS 篩選類別 */
+            /*消失*/
+            .product-card.hidden {
+                display: none;           
+            }
+            /*大小、高度、間距、完整顯示圖片*/
+            .product-card img {
+                max-width: 100%;
+                height: auto;
+                margin-bottom: 10px;
+                max-height: 150px; 
+                object-fit: contain;
+            }
+
+            /* 頁尾Footer  */
+            /*背景色、字體顏色、內邊距、水平置中、壓縮彈性*/
+            .footer {
+                background-color: #333;
+                color: #eee;
+                padding: 30px 20px;
+                text-align: center;
+                flex-shrink: 0; 
+            }
+
+
+        </style>
+        <script>
+            /*  將所有程式碼包裹在 DOMContentLoaded 內 */
+            document.addEventListener('DOMContentLoaded', () => {
+                
+                /*篩選邏輯*/
+
+                /* 1.取得 DOM 元素：分類連結、商品卡片、標題元素 (確保在 DOM 載入後才取得)*/
+                const links = document.querySelectorAll('.sidebar.left ul li a');
+                const cards = document.querySelectorAll('.product-card');
+                const title = document.getElementById('product-list-title');
+
+                /* 2. 設定篩選功能：為每個連結設定點擊事件*/
+                
+                /* 使用 for 迴圈來處理每一個連結、事件監聽、阻止連結跳轉*/
+                for (let i = 0; i < links.length; i++) {
+                    links[i].addEventListener('click', function(event) {
+                        event.preventDefault(); 
+
+                        /*取得選取的屬性值*/
+                        const selectedCategory = this.getAttribute('data-category');
+                        /*初始化計算多少個商品*/
+                        let count = 0; 
+                        
+                        /* 確認(Iterate)所有商品卡片、及商品分類*/
+                        for (let j = 0; j < cards.length; j++) {
+                            const card = cards[j];
+                            const cardCategory = card.getAttribute('data-category'); 
+
+                            /*核心判斷是否滿足條件 */
+                            if (selectedCategory === 'all' || cardCategory === selectedCategory) {
+                                /* 滿足條件：顯示商品*/
+                                card.classList.remove('hidden'); 
+                                count++;
+                                
+                            } else {
+                                /* 不滿足條件：隱藏商品*/
+                                card.classList.add('hidden'); 
+                            }
+                        }
+
+                        /* 更新標題及數量*/
+                        const categoryText = this.textContent.split('(')[0].trim();
+                        title.textContent = categoryText + ' (共 ' + count + ' 件)';
+                    });
+                }
+
+                /* 3. 網頁載入時執行初始化*/
+                /* 預設顯示所有商品 - 🌟 加入安全檢查 🌟 */
+                if (links.length > 0) {
+                    links[0].click();
+                }
+            }); 
+        </script>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-logo">迪士尼玩偶</div>
+            <div class="header-nav">
+                <a href="./index.html">小組首頁</a>
+                <a href="./花家烹飪教室.html">花家烹飪教室</a>
+                <a href="./心情與美食推薦.html">心情與美食推薦</a>
+            </div>
+        </div>
+        
+        <div class="banner">
+            <div class="banner-inner">
+                <img src="./image3/迪士尼.jpg" alt="迪士尼專區橫幅廣告">
+            </div>
+        </div>
+
+        <div class="main-wrapper-flex">
+            <div class="sidebar left">
+                <h3>產品分類</h3>
+                <ul id="category-list">
+                    <li><a href="#" data-category="all">所有商品 <span class="count">(12)</span></a></li>
+                    <li><a href="#" data-category="抱枕">抱枕 <span class="count">(4)</span></a></li>
+                    <li><a href="#" data-category="公仔">公仔 <span class="count">(5)</span></a></li>
+                    <li><a href="#" data-category="吊飾">吊飾 <span class="count">(3)</span></a></li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <h2 id="product-list-title">所有商品</h2>
+                <div class="product-grid" id="product-list">
+
+                    <div class="product-card" data-category="抱枕" data-name="火腿豬">
+                        <img src="./image3/火腿豬1.jpg" alt="Q萌粉紅豬玩偶">
+                        <h4>Q萌粉紅豬玩偶</h4><p>$399</p>
+                    </div>
+
+                    <div class="product-card" data-category="吊飾" data-name="熊抱哥">
+                        <img src="./image3/熊抱哥1.jpg" alt="經典泰迪熊玩偶">
+                        <h4>經典泰迪熊玩偶</h4><p>$680</p>
+                    </div>
+
+                    <div class="product-card" data-category="抱枕" data-name="奇奇蒂蒂">
+                        <img src="./image3/奇奇蒂蒂1.jpg" alt="奇奇蒂蒂抱枕">
+                        <h4>奇奇蒂蒂抱枕</h4><p>$599</p>
+                    </div>
+
+                    <div class="product-card" data-category="公仔" data-name="抱抱龍">
+                        <img src="./image3/抱抱龍1.jpg" alt="迷你暴龍公仔">
+                        <h4>迷你暴龍公仔</h4><p>$450</p>
+                    </div>
+                    
+                    <div class="product-card" data-category="抱枕" data-name="史迪奇">
+                        <img src="./image3/史迪奇1.jpg" alt="史迪奇抱枕">
+                        <h4>史迪奇抱枕</h4><p>$799</p>
+                    </div>
+
+                    <div class="product-card" data-category="公仔" data-name="雪寶">
+                        <img src="./image3/雪寶1.jpg" alt="雪寶玩偶">
+                        <h4>雪寶</h4><p>$850</p>
+                    </div>
+
+                    <div class="product-card" data-category="抱枕" data-name="毛怪">
+                        <img src="./image3/毛怪1.jpg" alt="毛怪絨毛玩偶">
+                        <h4>毛怪抱枕</h4><p>$520</p>
+                    </div>
+                    
+                    <div class="product-card" data-category="公仔" data-name="史迪奇公仔">
+                        <img src="./image3/史迪奇2.jpg" alt="史迪奇公仔">
+                        <h4>史迪奇公仔</h4><p>$799</p>
+                    </div>
+
+                    <div class="product-card" data-category="吊飾" data-name="動物方程市棉花糖">
+                        <img src="./image3/動物方程市1.jpg" alt="動物方程市棉花糖系列">
+                        <h4>動物方程市棉花糖系列</h4><p>$520</p>
+                    </div>
+
+                    <div class="product-card" data-category="公仔" data-name="動物方程市去旅遊">
+                        <img src="./image3/動物方程市2.jpg" alt="動物方程市去旅遊系列">
+                        <h4>動物方程市去旅遊系列</h4><p>$520</p>
+                    </div>
+
+                    <div class="product-card" data-category="公仔" data-name="動物方程市萌糖">
+                        <img src="./image3/動物方程市3.jpg" alt="動物方程市萌糖系列">
+                        <h4>動物方程市萌糖系列</h4><p>$520</p>
+                    </div>
+
+                    <div class="product-card" data-category="吊飾" data-name="動物方程市斜背包">
+                        <img src="./image3/動物方程市4.jpg" alt="動物方程市斜背包系列">
+                        <h4>動物方程市斜背包系列</h4><p>$520</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 迪士尼玩偶</p>
+        </div>
+
+
+    </body>
+</html>
