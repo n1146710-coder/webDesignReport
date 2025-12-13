@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網站施工中 | Website Under Construction</title>
+    <style>
+        /* 1. 基本設定與字型 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; /* 微軟正黑體 */
+            background-color: #f4f7f6;
+            height: 100vh;
+            display: flex;
+            justify-content: center; /* 水平置中 */
+            align-items: center;     /* 垂直置中 */
+            color: #333;
+        }
+
+        /* 2. 卡片容器樣式 */
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        /* 3. 圖示與動畫區域 */
+        .icon-box {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #FFC107; /* 工程黃 */
+        }
+
+        /* 定義旋轉動畫 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .gear {
+            display: inline-block;
+            animation: spin 4s linear infinite; /* 4秒轉一圈，無限循環 */
+        }
+
+        /* 4. 文字排版 */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* 5. 聯絡按鈕 (選用) */
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* 頁尾版權文字 */
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="icon-box">
+            <span class="gear">⚙️</span>
+        </div>
+
+        <h1>網站系統升級中</h1>
+        <p>為了提供更好的服務體驗，我們正在進行網站維護與更新。<br>預計將於近期恢復服務，感謝您的耐心等候。</p>
+
+        <a href="mailto:contact@example.com" class="btn">聯絡我們</a>
+        
+        <div class="footer">
+            &copy; 2025 Your Company Name. All Rights Reserved.
+        </div>
+    </div>
+
+</body>
+</html>
