@@ -11,37 +11,40 @@
   /* 核心容器 */
   .container {
     display: grid;
-    height: 100vh; /* 強制滿版 */
+    height: 100vh; 
     width: 100%;
-    /* 左側寬度維持 210px */
     grid-template-columns: 210px 1fr; 
-    /* 上方高度維持 70px */
     grid-template-rows: 70px 1fr;
     gap: 10px; 
     padding: 10px; 
-    background-color: #f0f2f5; 
-    overflow: hidden; /* 防止整個頁面出現捲軸 */
+    background-color: #1a1a1a; 
+    overflow: hidden; 
   }
 
   /* 通用區塊樣式 */
   .box {
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     overflow: hidden; 
+    height: 100%; 
   }
 
   /* --- 1. 上方區塊 (Header) --- */
   .main-top {
     grid-column: 1 / -1;
     grid-row: 1;
-    position: relative;
-    background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                      url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    position: relative; 
+    
+    /* ▼▼▼ 修改：更換為程式設計風格背景圖，並使用深色遮罩 ▼▼▼ */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                      url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    /* ▲▲▲ 修改結束 ▲▲▲ */
+    
     background-size: cover;
     background-position: center;
     color: white;
     display: flex;
-    justify-content: center;
+    justify-content: center; 
     align-items: center;
     padding: 0 20px;
   }
@@ -53,27 +56,24 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
-  .home-btn {
+  .class-name-text {
     position: absolute;
-    right: 20px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-    z-index: 10;
+    left: 30px; 
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
   }
-  .home-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+
+  .instructor-text {
+    position: absolute;
+    right: 30px; 
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    letter-spacing: 1px;
   }
 
   /* --- 2. 左下區塊 (Sidebar) --- */
@@ -220,6 +220,62 @@
     font-size: 0.8rem;
   }
 
+  /* --- 預覽遮罩層 --- */
+  .preview-overlay {
+    position: absolute;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85); 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    backdrop-filter: blur(8px);
+    
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; 
+    transition: opacity 0.4s ease, visibility 0.4s ease; 
+  }
+
+  .preview-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .preview-img {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    object-fit: contain;
+    border: 1px solid rgba(255,255,255,0.1);
+    transform: scale(0.92);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+  }
+  
+  .preview-overlay.active .preview-img {
+    transform: scale(1);
+  }
+
+  .preview-hint {
+    margin-top: 15px;
+    color: #4facfe;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease 0.1s; 
+  }
+  .preview-overlay.active .preview-hint {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   /* --- A. 詳細模式 --- */
   .portfolio-list {
     display: none; 
@@ -229,47 +285,12 @@
     overflow-y: auto; 
   }
 
-  .portfolio-item {
-    flex: 1; 
-    background: transparent; 
-    border: none;
-    display: flex;
-    flex-direction: column; 
-    gap: 10px; 
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-  }
-  .portfolio-item:hover { transform: translateY(-3px); }
-  
-  .thumb-box {
-    flex: 3; 
-    min-height: 150px;
-    width: 100%; 
-    background-color: #ddd;
-    background-size: cover;
-    background-position: center; 
-    border-radius: 10px; 
-    border: 1px solid rgba(255,255,255,0.2); 
-  }
-  .info-box {
-    flex: 2; 
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.9); 
-    backdrop-filter: blur(5px);
-    border-radius: 10px;
-    color: #333; 
-  }
-  .info-tag { font-size: 0.7rem; color: #004e92; font-weight: bold; text-transform: uppercase; }
-  .info-title { font-size: 0.95rem; font-weight: bold; margin: 2px 0; }
-  .info-desc { font-size: 0.8rem; color: #555; line-height: 1.3; }
-
   /* --- B. 總覽模式 (Dashboard) --- */
   .overview-grid {
     display: grid;
     /* 2 欄模式 */
     grid-template-columns: repeat(2, 1fr);
-    /* 修正：改為 3 列，確保 6 個人都能顯示 */
+    /* 3 列模式 */
     grid-template-rows: repeat(3, 1fr);
     gap: 15px;
     width: 100%;
@@ -277,44 +298,52 @@
     min-height: 0; 
   }
 
+  /* ▼▼▼ 修改重點：完全隱形化容器 ▼▼▼ */
   .member-card {
-    background: rgba(255, 255, 255, 0.1); 
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    padding: 10px; 
+    /* 1. 背景完全透明 */
+    background: transparent; 
+    
+    /* 2. 移除所有邊框與陰影 */
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none; /* 移除玻璃特效 */
+    
+    border-radius: 12px;
+    padding: 5px; /* 稍微減少內距，讓內容更緊湊 */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s, background 0.3s;
+    transition: transform 0.3s; /* 只保留位移特效 */
     min-height: 0; 
   }
   
   .member-card:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    border-color: #4facfe;
+    /* Hover 時也不顯示背景，只做輕微上浮 */
+    background: transparent; 
+    transform: translateY(-5px);
   }
 
   .card-header {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 5px;
+    border-bottom: none; 
+    padding-bottom: 0;
     flex-shrink: 0; 
   }
   
   .card-title {
     font-size: 1rem;
     font-weight: bold;
-    color: white;
+    color: white; 
+    /* 加強文字陰影，確保在任何背景都清晰 */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
   }
 
   .card-thumbs-area {
     display: flex;
     justify-content: space-between; 
-    gap: 10px;
+    gap: 12px;
     height: 100%;
     flex: 1; 
     min-height: 0; 
@@ -322,13 +351,16 @@
 
   .mini-thumb {
     flex: 1; 
-    background-color: #333;
+    background-color: #222; 
     background-size: cover;
     background-position: top center; 
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px; 
+    border: none;
+    /* 加強縮圖陰影，讓它們從背景浮出來 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    
     cursor: pointer;
-    transition: transform 0.2s, border-color 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     height: 100%;
     min-height: 0; 
     position: relative;
@@ -336,7 +368,7 @@
   
   .mini-thumb:hover {
     transform: scale(1.03);
-    border-color: #4facfe;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
     z-index: 2; 
   }
   
@@ -365,8 +397,9 @@
 <div class="container">
   
   <header class="box main-top" id="main-top-box">
+    <div class="class-name-text">進二技資管一甲</div>
     <h1 class="main-title" id="main-title-text">網站應用程式設計-期末成果</h1>
-    <button id="home-btn" class="home-btn" title="回到六宮格總覽">🏠</button>
+    <div class="instructor-text">授課老師：OOO</div>
   </header>
 
   <aside class="box sidebar">
@@ -375,6 +408,7 @@
     <details id="details-A" name="team-group">
       <summary>陳柏維</summary>
       <ul class="sub-list">
+        <li><a href="N1146710/p1.html">p1</a></li>
         <li><a href="N1146710/p2.html">p2</a></li>
         <li><a href="N1146710/p3.html">p3</a></li>
       </ul>
@@ -436,6 +470,11 @@
     <div id="overview-grid" class="overview-grid">
       </div>
 
+    <div id="preview-overlay" class="preview-overlay">
+        <img id="preview-image" src="" alt="預覽圖" class="preview-img">
+        <div class="preview-hint">頁面預覽模式</div>
+    </div>
+
     <div id="portfolio-list" class="portfolio-list">
       </div>
 
@@ -449,11 +488,9 @@
       name: "陳柏維 (N1146710)", subtitle: "組長",
       bg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80",
       works: [
-        // 第一張：連到首頁 (本頁)
         { title: "首頁", tag: "Home", img: "N1146710/media/n1146710-1.jpg", desc: "期末成果首頁", link: "#" },
-        // 第二張：p2
+        { title: "p1", tag: "P1", img: "N1146710/media/n1146710-1.jpg", desc: "第一階段作業", link: "N1146710/p1.html" },
         { title: "p2", tag: "P2", img: "N1146710/media/n1146710-2.jpg", desc: "專案會議與進度追蹤", link: "N1146710/p2.html" },
-        // 第三張：p3
         { title: "p3", tag: "P3", img: "N1146710/media/n1146710-3.jpg", desc: "最終成果彙整", link: "N1146710/p3.html" }
       ]
     },
@@ -513,8 +550,9 @@
   function showOverview() {
     overviewGrid.style.display = 'grid';
     bottomTitle.textContent = "期末成果總覽"; 
-    bottomDesc.textContent = "點選卡片內的縮圖前往頁面，或點擊左側查看詳細連結";
-    topBox.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')`;
+    bottomDesc.textContent = "點選卡片內的縮圖可直接前往頁面，或點擊左側查看詳細連結";
+    // 這裡的背景圖也同步更新為深色程式碼風格
+    topBox.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')`;
     bottomBox.style.backgroundImage = `none`; 
     bottomBox.style.backgroundColor = `#333`;
 
@@ -550,7 +588,34 @@
 
   window.onload = function() {
     showOverview();
-    document.getElementById('home-btn').addEventListener('click', showOverview);
+
+    const sidebarLinks = document.querySelectorAll('.sub-list a');
+    const previewOverlay = document.getElementById('preview-overlay');
+    const previewImage = document.getElementById('preview-image');
+
+    sidebarLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            const href = this.getAttribute('href');
+            let foundImg = null;
+
+            Object.values(memberData).forEach(member => {
+                member.works.forEach(work => {
+                    if (work.link === href && work.img) {
+                        foundImg = work.img;
+                    }
+                });
+            });
+
+            if (foundImg) {
+                previewImage.src = foundImg;
+                previewOverlay.classList.add('active');
+            }
+        });
+
+        link.addEventListener('mouseleave', function() {
+            previewOverlay.classList.remove('active');
+        });
+    });
   };
 </script>
 
