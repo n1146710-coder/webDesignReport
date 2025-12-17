@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSINT 攻擊鍊詳解</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glow-border {
+                position: relative;
+            }
+            .glow-border::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: inherit; 
+                padding: 1px; 
+                background: linear-gradient(135deg, var(--glow-start), var(--glow-end)); 
+                -webkit-mask: 
+                    linear-gradient(#fff 0 0) content-box, 
+                    linear-gradient(#fff 0 0);
+                mask: 
+                    linear-gradient(#fff 0 0) content-box, 
+                    linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                pointer-events: none;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": {
+                DEFAULT: "#4361EE", 
+                light: "#4CC9F0",   
+                dark: "#3A0CA3",    
+              },
+              "background-light": "#f0f2f5",
+              "background-dark": "#03045E", 
+              "surface": "#023E8A",     
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            boxShadow: {
+              'glow': '0 0 15px 0 rgba(76, 201, 240, 0.4), 0 0 5px 0 rgba(67, 97, 238, 0.3)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 300,
+            'GRAD' 0,
+            'opsz' 24
+        }
+        :root {
+            --glow-start: #4CC9F0;
+            --glow-end: #4361EE;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white/90">
+<div class="relative flex min-h-screen w-full flex-col">
+<div class="absolute inset-0 z-[-1] bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+<div class="absolute inset-0 z-[-1] bg-[radial-gradient(circle_500px_at_50%_200px,rgba(67,97,238,0.2),transparent)]"></div>
+
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-background-dark/80 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
+<div class="flex flex-1 items-center gap-10">
+<a href="index1.html" class="flex items-center gap-4 text-white hover:opacity-80 transition-opacity">
+<div class="size-6 text-primary-light">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">OSINT Attack Chain</h2>
+</a>
+
+<nav class="hidden items-center gap-8 md:flex">
+<a class="text-sm font-medium leading-normal text-white/70 transition-colors hover:text-white" href="index1.html">首頁：威脅概覽</a>
+<a class="relative text-sm font-medium leading-normal text-primary-light after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-primary-light after:shadow-glow" href="#">攻擊鍊詳解</a>
+<a class="text-sm font-medium leading-normal text-white/70 transition-colors hover:text-white" href="index3.html">防禦與工具</a>
+</nav>
+</div>
+<button class="md:hidden text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+
+<main class="flex flex-col items-center px-4 py-16 sm:px-6 lg:px-8">
+<div class="w-full max-w-6xl">
+<section class="mb-24 text-center">
+<div class="relative flex min-h-[400px] flex-col items-center justify-center gap-6 overflow-hidden rounded-xl border border-white/10 bg-surface/50 p-8 md:min-h-[400px]">
+<div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhVJiAmdQGj-AX3XnJDkJ3ygdqr-z7QNoG_QciNtA0s7YbZoZQa5fybEBiGa0VAtKfUEKvYiVAL7a7FfteMkzfDkWZ9Ba9mhhAABnogOsTdKU_27J76UePKy4mJXKeirPnIgH7bMXk5bt3XX0mxSAh1iRMyuJu1zUFhcdWpFx5rQT4doqXfpRECQEur94zZASzQZ3xaOEp5vvHFw0CtanjPupetB-5TvTZSpvThakuaCK7PG1G7_NYDmri0qEC-ipmJ5w0O91qqEwq");'></div>
+<div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background-dark to-transparent"></div>
+<div class="z-10 flex flex-col gap-4">
+<h1 class="text-4xl font-black leading-tight tracking-tighter text-white sm:text-5xl md:text-6xl">
+                                OSINT 攻擊鍊詳解
+                            </h1>
+<p class="mx-auto max-w-3xl text-base font-normal leading-relaxed text-white/80 sm:text-lg">
+                                OSINT（公開來源情報）攻擊鍊是一套系統性的流程，攻擊者藉此蒐集、分析並利用公開資訊來達成其目標。這個流程從被動的資訊蒐集開始，逐步演變為主動的攻擊行動。了解其運作方式，是建立有效防禦策略、保護數位資產免於威脅的關鍵第一步。
+                            </p>
+</div>
+</div>
+</section>
+
+<section class="relative mb-24">
+<h2 class="text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">互動式攻擊流程</h2>
+<p class="mt-4 text-center text-lg text-white/70">點擊下方階段，深入了解各步驟的詳細資訊。</p>
+<div class="relative mt-16 flex flex-col items-center justify-center gap-y-8 md:flex-row md:gap-x-4">
+<div class="absolute top-6 left-0 -z-10 hidden h-0.5 w-full bg-gradient-to-r from-transparent via-primary-light/30 to-transparent md:block"></div>
+<a href="#phase-01" class="flex flex-col items-center text-center group cursor-pointer">
+<div class="flex size-12 items-center justify-center rounded-full bg-primary-light text-background-dark shadow-glow ring-4 ring-primary-light/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:shadow-[0_0_20px_rgba(255,255,255,0.6)]">
+<span class="material-symbols-outlined">travel_explore</span>
+</div>
+<p class="mt-3 text-sm font-bold text-white group-hover:text-primary-light transition-colors duration-300">情報蒐集</p>
+</a>
+
+<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+
+<a href="#phase-02" class="flex flex-col items-center text-center group cursor-pointer">
+<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
+<span class="material-symbols-outlined">person_search</span>
+</div>
+<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">目標分析</p>
+</a>
+
+<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+
+<a href="#phase-03" class="flex flex-col items-center text-center group cursor-pointer">
+<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
+<span class="material-symbols-outlined">policy</span>
+</div>
+<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">漏洞識別</p>
+</a>
+
+<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+
+<a href="#phase-04" class="flex flex-col items-center text-center group cursor-pointer">
+<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">攻擊利用</p>
+</a>
+
+<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+
+<a href="#phase-05" class="flex flex-col items-center text-center group cursor-pointer">
+<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">達成目標</p>
+</a>
+</div>
+</section>
+
+<section class="mb-24">
+<h2 class="mb-12 text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">各階段詳細剖析</h2>
+<div class="space-y-16">
+<div id="phase-01" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+<div class="md:col-span-1">
+<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 01</p>
+<h3 class="mt-2 text-2xl font-bold leading-normal text-white">情報蒐集 (Reconnaissance)</h3>
+<p class="mt-4 font-semibold text-white/90">目的與重要性</p>
+<p class="mt-1 text-base font-normal leading-relaxed text-white/70">此階段是 OSINT 攻擊鍊的基石。其核心目標是在不與目標直接互動的情況下，廣泛蒐集所有可用的公開資訊。這一步驟建立的資訊基礎，將決定後續攻擊的精準度和成功率。一個全面的情報蒐集可以揭露目標的數位足跡、組織架構、技術弱點與人員習性。</p>
+</div>
+<div class="md:col-span-2 space-y-6">
+<div>
+<p class="font-semibold text-white/90">常用方法</p>
+<ul class="mt-2 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">public</span>
+<div>
+<h4 class="font-medium text-white/80">網站與社群媒體分析</h4>
+<p class="text-sm text-white/60">分析公開個人資料、貼文、關聯網路。</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">storage</span>
+<div>
+<h4 class="font-medium text-white/80">公共資料庫查詢</h4>
+<p class="text-sm text-white/60">查詢 WHOIS、DNS 紀錄、政府公開資料。</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">search</span>
+<div>
+<h4 class="font-medium text-white/80">搜尋引擎進階語法</h4>
+<p class="text-sm text-white/60">使用 Google Hacking 挖掘敏感文件與路徑。</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">code</span>
+<div>
+<h4 class="font-medium text-white/80">開源程式碼庫檢視</h4>
+<p class="text-sm text-white/60">在 GitHub 等平台尋找洩漏的憑證或程式碼缺陷。</p>
+</div>
+</li>
+</ul>
+</div>
+<div>
+<p class="font-semibold text-white/90">資料類型</p>
+<p class="mt-2 text-sm text-white/70">蒐集到的資料涵蓋範圍極廣，包括：<strong class="font-medium text-white/80">個人身分資訊</strong> (姓名、郵件、電話)、<strong class="font-medium text-white/80">組織結構</strong> (部門、員工、職位)、<strong class="font-medium text-white/80">技術堆疊</strong> (伺服器、框架、軟體版本) 及 <strong class="font-medium text-white/80">實體位置</strong> (辦公地點、IP 地理位置) 等。</p>
+</div>
+<div class="mt-4 border-t border-white/10 pt-4">
+<p class="font-semibold text-primary-light/90">案例分析</p>
+<p class="mt-1 text-sm text-white/70">攻擊者透過目標公司在徵才網站上發布的職缺，得知其內部使用特定版本的 VPN 軟體。接著，利用搜尋引擎進階語法，找到該版本軟體的已知遠端執行漏洞 (CVE)。最終，結合從 WHOIS 查到的公司 IP 段，成功鎖定潛在的攻擊入口點，為後續滲透鋪平了道路。</p>
+</div>
+</div>
+</div>
+
+<div id="phase-02" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+<div class="md:col-span-1">
+<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 02</p>
+<h3 class="mt-2 text-2xl font-bold leading-normal text-white">目標分析 (Target Analysis)</h3>
+<p class="mt-2 text-base font-normal leading-relaxed text-white/70">將蒐集到的雜亂資訊進行整理與分析，識別出目標的關鍵人物、使用的技術、組織架構以及潛在的弱點。</p>
+</div>
+<div class="md:col-span-2">
+<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
+<ul class="list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-medium text-white/80">關係鏈分析:</strong> 利用 Maltego 視覺化人員、組織與基礎設施之間的關聯。</li>
+<li><strong class="font-medium text-white/80">技術堆疊識別:</strong> 透過 Wappalyzer 或 BuiltWith 確定目標網站使用的 CMS、伺服器軟體和框架。</li>
+<li><strong class="font-medium text-white/80">人員模式分析:</strong> 觀察目標在社交媒體上的活躍時間、興趣偏好，為社交工程做準備。</li>
+</ul>
+<div class="mt-6 border-t border-white/10 pt-4">
+<p class="font-semibold text-primary-light/90">案例示意</p>
+<p class="mt-1 text-sm text-white/70">分析發現目標公司正在招聘熟悉特定版本 WordPress 的開發人員，暗示其網站可能使用該版本，進而搜尋相關漏洞。</p>
+</div>
+</div>
+</div>
+
+<div id="phase-03" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+<div class="md:col-span-1">
+<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 03</p>
+<h3 class="mt-2 text-2xl font-bold leading-normal text-white">漏洞識別 (Vulnerability Identification)</h3>
+<p class="mt-2 text-base font-normal leading-relaxed text-white/70">基於分析結果，主動搜尋目標在技術、人員或流程上存在的具體安全漏洞，這些漏洞將成為攻擊的切入點。</p>
+</div>
+<div class="md:col-span-2">
+<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
+<ul class="list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-medium text-white/80">已知漏洞匹配:</strong> 將識別出的軟體版本與 CVE（通用漏洞披露）資料庫進行比對。</li>
+<li><strong class="font-medium text-white/80">配置錯誤偵測:</strong> 使用 Shodan 尋找暴露在外的資料庫、管理介面或未受保護的雲端儲存。</li>
+<li><strong class="font-medium text-white/80">人員弱點評估:</strong> 分析員工在論壇或社交媒體的發言，尋找可能洩漏內部資訊或容易受釣魚攻擊的跡象。</li>
+</ul>
+<div class="mt-6 border-t border-white/10 pt-4">
+<p class="font-semibold text-primary-light/90">案例示意</p>
+<p class="mt-1 text-sm text-white/70">攻擊者在 GitHub 上發現一名目標公司員工公開的程式碼庫中，硬編碼了 AWS 的存取金鑰，構成了嚴重安全漏洞。</p>
+</div>
+</div>
+</div>
+
+<div id="phase-04" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+<div class="md:col-span-1">
+<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 04</p>
+<h3 class="mt-2 text-2xl font-bold leading-normal text-white">攻擊利用 (Exploitation)</h3>
+<p class="mt-2 text-base font-normal leading-relaxed text-white/70">此階段是將情報付諸行動的關鍵時刻。攻擊者利用已識別的漏洞，透過社交工程、惡意軟體或其他手段，嘗試獲取系統存取權限。</p>
+</div>
+<div class="md:col-span-2">
+<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
+<ul class="list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-medium text-white/80">魚叉式釣魚:</strong> 根據蒐集到的個人興趣，製作高度客製化的釣魚郵件，誘導點擊惡意連結。</li>
+<li><strong class="font-medium text-white/80">公開漏洞利用:</strong> 使用 Metasploit 等工具，對已知的軟體漏洞發動攻擊。</li>
+<li><strong class="font-medium text-white/80">憑證填充:</strong> 利用在其他資料外洩事件中洩漏的帳號密碼，嘗試登入目標系統。</li>
+</ul>
+<div class="mt-6 border-t border-white/10 pt-4">
+<p class="font-semibold text-primary-light/90">案例示意</p>
+<p class="mt-1 text-sm text-white/70">攻擊者向目標員工發送一封偽裝成 HR 部門的郵件，內容關於「年度績效評估」，附件是一個含有惡意宏的 Word 文件。</p>
+</div>
+</div>
+</div>
+
+<div id="phase-05" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+<div class="md:col-span-1">
+<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 05</p>
+<h3 class="mt-2 text-2xl font-bold leading-normal text-white">達成目標 (Goal Achievement)</h3>
+<p class="mt-2 text-base font-normal leading-relaxed text-white/70">攻擊鍊的最終階段。攻擊者在成功滲透後，執行其預定的惡意活動，無論是竊取資料、破壞系統或是潛伏監控。</p>
+</div>
+<div class="md:col-span-2">
+<p class="mb-2 font-semibold text-white/90">關鍵活動與可能後果：</p>
+<ul class="list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-medium text-white/80">資料外洩 (Exfiltration):</strong> 將敏感數據打包並傳輸至攻擊者控制的伺服器。</li>
+<li><strong class="font-medium text-white/80">權限維持 (Persistence):</strong> 安裝後門或建立隱蔽帳號，確保未來能持續存取系統。</li>
+<li><strong class="font-medium text-white/80">勒索與破壞:</strong> 部署勒索軟體加密檔案，或破壞關鍵基礎設施導致服務中斷。</li>
+</ul>
+<div class="mt-6 border-t border-white/10 pt-4">
+<p class="font-semibold text-primary-light/90">案例示意</p>
+<p class="mt-1 text-sm text-white/70">攻擊者成功取得資料庫管理員權限後，將客戶個資表導出並上傳至暗網販售，同時刪除原始備份，並留下勒索訊息要求比特幣贖金。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="mb-24">
+<div class="glow-border rounded-xl bg-surface p-8 md:p-12">
+<h2 class="text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">潛在影響與風險評估</h2>
+<p class="mx-auto mt-4 max-w-3xl text-center text-lg text-white/70">OSINT 攻擊的影響深遠，從個人隱私洩漏到企業的重大財務損失。有效的風險評估是制定防禦策略的基礎。</p>
+<div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
+<div class="rounded-lg bg-background-dark/50 p-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-3xl text-primary-light">warning</span>
+<h3 class="text-xl font-bold text-white">潛在影響</h3>
+</div>
+<ul class="mt-4 list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-semibold text-white/90">資料外洩：</strong>竊取客戶資料、智慧財產權、商業機密。</li>
+<li><strong class="font-semibold text-white/90">財務損失：</strong>直接的資金盜竊、勒索軟體攻擊或詐欺。</li>
+<li><strong class="font-semibold text-white/90">聲譽損害：</strong>客戶信任度下降，品牌形象受損。</li>
+<li><strong class="font-semibold text-white/90">營運中斷：</strong>關鍵系統癱瘓，影響正常業務運作。</li>
+<li><strong class="font-semibold text-white/90">法律與合規風險：</strong>因資料保護不力而面臨罰款或訴訟。</li>
+</ul>
+</div>
+<div class="rounded-lg bg-background-dark/50 p-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-3xl text-primary-light">shield</span>
+<h3 class="text-xl font-bold text-white">風險評估要點</h3>
+</div>
+<ul class="mt-4 list-inside list-disc space-y-2 text-white/70">
+<li><strong class="font-semibold text-white/90">識別數位足跡：</strong>評估組織和員工在網路上暴露了多少資訊。</li>
+<li><strong class="font-semibold text-white/90">評估資訊敏感度：</strong>確定哪些公開資訊一旦被利用將造成最大損害。</li>
+<li><strong class="font-semibold text-white/90">檢視安全政策：</strong>審查員工社交媒體使用政策和資料分享規範。</li>
+<li><strong class="font-semibold text-white/90">進行攻擊模擬：</strong>定期進行紅隊演練，模擬 OSINT 攻擊，找出防禦缺口。</li>
+<li><strong class="font-semibold text-white/90">強化安全意識：</strong>對員工進行持續的教育訓練，提高對社交工程的警覺性。</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-Hant">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>OSINT Defense & Tools</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": {
+                        "DEFAULT": "#3b82f6",
+                        "light": "#60a5fa",
+                        "dark": "#2563eb"
+                    },
+                    "secondary": {
+                        "DEFAULT": "#8b5cf6",
+                        "light": "#a78bfa",
+                        "dark": "#7c3aed"
+                    },
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#020414",
+                    "slate": {
+                        "900": "#0F172A",
+                        "800": "#1E293B",
+                        "700": "#334155",
+                        "400": "#94A3B8"
+                    }
+                },
+                fontFamily: {
+                    "display": ["Inter", "Noto Sans TC", "sans-serif"]
+                },
+                boxShadow: {
+                    'glow': '0 0 15px rgba(59, 130, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3)',
+                },
+                backgroundImage: {
+                    'grid': 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                },
+                backgroundSize: {
+                    'grid': '40px 40px'
+                },
+            },
+        },
+    }
+    </script>
+    <style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24
+    }
+    body {
+        margin: 0;
+        overflow-x: hidden;
+    }
+    .card-glow:hover {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        border-color: rgba(59, 130, 246, 0.6);
+    }
+    .text-gradient {
+        background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    #bg-video {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -20;
+        object-fit: cover;
+    }
+    #video-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #020414;
+        opacity: 0.4;
+        z-index: -10;
+    }
+    .map-dark-mode {
+        filter: invert(90%) hue-rotate(180deg) contrast(90%) grayscale(20%);
+    }
+    </style>
+</head>
+<body class="bg-transparent font-display text-white">
+
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="Page2.mp4" type="video/mp4">
+    </video>
+
+    <div id="video-overlay" class="bg-grid"></div>
+
+    <div class="relative z-10 flex min-h-screen w-full flex-col">
+        
+        <header class="sticky top-0 z-50 flex items-center justify-center border-b border-solid border-slate-700/50 bg-background-dark/60 px-4 py-3 backdrop-blur-md">
+            <div class="flex w-full max-w-7xl items-center justify-between">
+                <div class="flex items-center gap-4 text-white">
+                    <div class="size-8 text-primary">
+                        <span class="material-symbols-outlined !text-4xl">hub</span>
+                    </div>
+                    <h2 class="text-lg font-bold tracking-[-0.015em] text-white">OSINT Attack Chain</h2>
+                </div>
+                <nav class="hidden items-center gap-8 md:flex">
+                    <a class="text-sm font-medium text-slate-400 transition-colors hover:text-primary-light" href="index1.html">首頁：威脅概覽</a>
+                    <a class="text-sm font-medium text-slate-400 transition-colors hover:text-primary-light" href="index2.html">攻擊鍊詳解</a>
+                    <a class="relative text-sm font-bold text-primary-light" href="index3.html">防禦與工具</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="flex w-full grow flex-col items-center px-4 py-8 sm:px-6 md:py-16 lg:px-8">
+            <div class="flex w-full max-w-7xl flex-col gap-16">
+                <section class="@container">
+                    <div class="flex flex-col gap-8 rounded-xl border border-slate-700/50 bg-slate-900/60 p-8 shadow-2xl backdrop-blur-sm items-center justify-center">
+                        <div class="flex flex-col gap-4 text-center w-full">
+                            <h1 class="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">OSINT <span class="text-gradient">防禦策略</span>與實用工具</h1>
+                            <p class="text-base font-normal leading-normal text-slate-300 @[480px]:text-lg">本頁介紹實用的工具和策略，幫助您提升網路安全防護能力，有效應對 OSINT 相關的攻擊與威脅。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="flex flex-wrap gap-3 p-3 justify-center">
+                    <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-gradient-to-r from-primary to-secondary px-4 text-sm font-bold text-white shadow-glow transition-all duration-300">全部</button>
+                    <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-slate-700 bg-slate-800/80 px-4 text-sm font-medium text-slate-300 transition-colors hover:border-primary hover:text-primary-light">個人隱私防護</button>
+                    <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-slate-700 bg-slate-800/80 px-4 text-sm font-medium text-slate-300 transition-colors hover:border-primary hover:text-primary-light">企業安全策略</button>
+                    <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-slate-700 bg-slate-800/80 px-4 text-sm font-medium text-slate-300 transition-colors hover:border-primary hover:text-primary-light">資料洩露監控工具</button>
+                    <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full border border-slate-700 bg-slate-800/80 px-4 text-sm font-medium text-slate-300 transition-colors hover:border-primary hover:text-primary-light">社交工程防禦</button>
+                </section>
+
+                <section>
+                    <h2 class="px-4 pb-4 pt-5 text-3xl font-bold leading-tight tracking-tight text-white">Defensive Strategies</h2>
+                    <div class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2">
+                        <div class="flex flex-col gap-6">
+                            <div class="relative overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 p-6 transition-all duration-300 hover:border-primary/50 hover:bg-slate-900/90 backdrop-blur-md">
+                                <div class="absolute -left-16 -top-16 size-48 rounded-full bg-primary/10 blur-3xl"></div>
+                                <div class="relative z-10 flex flex-col gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-3xl text-primary-light">person</span>
+                                        <h3 class="text-xl font-bold text-white">個人層級防禦</h3>
+                                    </div>
+                                    <p class="text-base font-normal leading-relaxed text-slate-400">涵蓋如何管理社群媒體隱私、減少數位足跡、使用假名等策略，保護個人資訊免於洩漏。</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex flex-col overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 backdrop-blur-md">
+                                <div class="h-64 w-full relative overflow-hidden bg-slate-800 group">
+                                    <iframe 
+                                        id="mapFrame"
+                                        src="https://maps.google.com/maps?q=Taipei&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                                        class="w-full h-full border-0 map-dark-mode transition-all duration-500 group-hover:filter-none" 
+                                        allowfullscreen="" 
+                                        loading="lazy" 
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                    </iframe>
+                                    
+                                    <div class="absolute top-2 right-2 pointer-events-none rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
+                                        Interactive Map
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-col gap-4 p-6 bg-slate-900/40">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-lg font-bold text-white">地理位置防禦策略</h4>
+                                        <span class="material-symbols-outlined text-primary-light">map</span>
+                                    </div>
+                                    
+                                    <div class="flex w-full gap-2">
+                                        <input 
+                                            type="text" 
+                                            id="locationInput" 
+                                            placeholder="輸入座標 (25.03, 121.56) 或路名..." 
+                                            class="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                                        />
+                                        <button 
+                                            class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-white hover:bg-primary-dark transition-colors">
+                                            <span class="material-symbols-outlined !text-lg">search</span>
+                                        </button>
+                                    </div>
+
+                                    <p class="text-sm text-slate-300">輸入特定座標或地址以評估周邊環境風險。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 p-6 transition-all duration-300 hover:border-primary/50 hover:bg-slate-900/90 backdrop-blur-md h-full">
+                            <div class="absolute -right-16 -bottom-16 size-48 rounded-full bg-secondary/10 blur-3xl"></div>
+                            <div class="relative z-10 flex flex-col gap-3 h-full">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-3xl text-secondary-light">corporate_fare</span>
+                                    <h3 class="text-xl font-bold text-white">企業層級防禦</h3>
+                                </div>
+                                <p class="text-base font-normal leading-relaxed text-slate-400">介紹員工安全意識培訓、資料外洩防護 (DLP) 政策、供應鏈風險評估等主題，建立堅實的組織防線。</p>
+                                <div class="mt-auto pt-4">
+                                     <div class="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+                                        <div class="flex items-center gap-2 text-sm text-slate-300">
+                                            <span class="material-symbols-outlined text-green-400">check_circle</span>
+                                            <span>DLP 政策已啟用</span>
+                                        </div>
+                                        <div class="mt-2 h-2 w-full rounded-full bg-slate-700">
+                                            <div class="h-2 w-3/4 rounded-full bg-secondary"></div>
+                                        </div>
+                                        <p class="mt-1 text-right text-xs text-slate-500">系統安全評分: 85/100</p>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2 class="px-4 pb-4 pt-5 text-3xl font-bold leading-tight tracking-tight text-white">Practical Tools</h2>
+                    <div class="grid grid-cols-1 gap-6 p-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <a href="https://haveibeenpwned.com/" target="_blank" class="card-glow group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/50 p-6 transition-all duration-300 hover:-translate-y-1">
+                            <div class="flex items-center gap-4">
+                                <div class="flex size-12 items-center justify-center rounded-lg bg-red-500/20 text-red-400 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined">warning</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Have I Been Pwned</h3>
+                            </div>
+                            <p class="mt-4 text-sm text-slate-400">檢查您的 Email 或電話號碼是否在已知的資料外洩事件中被公開。</p>
+                        </a>
+
+                        <a href="https://bitwarden.com/" target="_blank" class="card-glow group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/50 p-6 transition-all duration-300 hover:-translate-y-1">
+                            <div class="flex items-center gap-4">
+                                <div class="flex size-12 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined">lock</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Bitwarden</h3>
+                            </div>
+                            <p class="mt-4 text-sm text-slate-400">開源的密碼管理器，協助生成並安全儲存複雜密碼，防止憑證填充攻擊。</p>
+                        </a>
+
+                        <a href="https://privacybadger.org/" target="_blank" class="card-glow group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/50 p-6 transition-all duration-300 hover:-translate-y-1">
+                            <div class="flex items-center gap-4">
+                                <div class="flex size-12 items-center justify-center rounded-lg bg-yellow-500/20 text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined">visibility_off</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Privacy Badger</h3>
+                            </div>
+                            <p class="mt-4 text-sm text-slate-400">自動學習並封鎖在網路上跟蹤您行為的隱形追蹤器。</p>
+                        </a>
+
+                        <a href="https://signal.org/" target="_blank" class="card-glow group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/50 p-6 transition-all duration-300 hover:-translate-y-1">
+                            <div class="flex items-center gap-4">
+                                <div class="flex size-12 items-center justify-center rounded-lg bg-primary/20 text-primary-light group-hover:bg-primary group-hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined">chat</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-white">Signal</h3>
+                            </div>
+                            <p class="mt-4 text-sm text-slate-400">端對端加密通訊軟體，確保訊息不被第三方攔截或讀取。</p>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

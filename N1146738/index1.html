@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSINT Attack Chain - 首頁</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F98FF",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0A192F",
+                        "card-dark": "#112240",
+                        "text-main-dark": "#ccd6f6",
+                        "text-secondary-dark": "#8892b0",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans TC", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+    body {
+        font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        color: #ccd6f6;
+        background-color: #0A192F;
+    }
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        font-size: inherit;
+    }
+</style>     
+</head>
+<body class="antialiased">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap bg-background-dark/80 backdrop-blur-sm px-10 py-4">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-6">
+<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.0006 18.26L4.9406 22.2082L6.52248 14.2799L0.587891 8.7918L8.6146 7.84006L12.0006 0.5L15.3866 7.84006L23.4133 8.7918L17.4787 14.2799L19.0606 22.2082L12.0006 18.26Z"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">OSINT Attack Chain</h2>
+</div>
+<div class="flex flex-1 justify-end">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="../index.html">小組首頁</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="index1.html">首頁：威脅概覽</a>
+<a class="text-text-secondary-dark text-sm font-medium leading-normal hover:text-primary transition-colors" href="index2.html">攻擊鍊詳解</a>
+<a class="text-text-secondary-dark text-sm font-medium leading-normal hover:text-primary transition-colors" href="index3.html">防禦與工具</a>
+</nav>
+</div>
+</header>
+<main class="flex-grow">
+<section class="min-h-[calc(100vh-80px)] flex flex-col items-start justify-center text-left py-16 px-4 md:px-10">
+<div class="max-w-2xl">
+<h1 class="text-primary text-base font-normal leading-normal mb-3">歡迎來到 OSINT 世界</h1>
+<p class="text-white text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">解構 OSINT 攻擊鍊</p>
+<p class="text-white mt-2 text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">洞悉無形戰場的威脅</p>
+<p class="text-text-secondary-dark text-base font-normal leading-relaxed mt-5 max-w-lg"> 深入了解公開來源情報在現代網路威脅中的關鍵作用，以及如何利用知識防禦潛在的數位攻擊。 </p>
+<a href="index2.html" class="mt-10 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded h-12 px-5 bg-transparent text-primary text-base font-bold leading-normal tracking-[0.015em] border border-primary hover:bg-primary/20 transition-colors w-fit">
+<span class="truncate">探索攻擊鍊</span>
+</a>
+</div>
+</section>
+<section class="py-16 px-4 md:px-10">
+<div class="text-center mb-12">
+<h2 class="text-white text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.015em]">OSINT 攻擊鍊與關鍵威脅</h2>
+<p class="text-text-secondary-dark text-sm mt-3 max-w-2xl mx-auto">攻擊者透過偵察、武器化、傳遞、利用及執行等階段，將公開情報轉化為實際威脅，其中以社交工程及釣魚攻擊為最常見的應用手法。</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+<div class="bg-card-dark border border-white/10 rounded-lg p-6 space-y-4">
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">person_search</span></div>
+<h3 class="text-white text-base font-bold">偵察 (Reconnaissance)</h3>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">build_circle</span></div>
+<h3 class="text-white text-base font-bold">武器化 (Weaponization)</h3>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">forward_to_inbox</span></div>
+<h3 class="text-white text-base font-bold">傳遞 (Delivery)</h3>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">key</span></div>
+<h3 class="text-white text-base font-bold">利用 (Exploitation)</h3>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">play_arrow</span></div>
+<h3 class="text-white text-base font-bold">執行 (Execution)</h3>
+</div>
+</div>
+<div class="bg-card-dark border border-white/10 rounded-lg p-6 space-y-6">
+<div>
+<div class="flex items-center gap-4 mb-2">
+<div class="bg-primary/10 text-primary rounded-md p-3 flex items-center justify-center text-3xl"><span class="material-symbols-outlined">groups</span></div>
+<h4 class="text-white text-lg font-bold">社交工程</h4>
+</div>
+<p class="text-text-secondary-dark text-sm leading-relaxed">利用心理學技巧操縱受害者，使其洩露敏感資訊或執行不安全的操作，直接攻擊人性的弱點。</p>
+</div>
+<div>
+<div class="flex items-center gap-4 mb-2">
+<div class="bg-primary/10 text-primary rounded-md p-3 flex items-center justify-center text-3xl"><span class="material-symbols-outlined">phishing</span></div>
+<h4 class="text-white text-lg font-bold">釣魚攻擊</h4>
+</div>
+<p class="text-text-secondary-dark text-sm leading-relaxed">透過偽造的電子郵件、訊息或網站，誘騙使用者點擊惡意連結或提供個人憑證，成功率極高。</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="text-center py-8 mt-12 border-t border-white/10">
+<p class="text-text-secondary-dark text-xs"> © 2024 OSINT Attack Chain Analysis. All rights reserved.<br/> 本網站內容僅供教育與研究目的。 </p>
+</footer>
+</div>
+</div>
+</div>
+</div>
+</body></html>
