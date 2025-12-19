@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電影感字幕捲動</title>
+    <!--  基礎排版 + 字幕捲動 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200..900&display=swap" rel="stylesheet">
+    <style>
+
+#story-frame {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: black;
+    height: 100vh;
+    overflow: clip;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    opacity: 1;
+    transition: opacity 2s ease;
+}
+
+#scroll-container {
+    width: 60%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#story-text {
+    position: absolute;
+    bottom: -130%;
+    width: 100%;
+    font-size: 20px;
+    color: #f2f2f2;
+    line-height: 1.7;
+    animation: scrollUp 20s linear forwards;
+}
+
+@keyframes scrollUp {
+    from { bottom: -130%; }
+    to { bottom: 105%; }
+}
+    </style>
+    <!-- 暗角（Vignette）  -->
+    <style>
+.vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
+    z-index: 5;
+}
+
+    </style>
+    <!--  電影粒子（Film Grain） -->
+    <style>
+.grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: url("data:image/svg+xml;utf8,\
+    <svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>\
+    <filter id='n'>\
+        <feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/>\
+    </filter>\
+    <rect width='100%' height='100%' filter='url(%23n)'/>\
+    </svg>");
+    opacity: 0.15;
+    animation: grainMove 1s steps(8) infinite;
+    z-index: 4;
+}
+
+@keyframes grainMove {
+    0%, 100% { transform: translate(0,0); }
+    10% { transform: translate(-2%, -1%); }
+    20% { transform: translate(1%, -2%); }
+    30% { transform: translate(-1%, 2%); }
+    40% { transform: translate(2%, 1%); }
+}
+
+    </style>
+    <!-- 漂浮光點（Dust Particles）  -->
+    <style>
+.dust {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.15) 2px, transparent 3px);
+    background-size: 5px 5px;
+    animation: dustFloat 40s linear infinite;
+    opacity: 0.12;
+    z-index: 3;
+}
+
+@keyframes dustFloat {
+    from { transform: translate(0,0); }
+    to { transform: translate(-300px, -600px); }
+}
+
+    </style>
+<!-- Main content -->
+  <style>
+#main-content {
+    display: none;
+    padding: 30px;
+    background: white;
+    color: #111;
+}
+#skip-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 100;
+    border-radius: 5px;
+}
+
+#skip-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+</style>
+    <style>
+/* 基本設定 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 60px 0 0;
+    background-image: url('./assets/images/background2.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* nav 主框架 */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 5px 60px;
+    z-index: 9000;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr;
+    align-items: center;
+    background-image: url(assets/images/nav-bg.jpg);
+    color: white;
+}
+
+nav img {
+    height: 60px;
+    display: block;
+}
+
+/* 中間選單 */
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* 每個 li */
+nav li {
+    flex: 1;
+    height: 100%;
+
+    display: flex;
+}
+
+/* 每個 a */
+nav li a {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* 讓 ::after 對準它 */
+    text-decoration: none;
+    font-size: 1.2em;
+    color: white;
+    height: 100%;
+}
+
+/* Hover 底部三角形 */
+nav li a::after {
+    content: '';
+    width: 20px;
+    aspect-ratio: 4/1.5;
+    background-color: rgba(255, 255, 255, 0.6);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* 滑過 li 時出現 */
+nav li:hover a::after {
+    opacity: 1;
+}
+
+nav div#right {
+    padding: 5px;
+    border: 3px solid cadetblue;
+    text-align: center;
+    border-radius: 10px;
+}
+
+nav div#right:hover {
+    background-color: cadetblue;
+    transform: scale(1.1);
+}
+
+/* content 區域可保持你的設定 */
+main {
+    padding: 0 20px 20px;
+    margin-top: 70px;
+    width: 100%;
+    color: black;
+    font-size: 18px;
+    line-height: 2;
+    background-color: rgba(255, 255, 255, 0.6);
+    box-sizing: border-box;
+}
+
+/* 整體區塊、冬木背景 */
+.story-intro {
+  position: relative;
+  //padding: 40px 0;
+  color: #e6e6e6;
+  overflow: hidden;
+  background-image: url('./assets/images/jpcity.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: calc(100vh - 70px);
+  box-sizing: border-box;
+  align-items: center;
+  display: inline-flex;
+  width: 100%;
+}
+
+/* 深色遮罩（關鍵） */
+.story-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.75) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.2) 100%
+  );
+  z-index: 1;
+}
+
+/* 內容容器 */
+.story-inner {
+  position: relative;
+  z-index: 2;
+
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* 文字區 */
+.story-content {
+  max-width: 560px;
+}
+
+/* PROLOGUE */
+.story-label {
+  display: inline-block;
+  font-size: 0.8em;
+  letter-spacing: 0.25em;
+  color: #c8a25a;
+  //margin-bottom: 14px;
+}
+
+/* 主標 */
+.story-content h1 {
+  font-family: 'Noto Serif HK', serif;
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+/* 副標 */
+.story-content h2 {
+  font-size: 18px;
+  font-weight: normal;
+  color: #b8b8b8;
+  margin-bottom: 18px;
+}
+
+/* 內文 */
+.story-content p {
+  font-size: 16px;
+  line-height: 1.9;
+  margin-bottom: 18px;
+  color: #dddddd;
+}
+
+/* 強調句（很官網） */
+.story-emphasis {
+  margin-top: 24px;
+  font-style: italic;
+  color: #cfcfcf;
+}
+
+
+/* Slider 主容器 */
+.slider {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    margin: 40px 0;
+    border-radius: 10px;
+    scroll-margin-top: calc(70px + (100vh - 470px) / 2);
+}
+
+/* 全部 slides 的容器 */
+.slides {
+    display: flex;
+    width: 800%; /* 8 張圖 → 8 * 100% */
+    height: 100%;
+    transition: transform 0.6s ease;
+}
+
+/* 每張 slide */
+.slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* 左右切換按鈕 */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    color: rgba(10,10,10,0.7);
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+    color: gray;
+}
+
+.slider-btn.prev {
+    left: 10px;
+}
+
+.slider-btn.next {
+    right: 10px;
+}
+
+/* 下方圓點 */
+.dots {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.dots span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.dots .active {
+    background: white;
+}
+
+div.slide section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: calc(100vw - 40px);
+    height: 100%;
+    padding: 30px;
+    //margin-left: 0px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: stretch;
+    box-sizing: border-box;
+
+}
+
+div.slide:nth-of-type(even) section {
+  flex-direction: row-reverse;
+}
+
+section .right {
+    width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+section button {
+    min-width: 180px;
+    height: 56px;
+    padding: 0 32px;
+    font-family: 'Noto Serif HK';
+    font-size: 1.3em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: #2a1c00;
+    background: linear-gradient(135deg, #fff2c2 0%,
+    #e6c26e 25%, #c9a24d 50%, #e6c26e 75%, #fff2c2 100%);
+    border: 1px solid #b08b38;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.6);
+    transition: all .3s ease;
+}
+
+section button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.5),
+    transparent
+  );
+  transition: left .6s ease;
+}
+
+section button:hover::before {
+  left: 0;
+}
+
+section button:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.4),
+    inset 0 2px 6px rgba(0,0,0,.2);
+}
+
+
+section .left {
+    width: 40%;
+    color: #ffffff;
+    text-align: left;
+}
+
+div.slide:nth-of-type(even) section .left {
+  text-align: right;
+}
+
+section h1, section h2 {
+    font-family: 'Noto Serif HK';
+    margin: 0 0 0 20px;
+}
+
+div.slide:nth-of-type(even) h1,
+div.slide:nth-of-type(even) h2 {
+    font-family: 'Noto Serif HK';
+    margin: 0 20px 0 0;
+}
+
+section p {
+    font-family: 'Noto-Sans-TC';
+    margin-left: 40px;
+    line-height: 1.5;
+}
+
+div.slide:nth-of-type(even) section p {
+    margin-right: 40px;
+}
+
+/* footer 整體 */
+.fgo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 24px 40px;
+  background-color: #2e2f31;
+  color: #9c9c9c;
+  font-size: 0.8em;
+}
+
+footer a img {
+  height: 50px;
+}
+
+/* 右側分級資訊 */
+.footer-level {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-level img {
+  width: 56px;
+  height: 56px;
+}
+
+.footer-level ul {
+  //list-style: none;     /* 移除項目符號 */
+  margin: 0;
+  padding: 0;
+}
+
+.footer-level li {
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* 最後一行不留空 */
+.footer-level li:last-child {
+  margin-bottom: 0;
+}
+
+/* model 元件 */
+.modal {
+  position: fixed;
+  inset: 0;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  display: none; /* 預設隱藏 */
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.8)), rgba(255, 255, 255, 0.08);
+}
+
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 1000px);
+  height: min(80vh, 700px);
+  margin: auto;
+  margin-top: 10vh;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+
+.modal-content {
+  padding: 60px 80px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background-color: whitesmoke;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+  </style>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelector(".slides");
+    const dotsContainer = document.querySelector(".dots");
+    const totalSlides = document.querySelectorAll(".slide").length;
+    let index = 0, interval = 10;
+    let jobId;
+
+    /* 產生圓點 */
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement("span");
+        if (i === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+
+    const dots = document.querySelectorAll(".dots span");
+
+    function goToSlide(i) {
+        index = i;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+        restartAutoPlay();
+    }
+
+    function updateDots() {
+        dots.forEach(d => d.classList.remove("active"));
+        dots[index].classList.add("active");
+    }
+
+    function autoPlay() {
+        jobId = setInterval(() => {
+            index = (index + 1) % totalSlides;
+            goToSlide(index);
+        }, interval * 1000);
+    }
+
+    function restartAutoPlay() {
+        clearInterval(jobId);
+        autoPlay();
+    }
+
+    /* 左右按鈕 */
+    document.querySelector(".prev").addEventListener("click", (e) => {
+        //index = (e.target.classList.contains("next") ? index + 1 : index - 1 + totalSlides) % totalSlides;
+        index = (index - 1 + totalSlides) % totalSlides;
+        goToSlide(index);
+    });
+
+    document.querySelector(".next").addEventListener("click", () => {
+        index = (index + 1) % totalSlides;
+        goToSlide(index);
+    });
+
+    // autoPlay();
+});
+
+function scrollToStory () {
+    document.getElementById("story").scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</head>
+<body>
+
+    <!-- 黑幕 + 字幕 >
+    <div id="story-frame">      
+        <div class="vignette">柔光（暗角）效果</div>
+        <div class="grain">粒子效果</div>
+        <div id="scroll-container">
+            <div id="story-text">
+                <p>西元2015年，魔術尚成立的最後的時代。</p>
+                <p>社會是由人之手構築起來的，但掌握著世界真理的，卻是魔術師。<br>魔術司掌著科學無法解釋的人類過去的技術，科學則累積著魔術無法達成的人類未來的技術。<br>這兩種決無法相容的學問之學徒，僅在某一點上是志同道合的。<br>無論是魔術還是科學，都是為了給鑽研的人類帶來更為長久的繁榮——也就是，守護人類歷史。</p>
+                <p>然而2015年，人理延續保障機構觀測到的未來領域毫無前兆地消失，根據計算，發現——不，是證明了人類將於2018年滅絕。</p>
+                <p>為什麼。怎麼會。是誰。做了什麼。面對眾多疑問，迦勒底的研究者們陷入了疑惑。</p>
+                <p>就在這時，人理延續保障機構觀測到了新的異變。<br>西元2004年，在日本的冬木市，在這裡，出現了從未出現過的「無法觀測的領域」。</p>
+                <p>迦勒底將這裡假定為人類滅絕的原因，決定執行尚處於試驗階段的第六實驗。<br>那就是回到過去的時間旅行。</p>
+                <p>其名為聖杯探索——冠位指定（Grand Order）<br>這是一切為保衛人類，與人類歷史對抗，與命運作戰存在的總稱。</p>
+            </div>
+        </div>
+       <button id="skip-button">跳過動畫</button>
+    </div-->
+
+    <nav>
+        <img src="./assets/images/logo.png" class="logo" alt="FGO Logo">
+        <ul><li></li>
+            <li><a onclick="scrollToStory()">故事場景</a></li>
+            <li><a href="page2.html">職階介紹</a></li>
+            <li><a href="page3.html">從者情報</a></li>
+            <li></li>
+        </ul>
+        <div id="right"><a href="../index.html">回小組首頁</a></div>
+    </nav>
+
+    <main class="content"> <!-- style="display:none" -->
+<div class="story-intro fuyuki-bg">
+  <div class="story-overlay"></div>
+
+  <div class="story-inner">
+    <div class="story-content">
+      <span class="story-label">序章</span>
+      <h1>炎上汙染都市・冬木</h1>
+      <h2>人理燒卻的起點</h2>
+
+      <p>
+        公元 2004 年 1 月 30 日，日本・冬木市。
+        原本應存在於歷史中的城市，卻因不明原因被完全燃燒殆盡，
+        成為人理遭受干涉後所產生的最初特異點。
+      </p>
+
+      <p>
+        主角與瑪修・基利艾拉特在此首次進行靈子轉移，
+        面對失控的從者與無數骷髏兵，
+        並在火海之中確認了「修復人理」的使命。
+      </p>
+
+      <p class="story-emphasis">
+        —— 冬木市，既是終焉的象徵，也是旅程的起點。
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!--p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年（國服為2016年），主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p>
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p>
+
+        <p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年（國服為2016年），主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p>
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p>
+
+        <p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年，主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p>
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p-->
+       <div id="story" class="slider">
+          <div class="slides">
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.png');background-color: rgba(0, 0, 0, .3);
+  background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第一特異點</h1>
+                       <h2>邪龍百年戰爭 奧爾良</h2>
+                            <p>被扭曲的百年戰爭歷史，<br>法蘭西大地陷入烈焰與混亂。<br>黑化的聖女現身，<br>率領邪龍大軍蹂躪世界。<br><br>御主啊，阻止失控的歷史，<br>修復人理的第一步由此開始。</p>
+                   </div>
+                   <div class="right"><button data-chapter="1">劇情介紹</button></div>
+                </section>
+	    </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap2.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第二特異點</h1>
+                       <h2>永續瘋狂帝國 七丘之城</h2>
+                            <p>羅馬帝國本該迎來終焉，<br>卻在此刻停滯不前。<br>不朽的皇帝統御一切，<br>歷史的流動被強行固定。<br><br>在七丘之城，你將面對永恆的榮光，<br>以及被扭曲的霸道。</p>
+                   </div>
+                   <div class="right"><button data-chapter="2">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap3.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第三特異點</h1>
+                       <h2>封鎖終局四海 俄刻阿諾斯</h2>
+                            <p>在無盡的海洋彼端，<br>人理被徹底封鎖。<br>群雄割據、海盜橫行，<br>命運在浪濤中彼此交錯。<br><br>跨越大海，<br>迎向尚未被書寫的結局。</p>
+                   </div>
+                   <div class="right"><button data-chapter="3">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap4.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第四特異點</h1>
+                       <h2>死界魔霧都市 倫敦</h2>
+                            <p>濃霧籠罩的工業都市，<br>魔術與機械相互交織。<br>倫敦的夜晚不再安眠，<br>死亡在街道中蔓延。<br><br>揭開霧的真相，<br>阻止文明的崩壞。</p>
+                   </div>
+                   <div class="right"><button data-chapter="4">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap5.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第五特異點</h1>
+                       <h2>北美神話大戰 合眾為一</h2>
+                            <p>神與英雄分據大地，<br>人類被迫選邊而戰。<br>文明、信仰與暴力，<br>在戰火中彼此衝突。<br><br>於神話的戰場之上，<br>抉擇人類的未來。</p>
+                   </div>
+                   <div class="right"><button data-chapter="5">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap6.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第六特異點</h1>
+                       <h2>神聖圓桌領域 卡美洛</h2>
+                            <p>被聖光統治的砂之國度，<br>人理遭到裁決。<br>理想化的秩序之下，<br>無數犧牲被視為必然。<br><br>在絕對的正義面前，<br>你是否仍能堅守人性。</p>
+                   </div>
+                   <div class="right"><button data-chapter="6">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap7.png');background-color: rgba(0, 0, 0, .45);background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>第七特異點</h1>
+                       <h2>絕對魔獸戰線 巴比倫尼亞</h2>
+                            <p>神代的黃昏降臨，<br>人類文明瀕臨終焉。<br>古老的神明甦醒，<br>魔獸越過最後防線。<br><br>為了生存，<br>人類必須迎戰神明。</p>
+                   </div>
+                   <div class="right"><button data-chapter="7">劇情介紹</button></div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap8-2.png');background-color: rgba(0, 0, 0, .3);
+  background-blend-mode: multiply;">
+                   <div class="left">
+                       <h1>最終特異點</h1>
+                       <h2>冠位時間神殿 所羅門</h2>
+                            <p>一切特異點的源頭，<br>終於顯現。<br>跨越無數犧牲與旅程，<br>決戰的時刻已然到來。<br><br>此戰，<br>將決定人理的存亡。</p>
+                   </div>
+                   <div class="right"><button data-chapter="8">劇情介紹</button></div>
+                </section>
+            </div>
+          </div>
+
+          <div class="slider-btn prev">&#8249;</div>
+          <div class="slider-btn next">&#8250;</div>
+          <div class="dots"></div>
+        </div>
+    </main>
+    <footer class="fgo-footer">
+    <a href="https://apps.apple.com/tw/app/apple-store/id1225867328">
+      <img src="assets/images/appleStoreBadge.svg" alt="Download on App Store">
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.xiaomeng.fategrandorder">
+      <img src="assets/images/googleStoreBadge.svg" alt="Download on Google Play">
+    </a>
+
+  <div class="footer-level">
+    <img src="assets/images/level.svg" alt="12+ 分級" class="level-icon">
+    <ul class="level-text">
+      <li>遊戲內容涉及性、暴力、不當語言，依遊戲軟體分級管理辦法分類為輔12級。</li>
+      <li>遊戲情節純屬虛構，注意使用時間，切勿沉迷或模仿。</li>
+      <li>部分內容須另行付費，勿用他人代儲以免觸法。</li>
+    </ul>
+  </div>
+</footer>
+<style>
+.modal-content {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.modal-top {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.modal-text {
+  flex: 0 0 55%;
+}
+
+.modal-video {
+  flex: 0 0 45%;
+  display: flex;
+  align-items: center;
+}
+
+.modal-video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+}
+.modal-servants h3 {
+  margin-bottom: 16px;
+}
+
+.servant-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+
+.servant-list li {
+  white-space: nowrap;
+}
+
+.modal-servants {
+  margin-top: 40px;
+}
+
+.modal-servants h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.servant-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.servant-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.servant {
+    display: inline-grid;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+}
+
+.servant > span {
+    padding: 0 3px;
+    width: var(--icon-width);
+    white-space: nowrap;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.servant > img {
+    width: 86px;
+    height: 86px;
+    border-radius: 10px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 0;
+    vertical-align: middle;
+}
+
+
+@media (max-width: 768px) {
+  .modal-top {
+    flex-direction: column;
+  }
+
+  .modal-text,
+  .modal-video {
+    flex: 1;
+  }
+}
+
+
+</style>
+<div class="modal" id="modal-story" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+
+  <div class="modal-panel">
+    <button class="modal-close" aria-label="關閉">✕</button>
+
+<div class="modal-content">
+
+  <!-- 上半部：文字 + 影片 -->
+  <div class="modal-top">
+    <div class="modal-text" id="chapter-story">
+      <h1>THE DEAD FOG CITY</h1>
+      <h2>死界魔霧都市・倫敦</h2>
+      <p>工業革命時期的倫敦，被不祥的魔霧全面籠罩。蒸汽與齒輪運轉的城市，在科學與魔術失衡的影響下，逐步化為死界。怪異事件頻發，人們在霧中消失，文明的象徵反而成為恐懼的根源。</p>
+<p>御主與莫德雷德、尼古拉・特斯拉等從者合作，調查魔霧的來源。隨著行動推進，亨利・傑基爾與海德、弗蘭肯斯坦等存在浮上檯面，揭示人類追求進步時所付出的代價。科學與魔術的交錯，不再是希望，而是失控的導火線。</p>
+<p>倫敦的戰鬥，是一場對「理性極限」的警示。當技術超越人性，人理便會崩壞。御主必須在霧中前行，阻止城市邁向不可逆的毀滅。
+      </p>
+    </div>
+
+    <div class="modal-video">
+      <iframe
+        src="https://www.youtube.com/embed/VY3d837SEjE"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- 下半部：登場從者 -->
+<div class="modal-servants">
+  <h3>登場從者</h3>
+
+  <div class="servant-grid">
+    <!-- 預設 5 個頭像（之後由 JS 動態生成） -->
+    <div class="servant" id="002"><img src="assets/images/servant/head002.png" class="gold"><span class="fit">阿爾托莉亞・潘德拉剛</span></div><div class="servant" id="003"><img src="assets/images/servant/head003.png" class="gold"><span class="fit">阿爾托莉亞・潘德拉剛〔Alter〕</span></div><div class="servant" id="004"><img src="assets/images/servant/head004.png" class="gold"><span class="fit">阿爾托莉亞・潘德拉剛〔Lily〕</span></div><div class="servant" id="005"><img src="assets/images/servant/head005.png" class="gold"><span class="fit">尼祿・克勞狄烏斯</span></div><div class="servant" id="006"><img src="assets/images/servant/head006.png" class="gold"><span class="fit">齊格飛</span></div>
+  </div>
+</div>
+
+</div>
+
+  </div>
+</div>
+
+
+
+<!--script>
+document.addEventListener("DOMContentLoaded", () => {
+    const storyFrame = document.getElementById("story-frame");
+    const mainContent = document.getElementsByTagName("main")[0];
+    const storyText = document.getElementById("story-text");
+    const skipButton = document.getElementById("skip-button");
+
+    // 用來跟蹤是否已經點擊了跳過按鈕
+    let skipAnimation = false;
+
+    // 當用戶點擊跳過按鈕時
+    skipButton.addEventListener("click", () => {
+        skipAnimation = true;
+        // 立即開始 3 秒過渡過程
+	mainContent.removeAttribute('style');
+        storyFrame.style.opacity = 0;
+
+        // 在 3 秒後過渡結束，隱藏字幕框，顯示主內容
+        setTimeout(() => {
+            storyFrame.style.display = "none";
+        }, 3000); 
+    });
+
+    // 當字幕動畫結束時觸發
+    storyText.addEventListener("animationend", () => {
+        // 如果沒有按下跳過按鈕，就繼續進行 3 秒的過渡
+        if (!skipAnimation) {
+            setTimeout(() => {
+            	mainContent.removeAttribute('style');
+                storyFrame.style.opacity = 0;
+                
+                setTimeout(() => {
+                    storyFrame.style.display = "none";
+                }, 3000); // 這裡的 2000 與過渡時間相對應
+            }, 2000);  // 字幕結束後等待 3 秒
+        }
+    });
+});
+
+</script-->
+<script>
+document.querySelectorAll('.right button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const story = [,{h1: "", h2: "邪龍百年戰爭・奧爾良", p: ["御主與瑪修首次靈子轉移，降臨於被扭曲的十五世紀法國奧爾良。本應以勝利告終的百年戰爭卻陷入無止境的殺戮，城市與村莊遭到邪龍焚毀，民眾在恐懼中流離失所。這一切的中心，是本不該存在於此的「黑化聖女」──以復仇與憎恨為核心的貞德。","在調查過程中，御主結識了吉爾・德・萊斯、伊莉莎白・巴托里等從者，逐步理解這場戰爭已被外力徹底扭曲。邪龍的出現並非偶然，而是由魔術干涉所引發的人理異常。面對被仇恨侵蝕的聖女，御主必須在戰場上一次次作出抉擇，保護民眾、集結戰力，並直面「理想被否定後所誕生的絕望」。","這場戰役不只是為了勝利，更是為了確認「人理修復」真正的意義。奧爾良的火焰，成為御主踏上漫長旅程的起點。"]},{h1: "", h2: "永續瘋狂帝國・七丘之城", p: ["靈子轉移的目的地來到古羅馬，七丘之城卻呈現出異樣的景象。歷史本應迎來衰退的羅馬帝國，在此卻陷入「永恆繁榮」的瘋狂狀態。皇帝尼祿依舊統治一切，人民歌頌榮光，卻對異常毫無察覺。時間彷彿被強行停滯，人理的流動遭到破壞。","御主與布狄卡、凱撒等從者攜手行動，逐步揭開帝國表象下的扭曲真相。七丘之城不再只是文明象徵，而成為執念的具現。隨著調查深入，御主意識到，這並非單純的暴政，而是某種力量試圖以「永恆秩序」取代人類歷史的前進。","在榮光與瘋狂交織的帝都中，御主必須選擇打破虛假的和平，讓歷史重新流動。七丘之城的戰鬥，象徵著人理修復的第二次試煉。"]},{h1: "", h2: "封鎖終局四海・俄刻阿諾斯", p: ["靈子轉移將御主帶入大航海時代的廣闊海域，然而本應連結世界的海洋，卻被異常氣象與未知力量封鎖。船隊失聯、港口荒廢，航海史的核心被徹底改寫。這片名為「俄刻阿諾斯」的海域，成為人理無法延伸的盲區。","在弗朗西斯・德雷克、黑鬍子等從者的協助下，御主展開航行調查。隨著航線推進，英雄、海盜與神話傳說彼此交錯，過去的榮耀與未來的命運在浪濤中碰撞。這不僅是一場對抗敵人的戰鬥，更是對「自由」與「選擇」的考驗。","當真相逐漸浮現，御主意識到，封鎖海洋的並非單一敵人，而是對歷史終局的強行干涉。跨越四海，才能讓人理重新連結世界。"]},{h1: "", h2: "死界魔霧都市・倫敦", p: ["工業革命時期的倫敦，被不祥的魔霧全面籠罩。蒸汽與齒輪運轉的城市，在科學與魔術失衡的影響下，逐步化為死界。怪異事件頻發，人們在霧中消失，文明的象徵反而成為恐懼的根源。","御主與莫德雷德、尼古拉・特斯拉等從者合作，調查魔霧的來源。隨著行動推進，亨利・傑基爾與海德、弗蘭肯斯坦等存在浮上檯面，揭示人類追求進步時所付出的代價。科學與魔術的交錯，不再是希望，而是失控的導火線。","倫敦的戰鬥，是一場對「理性極限」的警示。當技術超越人性，人理便會崩壞。御主必須在霧中前行，阻止城市邁向不可逆的毀滅。"]},{h1: "", h2: "合眾為一・北美", p: ["北美大陸成為神話與英雄對峙的戰場。不同文明、不同信仰的勢力割據土地，人類被迫在神與英雄之間選邊站。歷史不再是人類的選擇，而是神話的延伸。","御主與庫・夫林、南丁格爾等從者並肩作戰，面對連續不斷的衝突與試煉。英雄的理想、神明的意志、人類的生存，三者彼此衝突，讓戰場不斷擴大。這裡不存在單純的正義，只有立場與信念的對立。","北美特異點迫使御主直視「人類在神話中的位置」。唯有重新確立人類的主體性，歷史才能回到正軌。"]},{h1: "", h2: "神聖圓桌領域・卡美洛", p: ["沙漠中的卡美洛，被聖光與鐵血秩序所支配。獅子王阿爾托莉亞以「絕對正義」統治一切，圓桌騎士分裂為不同立場，守護與裁決不再區分。人類的價值，被重新定義。","御主在這片土地上，面對高文、蘭斯洛特等騎士的信念衝突，也逐步理解獅子王的理想與其代價。為了保存「理想化的人理」，無數犧牲被視為必然。這場戰役不只是武力對抗，更是對價值觀的全面衝突。","卡美洛考驗的，是御主是否能在絕對正義之前，依然選擇人性。"]},{h1: "", h2: "絕對魔獸戰線・巴比倫尼亞", p: ["人理崩壞的核心，位於神代終焉的古巴比倫。魔獸橫行，神明甦醒，人類文明瀕臨滅絕。烏魯克城成為最後的防線，而統治此地的，是賢王吉爾伽美什。","御主與恩奇都、伊絲塔等從者共同作戰，迎擊不斷來襲的魔獸軍團。這不只是戰爭，更是神與人類告別的時代。每一次防守，都是在為人類爭取存續的可能。","巴比倫尼亞，是人理與神代的最終分界線。"]},{h1: "", h2: "冠位時間神殿・所羅門", p: ["所有特異點的源頭，終於顯現。時間神殿成為人理存亡的最終戰場，御主與歷經旅程的從者們再次集結。敵人並非單純的存在，而是對「人類歷史本身」的否定。","在這裡，過去的犧牲與羈絆交織成最後的力量。戰鬥的意義，已超越勝敗本身。這是對人類未來的最終回應，也是御主旅程的終點。","人理是否值得被守護，答案，將在此揭曉。"]}][btn.dataset.chapter];
+
+    document.getElementById("chapter-story").innerHTML = ["p", "h2", "h1"].map((e, i) => i ?  `<${e}>${story[e]}</${e}>` : story[e].map(t => `<p>${t}</p>`).join("")).reverse().join("");
+
+    document.getElementById("modal-story").style.display = 'block';
+    document.body.style.overflow = 'hidden'; // 禁止背景捲動
+  });
+});
+
+document.querySelectorAll('.modal-close, .modal-backdrop').forEach(el => {
+  el.addEventListener('click', () => {
+    el.closest('.modal').style.display = 'none';
+    document.body.style.overflow = '';
+  });
+});
+</script>
+</body>
+</html>
