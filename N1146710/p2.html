@@ -5,77 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>銀河帝國 | GALACTIC EMPIRE</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Orbitron:wght@400;700;900&family=Teko:wght@300;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Orbitron:wght@400;700;900&family=Teko:wght@300;500&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================
-           簡易配置區 (CONFIGURATION ZONE)
+           變數配置 (CONFIGURATION)
            ========================================= */
         :root {
-            /* --- 顏色設定 --- */
+            /* 顏色變數 */
             --bg-color: #050508;
-            /* 網頁背景深色 */
             --card-bg: rgba(22, 22, 37, 0.8);
-            /* 卡片背景半透明色 */
-
             --primary-neon: #00f3ff;
-            /* 主色調 (科技青) */
             --secondary-neon: #bc13fe;
-            /* 副色調 (皇室紫) */
             --alert-neon: #ff2a6d;
-            /* 警告/強調色 (戰爭紅) */
             --nav-highlight: #ff5722;
-            /* 導覽列強調色 (橘紅) */
-
             --text-main: #e0e0ff;
-            /* 主要文字顏色 */
             --text-dim: #8a8aab;
-            /* 次要/說明文字顏色 */
-
-            /* --- 尺寸設定 --- */
+            /* 尺寸變數 */
             --header-height: 80px;
-            /* 導覽列高度 */
             --max-width: 1300px;
-            /* 內容最大寬度 */
         }
 
         /* =========================================
-           基礎重置 (RESET & BASE)
+           基礎樣式 (BASE)
            ========================================= */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             overflow-x: hidden;
-            /* 隱藏水平卷軸 */
             line-height: 1.6;
             min-width: 1024px;
-            /* 強制最小寬度，避免縮小視窗時跑版 */
         }
-
-        /* 標題字體設定 */
-        h1,
-        h2,
-        h3,
-        .logo,
-        .btn,
-        label,
-        .card-icon,
-        .fleet-class,
-        .btn-full,
-        .tech-label {
+        h1, h2, h3, .logo, .btn, label, .card-icon, .fleet-class, .btn-full, .tech-label {
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -85,21 +49,15 @@
            導覽列 (NAVIGATION)
            ========================================= */
         header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
+            position: fixed; top: 0; width: 100%; z-index: 1000;
             height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.4s ease;
             background: linear-gradient(to right, rgba(0, 20, 40, 0.8), rgba(0, 40, 80, 0.6));
             backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(0, 243, 255, 0.2);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
-
         header.scrolled {
             background: linear-gradient(to right, rgba(0, 15, 30, 0.95), rgba(0, 30, 60, 0.9));
             backdrop-filter: blur(15px);
@@ -107,886 +65,418 @@
             box-shadow: 0 5px 20px rgba(0, 243, 255, 0.2);
             height: 70px;
         }
-
-        nav {
-            width: 95%;
-            max-width: var(--max-width);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        nav { width: 95%; max-width: var(--max-width); display: flex; justify-content: space-between; align-items: center; }
+        
         .logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #fff;
+            font-size: 1.8rem; font-weight: 900; color: #fff;
             text-shadow: 0 0 10px var(--primary-neon), 0 0 20px var(--primary-neon);
-            position: relative;
             letter-spacing: 3px;
         }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 0.5rem;
-            list-style: none;
-        }
-
+        .nav-container { display: flex; align-items: center; gap: 1.5rem; }
+        .nav-links { display: flex; gap: 0.5rem; list-style: none; }
+        
         .nav-links a {
-            text-decoration: none;
-            color: #fff;
-            font-size: 0.9rem;
-            font-weight: 600;
-            padding: 0.6rem 1.2rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid transparent;
+            text-decoration: none; color: #fff; font-size: 0.9rem; font-weight: 600;
+            padding: 0.6rem 1.2rem; border-radius: 4px; transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid transparent;
         }
-
         .nav-links a:hover {
-            background: rgba(0, 243, 255, 0.15);
-            border-color: var(--primary-neon);
-            color: var(--primary-neon);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.15); border-color: var(--primary-neon);
+            color: var(--primary-neon); box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
             transform: translateY(-2px);
         }
-
         .nav-cta-btn {
-            padding: 0.7rem 1.5rem;
-            background: linear-gradient(45deg, var(--nav-highlight), #ff8c00);
-            color: #fff;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
-            transition: all 0.3s ease;
-            letter-spacing: 1px;
-            border: none;
-            cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
+            padding: 0.7rem 1.5rem; background: linear-gradient(45deg, var(--nav-highlight), #ff8c00);
+            color: #fff; font-weight: bold; text-decoration: none; border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4); transition: all 0.3s ease;
+            letter-spacing: 1px; font-family: 'Orbitron', sans-serif; font-size: 0.9rem;
         }
-
         .nav-cta-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 87, 34, 0.6);
+            transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 87, 34, 0.6);
             background: linear-gradient(45deg, #ff8c00, var(--nav-highlight));
         }
 
-
         /* =========================================
-           主視覺區 (HERO SECTION)
+           首頁主視覺 (HERO SECTION)
            ========================================= */
         .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(to bottom, rgba(5, 5, 8, 0.3), var(--bg-color)),
-                url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80');
-            background-size: cover;
-            background-position: center;
-            padding: 0 20px;
-            position: relative;
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: linear-gradient(to bottom, rgba(5, 5, 8, 0.3), var(--bg-color)), url('media/p2-01.jpg');
+            background-size: cover; background-position: center;
+            padding: 0 20px; position: relative;
         }
 
-        /* Glitch 故障文字特效 */
+        /* 文字故障特效 (Glitch Effect) */
         .glitch {
-            position: relative;
-            font-size: 4.5rem;
-            /* 固定字體大小 */
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 3px;
-            z-index: 1;
-            margin-bottom: 1rem;
+            position: relative; font-size: 4.5rem; font-weight: bold; color: #fff;
+            letter-spacing: 3px; z-index: 1; margin-bottom: 1rem;
             text-shadow: 2px 2px 0px var(--alert-neon), -2px -2px 0px var(--primary-neon);
             animation: glitch-skew 1s infinite linear alternate-reverse;
         }
-
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%; height: 100%;
         }
-
         .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 var(--alert-neon);
+            left: 2px; text-shadow: -1px 0 var(--alert-neon);
             clip: rect(44px, 450px, 56px, 0);
             animation: glitch-anim 5s infinite linear alternate-reverse;
         }
-
         .glitch::after {
-            left: -2px;
-            text-shadow: -1px 0 var(--primary-neon);
+            left: -2px; text-shadow: -1px 0 var(--primary-neon);
             clip: rect(44px, 450px, 56px, 0);
             animation: glitch-anim2 5s infinite linear alternate-reverse;
         }
-
         @keyframes glitch-anim {
-            0% { clip: rect(18px, 9999px, 81px, 0); }
-            20% { clip: rect(76px, 9999px, 14px, 0); }
-            40% { clip: rect(32px, 9999px, 63px, 0); }
-            60% { clip: rect(46px, 9999px, 3px, 0); }
-            80% { clip: rect(84px, 9999px, 98px, 0); }
-            100% { clip: rect(10px, 9999px, 95px, 0); }
+            0% { clip: rect(18px, 9999px, 81px, 0); } 20% { clip: rect(76px, 9999px, 14px, 0); }
+            40% { clip: rect(32px, 9999px, 63px, 0); } 60% { clip: rect(46px, 9999px, 3px, 0); }
+            80% { clip: rect(84px, 9999px, 98px, 0); } 100% { clip: rect(10px, 9999px, 95px, 0); }
         }
-
         @keyframes glitch-anim2 {
-            0% { clip: rect(63px, 9999px, 5px, 0); }
-            20% { clip: rect(36px, 9999px, 86px, 0); }
-            40% { clip: rect(5px, 9999px, 20px, 0); }
-            60% { clip: rect(98px, 9999px, 60px, 0); }
-            80% { clip: rect(4px, 9999px, 3px, 0); }
-            100% { clip: rect(74px, 9999px, 80px, 0); }
+            0% { clip: rect(63px, 9999px, 5px, 0); } 20% { clip: rect(36px, 9999px, 86px, 0); }
+            40% { clip: rect(5px, 9999px, 20px, 0); } 60% { clip: rect(98px, 9999px, 60px, 0); }
+            80% { clip: rect(4px, 9999px, 3px, 0); } 100% { clip: rect(74px, 9999px, 80px, 0); }
         }
-
         @keyframes glitch-skew {
-            0% { transform: skew(0deg); }
-            10% { transform: skew(-1deg); }
-            20% { transform: skew(1deg); }
-            30% { transform: skew(0deg); }
+            0% { transform: skew(0deg); } 10% { transform: skew(-1deg); }
+            20% { transform: skew(1deg); } 30% { transform: skew(0deg); }
             100% { transform: skew(0deg); }
         }
 
-        /* 垂直跑馬燈 CSS */
+        /* 捲動文字特效 */
         .scroll-container {
-            height: 6rem; 
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 3rem;
-            max-width: 800px;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+            height: 6rem; overflow: hidden; position: relative; margin-bottom: 3rem; max-width: 800px;
             mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
         }
-
-        .scroll-content {
-            animation: scroll-vertical 20s linear infinite;
-        }
-
+        .scroll-content { animation: scroll-vertical 20s linear infinite; }
         .scroll-item {
-            color: var(--text-dim);
-            font-size: 1.2rem;
-            line-height: 2rem; 
-            text-align: center;
-            padding-bottom: 2rem; 
+            color: var(--text-dim); font-size: 1.2rem; line-height: 2rem;
+            text-align: center; padding-bottom: 2rem;
         }
-
         @keyframes scroll-vertical {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); }
+            0% { transform: translateY(0); } 100% { transform: translateY(-50%); }
         }
 
+        /* 通用按鈕 */
         .btn {
-            padding: 1rem 3rem;
-            border: 1px solid var(--primary-neon);
-            color: var(--primary-neon);
-            background: rgba(0, 243, 255, 0.05);
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            font-size: 1.1rem;
+            padding: 1rem 3rem; border: 1px solid var(--primary-neon);
+            color: var(--primary-neon); background: rgba(0, 243, 255, 0.05);
+            font-weight: bold; text-decoration: none; transition: 0.3s;
+            cursor: pointer; position: relative; overflow: hidden;
+            display: inline-block; font-size: 1.1rem;
         }
-
         .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
             transition: 0.5s;
         }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:hover {
-            background: var(--primary-neon);
-            color: #000;
-            box-shadow: 0 0 30px var(--primary-neon);
-        }
+        .btn:hover::before { left: 100%; }
+        .btn:hover { background: var(--primary-neon); color: #000; box-shadow: 0 0 30px var(--primary-neon); }
 
         /* =========================================
-           通用區塊 (SECTIONS) - 調整 padding
+           通用區塊設定 (COMMON SECTIONS)
            ========================================= */
-        .section {
-            padding: 4rem 5%; /* 從 6rem 減少為 4rem */
-            max-width: var(--max-width);
-            margin: 0 auto;
-        }
-
+        .section { padding: 4rem 5%; max-width: var(--max-width); margin: 0 auto; }
+        
+        /* 區塊標題 */
         .section-title {
-            text-align: center;
-            margin-top: 1rem;
-            margin-bottom: 3rem; /* 稍微減少底部間距 */
-            opacity: 0;
-            transform: translateY(30px);
-            transition: 1s;
+            text-align: center; margin-top: 1rem; margin-bottom: 3rem;
+            opacity: 0; transform: translateY(30px); transition: 1s;
         }
-
-        .section-title.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-title h2 {
-            font-size: 2.2rem; /* 稍微縮小字體 */
-            color: var(--text-main);
-        }
-
+        .section-title.active { opacity: 1; transform: translateY(0); }
+        .section-title h2 { font-size: 2.2rem; color: var(--text-main); }
         .section-title span {
-            display: block;
-            color: var(--secondary-neon);
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            margin-bottom: 0.5rem;
+            display: block; color: var(--secondary-neon); font-size: 0.9rem;
+            letter-spacing: 3px; margin-bottom: 0.5rem;
         }
-
         .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 3px;
+            content: ''; display: block; width: 80px; height: 3px;
             background: linear-gradient(to right, var(--primary-neon), var(--secondary-neon));
-            margin: 1rem auto 0;
-            box-shadow: 0 0 10px var(--primary-neon);
+            margin: 1rem auto 0; box-shadow: 0 0 10px var(--primary-neon);
         }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s ease-out;
-        }
+        /* 捲動顯現動畫 */
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* 區塊背景設定 */
+        #vision, #tech, #fleet, #join {
+            background: linear-gradient(to bottom, rgba(5, 5, 8, 0.85), rgba(5, 5, 8, 0.95)), url('media/p2-02.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed; position: relative;
+        }
+        #vision { overflow: hidden; }
+        
+        /* 網格背景紋理 */
+        #vision::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; pointer-events: none; z-index: 0;
+        }
+        #vision::after {
+            content: ''; position: absolute; bottom: 0; right: 0; width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.05) 0%, transparent 70%);
+            pointer-events: none; z-index: 0;
         }
 
         /* =========================================
-           各區塊統一底圖設定
+           帝國願景 (VISION)
            ========================================= */
-        #vision, #tech, #fleet, #join {
-            background: linear-gradient(to bottom, rgba(5, 5, 8, 0.85), rgba(5, 5, 8, 0.95)),
-                url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* 視差滾動效果 */
-            position: relative;
-        }
-
-        #vision { overflow: hidden; }
-
-        #vision::before {
-            content: '';
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image:
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        #vision::after {
-            content: '';
-            position: absolute; bottom: 0; right: 0; width: 800px; height: 800px;
-            background: radial-gradient(circle, rgba(188, 19, 254, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* 帝國願景內容排版 - 調整間距與圖片高度 */
         .vision-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem; /* 從 4rem 縮小到 3rem */
-            align-items: center;
-            position: relative;
-            z-index: 1;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+            align-items: center; position: relative; z-index: 1;
         }
-
         .vision-text h3 {
-            font-size: 1.6rem; /* 稍微縮小字體 */
-            color: var(--primary-neon);
-            margin-bottom: 1rem;
-            position: relative;
+            font-size: 1.6rem; color: var(--primary-neon); margin-bottom: 1rem; position: relative;
         }
-
         .vision-text h3::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--secondary-neon);
-            margin-right: 10px;
-            transform: rotate(45deg);
-            box-shadow: 0 0 10px var(--secondary-neon);
+            content: ''; display: inline-block; width: 8px; height: 8px;
+            background: var(--secondary-neon); margin-right: 10px;
+            transform: rotate(45deg); box-shadow: 0 0 10px var(--secondary-neon);
         }
-
         .vision-text p {
-            color: var(--text-dim);
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            text-align: justify;
+            color: var(--text-dim); margin-bottom: 1.5rem; font-size: 1rem; text-align: justify;
         }
-
+        
+        /* 願景圖片框 */
         .vision-img-frame {
-            position: relative;
-            height: 400px; /* 從 500px 縮小到 400px */
-            border: 1px solid rgba(188, 19, 254, 0.3);
-            padding: 10px;
-            background: rgba(188, 19, 254, 0.05);
-            box-shadow: inset 0 0 30px rgba(188, 19, 254, 0.1);
-            transition: transform 0.5s;
+            position: relative; height: 400px; padding: 10px;
+            border: 1px solid rgba(188, 19, 254, 0.3); background: rgba(188, 19, 254, 0.05);
+            box-shadow: inset 0 0 30px rgba(188, 19, 254, 0.1); transition: transform 0.5s;
         }
-
-        .vision-img-frame:hover {
-            transform: scale(1.02);
-        }
-
+        .vision-img-frame:hover { transform: scale(1.02); }
         .vision-img-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: contrast(1.1) saturate(1.2);
-            border: 1px solid var(--primary-neon);
+            width: 100%; height: 100%; object-fit: cover;
+            filter: contrast(1.1) saturate(1.2); border: 1px solid var(--primary-neon);
         }
-
+        
+        /* 圖片四角裝飾 */
         .corner-dec {
-            position: absolute;
-            width: 15px; /* 稍微縮小裝飾 */
-            height: 15px;
-            border: 2px solid var(--primary-neon);
-            box-shadow: 0 0 10px var(--primary-neon);
+            position: absolute; width: 15px; height: 15px;
+            border: 2px solid var(--primary-neon); box-shadow: 0 0 10px var(--primary-neon);
         }
-
         .c-tl { top: -5px; left: -5px; border-right: none; border-bottom: none; }
         .c-tr { top: -5px; right: -5px; border-left: none; border-bottom: none; }
         .c-bl { bottom: -5px; left: -5px; border-right: none; border-top: none; }
         .c-br { bottom: -5px; right: -5px; border-left: none; border-top: none; }
 
         /* =========================================
-           核心科技 (TECH) - 修改為詳細版垂直 Carousel
+           帝國智慧/科技 (TECH) - 垂直輪播
            ========================================= */
-        
-        /* 垂直視窗：增加高度以容納圖片與詳細資訊 */
         .tech-carousel-viewport {
-            height: 380px; /* 加高 */
-            overflow: hidden;
-            position: relative;
-            opacity: 0; 
-            transform: translateY(50px);
-            transition: all 0.8s ease-out;
+            height: 380px; overflow: hidden; position: relative;
+            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out;
         }
-        .tech-carousel-viewport.active {
-            opacity: 1; 
-            transform: translateY(0);
-        }
-
+        .tech-carousel-viewport.active { opacity: 1; transform: translateY(0); }
         .tech-track {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            display: flex; flex-direction: column; height: 100%;
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
-
-        /* 單個科技項目 */
         .tech-item {
-            display: flex;
-            gap: 2rem; /* 縮小一點間距 */
-            align-items: center;
-            background: rgba(10, 10, 15, 0.85);
-            padding: 1.5rem; /* 縮小內距以適應較矮的高度 */
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 243, 255, 0.3); /* 使用主色調 */
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
-            
-            /* Carousel 設定 */
-            height: 100%; /* 佔滿 500px */
-            flex-shrink: 0;
-            box-sizing: border-box;
-            margin-bottom: 0; /* 無間隙 */
+            display: flex; gap: 2rem; align-items: center; background: rgba(10, 10, 15, 0.85);
+            padding: 1.5rem; border-radius: 10px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.3); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            height: 100%; flex-shrink: 0; box-sizing: border-box;
         }
-
         .tech-item:hover {
-            border-color: var(--primary-neon);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            border-color: var(--primary-neon); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
         }
-
-        /* 左右交錯排版 */
-        .tech-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        /* 圖片區域 */
+        .tech-item:nth-child(even) { flex-direction: row-reverse; }
+        
         .tech-img {
-            flex: 1;
-            height: 100%;
-            /* 移除 min-height，讓它隨父容器調整 */
-            overflow: hidden;
-            border-radius: 4px;
-            border: 2px solid var(--primary-neon);
-            position: relative;
+            flex: 1; height: 100%; overflow: hidden; border-radius: 4px;
+            border: 2px solid var(--primary-neon); position: relative;
         }
-
         .tech-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-            filter: grayscale(30%) contrast(1.2);
+            width: 100%; height: 100%; object-fit: cover;
+            transition: 0.5s; filter: grayscale(30%) contrast(1.2);
         }
-
-        .tech-item:hover .tech-img img {
-            transform: scale(1.1);
-            filter: grayscale(0%);
-        }
-
-        /* 重疊在圖片上的 ICON */
+        .tech-item:hover .tech-img img { transform: scale(1.1); filter: grayscale(0%); }
         .tech-overlay-icon {
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-            font-size: 4rem;
-            color: #fff;
-            text-shadow: 0 0 20px var(--primary-neon);
-            opacity: 0.8;
-            z-index: 2;
+            position: absolute; bottom: 10px; right: 15px; font-size: 4rem;
+            color: #fff; text-shadow: 0 0 20px var(--primary-neon); opacity: 0.8; z-index: 2;
         }
-
-        /* 文字資訊區域 */
-        .tech-info {
-            flex: 1;
-            text-align: left;
-        }
-
+        
+        .tech-info { flex: 1; text-align: left; }
         .tech-label {
-            color: var(--primary-neon);
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-            display: block;
-            letter-spacing: 2px;
+            color: var(--primary-neon); font-weight: bold; font-size: 0.8rem; margin-bottom: 0.5rem; display: block;
         }
-
         .tech-info h3 {
-            font-size: 1.8rem; /* 稍微縮小字體 */
-            color: #fff;
-            margin-bottom: 0.5rem;
+            font-size: 1.8rem; color: #fff; margin-bottom: 0.5rem;
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
         }
-
-        .tech-info p {
-            color: #ddd;
-            margin-bottom: 1rem;
-            font-size: 0.95rem; /* 稍微縮小說明文字 */
-        }
-
-        /* 數據表格樣式 */
+        .tech-info p { color: #ddd; margin-bottom: 1rem; font-size: 0.95rem; }
+        
         .tech-specs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            border-top: 1px solid rgba(0, 243, 255, 0.3);
-            padding-top: 0.1rem; /* 縮小上邊距 */
-            margin-top: 0.1rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+            border-top: 1px solid rgba(0, 243, 255, 0.3); padding-top: 0.1rem; margin-top: 0.1rem;
         }
-
         .tech-specs div span {
-            display: block;
-            font-size: 1.2rem;
-            color: var(--primary-neon);
-            font-family: 'Teko', sans-serif;
-            padding-top: 0.1rem; /* 縮小上邊距 */
-            margin-top: 0.1rem;
-            
+            display: block; font-size: 1.2rem; color: var(--primary-neon);
+            font-family: 'Teko', sans-serif; padding-top: 0.1rem; margin-top: 0.1rem;
         }
-
         .tech-specs div label {
-            font-size: 0.7rem;
-            color: #aaa;
-            padding-top: 0.1rem; /* 縮小上邊距 */
-            margin-top: 0.1rem;
+            font-size: 0.7rem; color: #aaa; padding-top: 0.1rem; margin-top: 0.1rem;
         }
-
 
         /* =========================================
-           艦隊展示 (FLEET)
+           帝國之劍/艦隊 (FLEET) - 淡入淡出展示
            ========================================= */
-        #fleet {
-            box-shadow: inset 0 0 150px #000;
-        }
-
+        #fleet { box-shadow: inset 0 0 150px #000; }
+        
+        /* 輪播視窗容器 */
         .fleet-carousel-viewport {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            opacity: 0; 
-            transform: translateY(50px);
-            transition: all 0.8s ease-out;
+            width: 100%; height: 500px; /* 固定高度防止塌陷 */
+            overflow: hidden; position: relative;
+            opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out;
         }
-        .fleet-carousel-viewport.active {
-            opacity: 1; 
-            transform: translateY(0);
-        }
+        .fleet-carousel-viewport.active { opacity: 1; transform: translateY(0); }
+        .fleet-track { position: relative; width: 100%; height: 100%; }
 
-        .fleet-track {
-            display: flex;
-            width: 100%;
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
-        }
-
+        /* 艦隊卡片樣式 */
         .fleet-item {
-            display: flex;
-            gap: 3rem;
-            align-items: center;
-            background: rgba(10, 10, 15, 0.85);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 42, 109, 0.5);
-            box-shadow: 0 0 20px rgba(255, 42, 109, 0.15);
-            min-width: 100%; 
-            flex-shrink: 0;  
-            margin-right: 0; 
+            display: flex; gap: 3rem; align-items: center;
+            background: rgba(10, 10, 15, 0.85); padding: 2rem;
+            border-radius: 10px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 42, 109, 0.5); box-shadow: 0 0 20px rgba(255, 42, 109, 0.15);
+            
+            /* 絕對定位實現重疊效果 */
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; z-index: 0;
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            margin-right: 0; box-sizing: border-box;
+            transform: scale(0.95);
         }
-
-        .fleet-item:hover {
-            border-color: var(--alert-neon);
+        .fleet-item.active {
+            opacity: 1; z-index: 1; transform: scale(1);
         }
-
-        .fleet-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
+        .fleet-item:hover { border-color: var(--alert-neon); }
+        .fleet-item:nth-child(even) { flex-direction: row-reverse; }
 
         .fleet-img {
-            flex: 1;
-            height: 300px;
-            overflow: hidden;
-            border-radius: 4px;
-            border: 2px solid var(--alert-neon);
-            box-shadow: 0 0 15px var(--alert-neon);
+            flex: 1; height: 100%; overflow: hidden; border-radius: 4px;
+            border: 2px solid var(--alert-neon); box-shadow: 0 0 15px var(--alert-neon);
             position: relative;
         }
-
         .fleet-img::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.5) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 2;
+            background-size: 100% 4px; pointer-events: none; z-index: 2;
         }
+        .fleet-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .fleet-item:hover .fleet-img img { transform: scale(1.1); }
 
-        .fleet-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-        }
-
-        .fleet-item:hover .fleet-img img {
-            transform: scale(1.1);
-        }
-
-        .fleet-info {
-            flex: 1;
-        }
-
+        .fleet-info { flex: 1; }
         .fleet-info h3 {
-            font-size: 2rem;
-            color: #fff;
-            margin-bottom: 1rem;
+            font-size: 2rem; color: #fff; margin-bottom: 1rem;
             text-shadow: 0 0 10px rgba(255, 42, 109, 0.8);
         }
-
         .fleet-class {
-            color: var(--alert-neon);
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            display: block;
-            letter-spacing: 2px;
+            color: var(--alert-neon); font-weight: bold; margin-bottom: 0.5rem;
+            display: block; letter-spacing: 2px;
         }
-
-        .fleet-info p {
-            text-shadow: none;
-            color: #ddd;
-        }
-
+        .fleet-info p { color: #ddd; }
+        
         .specs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            border-top: 1px solid rgba(255, 42, 109, 0.3);
-            padding-top: 1rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+            margin-top: 1.5rem; border-top: 1px solid rgba(255, 42, 109, 0.3); padding-top: 1rem;
         }
-
         .specs div span {
-            display: block;
-            font-size: 1.2rem;
-            color: var(--alert-neon);
-            font-family: 'Teko', sans-serif;
+            display: block; font-size: 1.2rem; color: var(--alert-neon); font-family: 'Teko', sans-serif;
         }
-
-        .specs div label {
-            font-size: 0.7rem;
-            color: #aaa;
-        }
+        .specs div label { font-size: 0.7rem; color: #aaa; }
 
         /* =========================================
-           表單與頁腳 (FORM & FOOTER)
+           招募表單 (JOIN FORM)
            ========================================= */
-        /* 修改：縮小容器寬度與內距，使其更緊湊 */
         .join-box {
-            background: rgba(5, 5, 8, 0.95);
-            border: 2px solid var(--primary-neon);
-            padding: 2.5rem 2rem; /* 原為 4rem 3rem */
-            max-width: 550px;     /* 原為 700px，縮小寬度 */
-            margin: 0 auto;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
-            text-align: left;
-            transition: box-shadow 0.3s;
+            background: rgba(5, 5, 8, 0.95); border: 2px solid var(--primary-neon);
+            padding: 2.5rem 2rem; max-width: 550px; margin: 0 auto;
+            position: relative; box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
+            text-align: left; transition: box-shadow 0.3s;
         }
-
-        .join-box:hover {
-            box-shadow: 0 0 60px rgba(0, 243, 255, 0.2);
-        }
-
+        .join-box:hover { box-shadow: 0 0 60px rgba(0, 243, 255, 0.2); }
         .join-box::after {
-            content: 'SYSTEM READY';
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            color: var(--primary-neon);
-            letter-spacing: 1px;
-            opacity: 0.8;
-            animation: blink 2s infinite;
+            content: 'SYSTEM READY'; position: absolute; top: 15px; right: 15px;
+            font-family: 'Orbitron'; font-size: 0.7rem; color: var(--primary-neon);
+            letter-spacing: 1px; opacity: 0.8; animation: blink 2s infinite;
         }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.3; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.3; } }
 
         .join-box h2 {
-            color: var(--primary-neon);
-            font-size: 2rem; /* 原為 2.5rem，稍微縮小標題 */
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            color: var(--primary-neon); font-size: 2rem; margin-bottom: 0.5rem;
+            text-transform: uppercase; letter-spacing: 3px;
         }
-
         .hud-divider {
-            height: 1px;
-            border-bottom: 2px dashed rgba(0, 243, 255, 0.3);
-            margin: 1rem 0 1.5rem 0; /* 縮小上下間距 */
-            width: 100%;
+            height: 1px; border-bottom: 2px dashed rgba(0, 243, 255, 0.3);
+            margin: 1rem 0 1.5rem 0; width: 100%;
         }
-
-        .join-text {
-            color: var(--text-dim);
-            margin-bottom: 1.5rem; /* 原為 2.5rem，縮小間距 */
-            font-size: 0.9rem;
-        }
-
+        .join-text { color: var(--text-dim); margin-bottom: 1.5rem; font-size: 0.9rem; }
+        
         .form-label {
-            display: block;
-            color: var(--text-main);
-            font-family: 'Orbitron';
-            font-size: 0.9rem; /* 稍微縮小字體 */
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: block; color: var(--text-main); font-family: 'Orbitron';
+            font-size: 0.9rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;
         }
-
-        /* 修改：縮小輸入框的高度與間距 */
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 0.8rem; /* 原為 1.2rem */
-            margin-bottom: 1.2rem; /* 原為 2rem */
-            background: rgba(0, 10, 20, 0.6);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            color: var(--primary-neon);
-            font-family: 'Orbitron';
-            font-size: 0.95rem;
-            transition: 0.3s;
+        input[type="text"], select {
+            width: 100%; padding: 0.8rem; margin-bottom: 1.2rem;
+            background: rgba(0, 10, 20, 0.6); border: 1px solid rgba(0, 243, 255, 0.2);
+            color: var(--primary-neon); font-family: 'Orbitron'; font-size: 0.95rem; transition: 0.3s;
         }
-
-        input[type="text"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--primary-neon);
-            background: rgba(0, 243, 255, 0.05);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        input[type="text"]:focus, select:focus {
+            outline: none; border-color: var(--primary-neon);
+            background: rgba(0, 243, 255, 0.05); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
         }
-
-        .radio-group {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 1.5rem; /* 原為 2.5rem */
-        }
-
+        .radio-group { display: flex; gap: 2rem; margin-bottom: 1.5rem; }
         .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim);
+            cursor: pointer; font-size: 0.9rem;
         }
-
-        .radio-item input {
-            margin: 0;
-            width: auto;
-        }
+        .radio-item input { margin: 0; width: auto; }
 
         .btn-full {
-            width: 100%;
-            padding: 1rem; /* 原為 1.5rem */
-            background: transparent;
-            border: 2px solid var(--primary-neon);
-            color: var(--primary-neon);
-            font-weight: 900;
-            cursor: pointer;
-            font-family: 'Orbitron';
-            letter-spacing: 3px;
-            transition: 0.3s;
-            text-transform: uppercase;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
+            width: 100%; padding: 1rem; background: transparent;
+            border: 2px solid var(--primary-neon); color: var(--primary-neon);
+            font-weight: 900; cursor: pointer; font-family: 'Orbitron';
+            letter-spacing: 3px; transition: 0.3s; text-transform: uppercase;
+            font-size: 1rem; position: relative; overflow: hidden;
         }
-
         .btn-full::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
             transition: 0.5s;
         }
-
-        .btn-full:hover::before {
-            left: 100%;
-        }
-
+        .btn-full:hover::before { left: 100%; }
         .btn-full:hover {
-            background: var(--primary-neon);
-            color: #000;
-            box-shadow: 0 0 30px var(--primary-neon);
+            background: var(--primary-neon); color: #000; box-shadow: 0 0 30px var(--primary-neon);
         }
 
-        footer {            
-            background: #000;
-            padding: 1rem;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        /* =========================================
+           頁腳 (FOOTER)
+           ========================================= */
+        footer {
+            background: #000; padding: 1rem; text-align: center; color: var(--text-dim);
+            font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* * =========================================
-         * 新增：彈出視窗樣式 (Lightbox/Modal)
-         * =========================================
-         */
+        /* =========================================
+           模態視窗/地圖 (MODAL)
+           ========================================= */
         .modal-overlay {
-            display: none;
-            /* 預設隱藏 */
-            position: fixed;
-            z-index: 2000;
-            /* 必須高於導覽列 */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(5, 5, 8, 0.95);
-            /* 深色背景 */
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s;
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(5, 5, 8, 0.95); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; animation: fadeIn 0.3s;
         }
-
         .modal-content {
-            max-width: 90%;
-            max-height: 85%;
-            border: 2px solid var(--primary-neon);
-            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
-            animation: zoomIn 0.3s;
+            max-width: 90%; max-height: 85%; border: 2px solid var(--primary-neon);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.2); animation: zoomIn 0.3s;
         }
-
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 40px;
-            color: var(--text-main);
-            font-size: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            line-height: 1;
+            position: absolute; top: 20px; right: 40px; color: var(--text-main);
+            font-size: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; line-height: 1;
         }
-
-        .close-modal:hover {
-            color: var(--alert-neon);
-            text-shadow: 0 0 10px var(--alert-neon);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes zoomIn {
-            from {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+        .close-modal:hover { color: var(--alert-neon); text-shadow: 0 0 10px var(--alert-neon); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 
@@ -999,11 +489,10 @@
                 <img src="media/p2-1.jpg" alt="Empire Logo"
                     style="height: 50px; border-radius: 5px; border: 1px solid var(--primary-neon); object-fit: cover;">
             </a>
-
             <div class="nav-container">
                 <ul class="nav-links">
                     <li><a href="#vision">帝國願景</a></li>
-                    <li><a href="#tech">帝國智彗</a></li>
+                    <li><a href="#tech">帝國智慧</a></li>
                     <li><a href="#fleet">帝國之劍</a></li>
                     <li><a href="#join">帝國搖籃</a></li>
                 </ul>
@@ -1018,22 +507,14 @@
         <div class="scroll-container">
             <div class="scroll-content">
                 <div class="scroll-item">
-                    帝國曆490年<br>
-                    由『獅子帝』萊茵哈特·馮·羅嚴克拉姆陛下<br>
-                    所建立的羅嚴克拉姆王朝誕生<br>
-                    憑藉降伏同盟軍的威光與人民盛大的期待<br>
-                    開創了帝國新一頁偉大光輝<br>
-                    以絕對的力量與先進科技<br>
-                    開創人類文明的新紀元。
+                    帝國曆490年<br>由『獅子帝』萊茵哈特·馮·羅嚴克拉姆陛下<br>所建立的羅嚴克拉姆王朝誕生<br>
+                    憑藉降伏同盟軍的威光與人民盛大的期待<br>開創了帝國新一頁偉大光輝<br>
+                    以絕對的力量與先進科技<br>開創人類文明的新紀元。
                 </div>
                 <div class="scroll-item">
-                    帝國曆490年<br>
-                    由『獅子帝』萊茵哈特·馮·羅嚴克拉姆陛下<br>
-                    所建立的羅嚴克拉姆王朝誕生<br>
-                    憑藉降伏同盟軍的威光與人民盛大的期待<br>
-                    開創了帝國新一頁偉大光輝<br>
-                    以絕對的力量與先進科技<br>
-                    開創人類文明的新紀元。
+                    帝國曆490年<br>由『獅子帝』萊茵哈特·馮·羅嚴克拉姆陛下<br>所建立的羅嚴克拉姆王朝誕生<br>
+                    憑藉降伏同盟軍的威光與人民盛大的期待<br>開創了帝國新一頁偉大光輝<br>
+                    以絕對的力量與先進科技<br>開創人類文明的新紀元。
                 </div>
             </div>
         </div>
@@ -1045,7 +526,7 @@
             <span>The New Order</span>
             <h2>帝國願景</h2>
         </div>
-        
+
         <div class="vision-grid reveal">
             <div class="vision-text">
                 <h3 style="color: var(--secondary-neon);">終結混亂，建立秩序</h3>
@@ -1055,7 +536,7 @@
                 <h3 style="color: var(--secondary-neon);">寰宇統一，邁向永恆</h3>
                 <p>我們的終極目標是將人類文明推向未曾設想的高度。透過高效的中央集權與壓倒性的科技力量，確保每一顆帝國星辰下的和平與繁榮。任何阻擋這項偉大進程的障礙，都將被無情掃除，為了更偉大的利益。</p>
             </div>
-            <div class="vision-img-frame" >
+            <div class="vision-img-frame">
                 <div class="corner-dec c-tl" style="border-color: var(--secondary-neon);"></div>
                 <div class="corner-dec c-tr" style="border-color: var(--secondary-neon);"></div>
                 <div class="corner-dec c-bl" style="border-color: var(--secondary-neon);"></div>
@@ -1065,7 +546,7 @@
         </div>
 
         <div class="vision-grid reveal" style="margin-top: 4rem;">
-            <div class="vision-img-frame" >
+            <div class="vision-img-frame">
                 <div class="corner-dec c-tl" style="border-color: var(--secondary-neon);"></div>
                 <div class="corner-dec c-tr" style="border-color: var(--secondary-neon);"></div>
                 <div class="corner-dec c-bl" style="border-color: var(--secondary-neon);"></div>
@@ -1074,11 +555,11 @@
             </div>
             <div class="vision-text">
                 <h3 style="color: var(--secondary-neon);">銀河帝國皇帝萊因哈特·馮·羅嚴克拉姆</h3>
-                <p>羅嚴克拉姆王朝初代皇帝</p>                
+                <p>羅嚴克拉姆王朝初代皇帝</p>
                 <p>擁有一頭金黃色頭髮、冰藍色眼眸、修長身軀和像古代名匠雕刻出來之美貌。</p>
                 <p>傑出的軍事家，常勝名將，其軍事天賦堪稱獨一無二。每次皆親臨戰場，集全體帝國軍兵士敬畏與忠誠於一身。</p>
                 <p>實行大規模改革，消除了舊王朝的社會弊病和不公，剝奪貴族特權，人民普遍歡迎，亦為羅嚴克拉姆王朝成為開明專制君主制度的典範。</p>
-                <p>用人惟才，即使是敵方人才也會不計前嫌收入麾下。</p>                
+                <p>用人惟才，即使是敵方人才也會不計前嫌收入麾下。</p>
             </div>
         </div>
     </section>
@@ -1088,12 +569,12 @@
             <span style="color: var(--primary-neon);">Advanced Technology</span>
             <h2>帝國智慧</h2>
         </div>
-        
+
         <div class="tech-carousel-viewport reveal">
             <div class="tech-track">
                 <div class="tech-item">
                     <div class="tech-img">
-                        <img src="./media/p2-5.jpg" alt="Warp Drive">                        
+                        <img src="./media/p2-5.jpg" alt="Warp Drive">
                     </div>
                     <div class="tech-info">
                         <span class="tech-label">PROPULSION SYSTEM</span>
@@ -1102,13 +583,15 @@
                         <div class="tech-specs">
                             <div><label>RANGE</label><span>Infinite</span></div>
                             <div><label>CHARGE</label><span>30s</span></div>
+                            <div><label>SPEED</label><span>Warp 9.9</span></div>
+                            <div><label>MASS</label><span>5M Tons</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="tech-item">
                     <div class="tech-img">
-                        <img src="./media/p2-6.jpg" alt="Reactor">                        
+                        <img src="./media/p2-6.jpg" alt="Reactor">
                     </div>
                     <div class="tech-info">
                         <span class="tech-label">POWER SOURCE</span>
@@ -1117,21 +600,25 @@
                         <div class="tech-specs">
                             <div><label>OUTPUT</label><span>500 TW</span></div>
                             <div><label>STABILITY</label><span>99.9%</span></div>
+                            <div><label>FUEL</label><span>A-H2</span></div>
+                            <div><label>TEMP</label><span>10M K</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="tech-item">
                     <div class="tech-img">
-                        <img src="./media/p2-7.jpg" alt="Shields">                        
+                        <img src="./media/p2-7.jpg" alt="Shields">
                     </div>
                     <div class="tech-info">
                         <span class="tech-label">DEFENSE MATRIX</span>
                         <h3>相位偏轉護盾</h3>
-                        <p>可折射高能光束武器攻擊，艦隊生存率大幅提升 500%。</p>
+                        <p>可折射高能光束武器攻擊，艦隊生存率大幅提升。</p>
                         <div class="tech-specs">
                             <div><label>INTEG</label><span>100%</span></div>
                             <div><label>TYPE</label><span>Phased</span></div>
+                            <div><label>REGEN</label><span>50 GW/s</span></div>
+                            <div><label>LAYERS</label><span>Dual</span></div>
                         </div>
                     </div>
                 </div>
@@ -1148,13 +635,15 @@
                         <div class="tech-specs">
                             <div><label>CALIBER</label><span>800mm</span></div>
                             <div><label>IMPACT</label><span>Critical</span></div>
+                            <div><label>RANGE</label><span>2000 km</span></div>
+                            <div><label>RELOAD</label><span>120s</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="tech-item">
                     <div class="tech-img">
-                        <img src="./media/p2-9.jpg" alt="Droid">                        
+                        <img src="./media/p2-9.jpg" alt="Droid">
                     </div>
                     <div class="tech-info">
                         <span class="tech-label">GROUND UNITS</span>
@@ -1163,13 +652,15 @@
                         <div class="tech-specs">
                             <div><label>CPU</label><span>Quantum</span></div>
                             <div><label>UNIT</label><span>Legion</span></div>
+                            <div><label>ARMOR</label><span>Titanium</span></div>
+                            <div><label>REACT</label><span>0.01s</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="tech-item">
                     <div class="tech-img">
-                        <img src="./media/p2-A.jpg" alt="Neural Net">                        
+                        <img src="./media/p2-A.jpg" alt="Neural Net">
                     </div>
                     <div class="tech-info">
                         <span class="tech-label">SURVEILLANCE</span>
@@ -1178,6 +669,8 @@
                         <div class="tech-specs">
                             <div><label>NODES</label><span>10B+</span></div>
                             <div><label>LATENCY</label><span>0ms</span></div>
+                            <div><label>CRYPT</label><span>Omega</span></div>
+                            <div><label>UPLINK</label><span>Secure</span></div>
                         </div>
                     </div>
                 </div>
@@ -1200,8 +693,8 @@
                     <div class="fleet-info">
                         <span class="fleet-class">FLAGSHIP CLASS</span>
                         <h3>伯倫希爾號 (Brünhild)</h3>
-                        <p>帝國總旗艦，擁有優雅的白色流線型裝甲；搭載最先進的指揮中樞系統，</p>
-                        <p>帝國軍最先進的試作型旗艦級戰艦，以性能為第一思量的新銳戰艦。</p>                        
+                        <p>帝國總旗艦，擁有優雅白色流線型裝甲；搭載最先進指揮中樞系統，</p>
+                        <p>帝國軍最先進的試作型旗艦級戰艦，以性能為第一思量的新銳戰艦。</p>
                         <div class="specs">
                             <div><label>指揮官</label><span>銀河帝國皇帝</span></div>
                             <div><label>LENGTH</label><span>1,007 m</span></div>
@@ -1252,7 +745,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="fleet-item">
                     <div class="fleet-img">
                         <img src="./media/p2-E.jpg" alt="Assault Ship">
@@ -1272,7 +765,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -1306,18 +798,10 @@
                 <div>
                     <label class="form-label">DIVISION / 志願部門</label>
                     <div class="radio-group">
-                        <label class="radio-item">
-                            <input type="radio" name="division" checked> 核心科技
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="division"> 銀河艦隊
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="division" checked> 機甲步兵
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="division"> 帝國後勤
-                        </label>                        
+                        <label class="radio-item"><input type="radio" name="division" checked> 核心科技</label>
+                        <label class="radio-item"><input type="radio" name="division"> 銀河艦隊</label>
+                        <label class="radio-item"><input type="radio" name="division"> 機甲步兵</label>
+                        <label class="radio-item"><input type="radio" name="division"> 帝國後勤</label>
                     </div>
                 </div>
 
@@ -1341,7 +825,7 @@
     </div>
 
     <script>
-        // 1. 導覽列滾動監聽
+        // 1. 導覽列滾動效果 (背景模糊與縮小)
         const header = document.getElementById('main-header');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -1351,12 +835,11 @@
             }
         });
 
-        // 2. 滾動顯現動畫 (Intersection Observer)
+        // 2. 頁面滾動顯現動畫 (Intersection Observer)
         const observerOptions = {
             threshold: 0.15,
             rootMargin: "0px 0px -50px 0px"
         };
-
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1365,121 +848,79 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.reveal, .section-title, .card').forEach(el => {
+        document.querySelectorAll('.reveal, .section-title').forEach(el => {
             observer.observe(el);
         });
 
-        // 3. 新增：圖片彈出視窗控制 (Lightbox)
+        // 3. 帝國領域地圖彈出視窗控制
         const modal = document.getElementById('mapModal');
         const btn = document.getElementById('viewMapBtn');
         const span = document.getElementsByClassName("close-modal")[0];
 
-        // 點擊按鈕開啟
         btn.onclick = function (e) {
-            e.preventDefault(); // 防止連結跳轉
-            modal.style.display = "flex"; // 使用 flex 來置中
+            e.preventDefault();
+            modal.style.display = "flex";
         }
-
-        // 點擊 X 關閉
         span.onclick = function () {
             modal.style.display = "none";
         }
-
-        // 點擊圖片外部範圍關閉
         window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
         }
 
-        // 4. 新增：艦隊自動橫移循環跑馬燈 (Horizontal Carousel)
-        // 並新增滑鼠懸停暫停功能
-        const fleetTrack = document.querySelector('.fleet-track');
-        const fleetItems = document.querySelectorAll('.fleet-item');
-        const fleetCount = fleetItems.length;
-        let fleetIndex = 0;
-        
-        // 複製第一張卡片
-        const firstFleetClone = fleetItems[0].cloneNode(true);
-        fleetTrack.appendChild(firstFleetClone);
-
-        // 定義輪播邏輯
-        function nextFleetSlide() {
-            fleetIndex++;
-            fleetTrack.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-            fleetTrack.style.transform = `translateX(-${fleetIndex * 100}%)`;
-
-            if (fleetIndex === fleetCount) {
-                // 使用 transitionend 事件來處理重置，避免卡頓
-                fleetTrack.addEventListener('transitionend', function() {
-                    fleetTrack.style.transition = 'none';
-                    fleetIndex = 0;
-                    fleetTrack.style.transform = `translateX(0)`;
-                    // 強制重繪 (Reflow) 以確保 CSS 更新生效
-                    void fleetTrack.offsetWidth; 
-                }, { once: true }); // 只執行一次
-            }
-        }
-
-        // 啟動輪播
-        let fleetTimer = setInterval(nextFleetSlide, 3000);
-        
-        // 加入滑鼠監聽：移入暫停，移出繼續
-        const fleetContainer = document.querySelector('.fleet-carousel-viewport');
-
-        fleetContainer.addEventListener('mouseenter', () => {
-            clearInterval(fleetTimer);
-        });
-
-        fleetContainer.addEventListener('mouseleave', () => {
-            fleetTimer = setInterval(nextFleetSlide, 3000);
-        });
-
-
-        // 5. 新增：核心科技自動垂直循環跑馬燈 (Vertical Carousel)
-        // 並新增滑鼠懸停暫停功能
+        // 4. 核心科技：垂直循環跑馬燈 (Vertical Carousel)
         const techTrack = document.querySelector('.tech-track');
         const techItems = document.querySelectorAll('.tech-item');
         const techCount = techItems.length;
         let techIndex = 0;
 
-        // 複製第一張卡片
+        // 複製第一項以實現無縫循環
         const firstTechClone = techItems[0].cloneNode(true);
         techTrack.appendChild(firstTechClone);
 
         function nextTechSlide() {
             techIndex++;
             techTrack.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-            // 垂直移動：translateY
             techTrack.style.transform = `translateY(-${techIndex * 100}%)`;
 
             if (techIndex === techCount) {
-                // 使用 transitionend 事件來處理重置
-                techTrack.addEventListener('transitionend', function() {
+                techTrack.addEventListener('transitionend', function () {
                     techTrack.style.transition = 'none';
                     techIndex = 0;
                     techTrack.style.transform = `translateY(0)`;
-                    void techTrack.offsetWidth; 
+                    void techTrack.offsetWidth;
                 }, { once: true });
             }
         }
 
-        // 啟動輪播
         let techTimer = setInterval(nextTechSlide, 2500);
 
-        // 加入滑鼠監聽：移入暫停，移出繼續
         const techContainer = document.querySelector('.tech-carousel-viewport');
+        techContainer.addEventListener('mouseenter', () => clearInterval(techTimer));
+        techContainer.addEventListener('mouseleave', () => techTimer = setInterval(nextTechSlide, 2500));
 
-        techContainer.addEventListener('mouseenter', () => {
-            clearInterval(techTimer);
-        });
+        // 5. 艦隊展示：淡入淡出輪播效果 (Fade Carousel)
+        const fleetItems = document.querySelectorAll('.fleet-item');
+        let currentFleetIndex = 0;
 
-        techContainer.addEventListener('mouseleave', () => {
-            techTimer = setInterval(nextTechSlide, 2500);
-        });
+        if (fleetItems.length > 0) {
+            fleetItems[0].classList.add('active');
+        }
+
+        function nextFleetFade() {
+            fleetItems[currentFleetIndex].classList.remove('active');
+            currentFleetIndex = (currentFleetIndex + 1) % fleetItems.length;
+            fleetItems[currentFleetIndex].classList.add('active');
+        }
+
+        let fleetTimer = setInterval(nextFleetFade, 3000);
+
+        const fleetViewport = document.querySelector('.fleet-carousel-viewport');
+        fleetViewport.addEventListener('mouseenter', () => clearInterval(fleetTimer));
+        fleetViewport.addEventListener('mouseleave', () => fleetTimer = setInterval(nextFleetFade, 3000));
 
     </script>
-
 </body>
-
 </html>
