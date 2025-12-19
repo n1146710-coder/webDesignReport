@@ -1,327 +1,984 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Luxury Gallery with Logo</title>
-<style>
-  /* --- 0. 全局變數 --- */
-  :root {
-    --gold: #D4AF37;          
-    --gold-dim: #8a7020;      
-    --dark-bg: #111;          
-    --frame-height: 70px;     
-  }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: #000; }
-  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Fantasy Nostalgic Gallery</title>
+    <!-- 引入 Google Fonts: Cinzel (奇幻標題), Noto Serif TC (內文) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+TC:wght@300;500;700&display=swap"
+      rel="stylesheet">
 
-  body { 
-    font-family: 'Didot', 'Times New Roman', serif; 
-    background-color: #000; 
-    color: #333;
-  }
+    <style>
+      /* --- 0. 全局變數 --- */
+      :root {
+        /* 懷舊主題色：水晶金與深淵黑 */
+        --gold: #D4AF37;
+        --gold-dim: #8a7020;
+        --crystal-blue: #1c2e4a;
+        --dark-bg: #0a0a0a;
+        --frame-height: 70px;
+      }
 
-  /* --- 1. 主架構 --- */
-  .split-container {
-    display: flex;
-    height: 100vh; 
-    width: 100%;
-    overflow: hidden; 
-  }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  /* --- 2. 左側：側邊欄 --- */
-  .left-pane {
-    width: 25%; 
-    background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-    color: var(--gold);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 3rem;
-    z-index: 30;
-    border-right: 2px solid var(--gold-dim);
-    box-shadow: 10px 0 50px rgba(0,0,0,0.8);
-    position: relative; /* 為了定位 Logo */
-  }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
 
-  /* ★★★ 新增 Logo 樣式 ★★★ */
-  .logo-wrapper {
-    margin-bottom: 3rem; /* 與下方標題拉開距離 */
-    display: flex;
-    justify-content: flex-start; /* 靠左對齊 */
-  }
+      ::-webkit-scrollbar-track {
+        background: #000;
+      }
 
-  .brand-logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80px;
-    height: 80px;
-    border: 3px solid var(--gold);
-    text-decoration: none;
-    color: var(--gold);
-    font-size: 2.5rem;
-    font-weight: bold;
-    font-family: 'Times New Roman', serif;
-    position: relative;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
+      ::-webkit-scrollbar-thumb {
+        background: var(--gold);
+        border-radius: 4px;
+      }
 
-  /* Logo 內層細線裝飾 */
-  .brand-logo::after {
-    content: '';
-    position: absolute;
-    top: 4px; left: 4px; right: 4px; bottom: 4px;
-    border: 1px solid var(--gold-dim);
-    transition: inherit;
-  }
+      body {
+        font-family: 'Noto Serif TC', 'Songti TC', serif;
+        background-color: #000;
+        color: #ccc;
+      }
 
-  /* Logo Hover 效果 */
-  .brand-logo:hover {
-    background-color: var(--gold);
-    color: #000;
-    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
-    transform: rotate(45deg); /* 稍微旋轉增加動感 */
-  }
+      /* --- 1. 主架構 --- */
+      .split-container {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+      }
 
-  /* 旋轉時文字轉回來，保持閱讀性 */
-  .brand-logo:hover span {
-    transform: rotate(-45deg); 
-  }
-  .brand-logo span { transition: inherit; display: block; }
+      /* --- 2. 左側：側邊欄 --- */
+      .left-pane {
+        width: 25%;
+        background: linear-gradient(180deg, #050510 0%, #000 100%);
+        color: var(--gold);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem;
+        z-index: 30;
+        border-right: 2px solid var(--gold-dim);
+        box-shadow: 10px 0 50px rgba(0, 0, 0, 0.8);
+        position: relative;
+      }
+
+      .logo-wrapper {
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: center;
+        /* 修改：置中對齊 */
+        padding-left: 0;
+        /* 修改：移除左邊距 */
+      }
+
+      /* --- 修改：水晶樣式 Logo --- */
+      .brand-logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        border: 2px solid var(--gold);
+        text-decoration: none;
+        color: var(--gold);
+        font-size: 2rem;
+        font-weight: bold;
+        font-family: 'Cinzel', serif;
+        position: relative;
+        /* 旋轉 45 度變成菱形水晶 */
+        transform: rotate(45deg);
+        /* 水晶質感漸層背景 */
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(212, 175, 55, 0.1) 50%, rgba(0, 0, 0, 0.6) 100%);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.1);
+        /* 修改：增加過渡時間與緩動函數，讓旋轉更流暢 */
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        margin: 10px;
+        /* 避免旋轉後切到邊緣 */
+      }
+
+      /* 內層裝飾線，增加層次感 */
+      .brand-logo::after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        border: 1px solid rgba(212, 175, 55, 0.5);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      /* 文字反向旋轉，保持正立 */
+      .brand-logo span {
+        transform: rotate(-45deg);
+        display: block;
+        letter-spacing: -2px;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+        /* 修改：文字旋轉也需要過渡動畫，才能配合外框一起轉正 */
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s;
+      }
+
+      /* Logo 懸停特效 - 轉正為正方形 */
+      .brand-logo:hover {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(212, 175, 55, 0.8) 50%, rgba(255, 255, 255, 0.4) 100%);
+        color: #000;
+        border-color: #fff;
+        /* 強烈發光 */
+        box-shadow:
+          0 0 20px #fff,
+          0 0 40px var(--gold),
+          0 0 60px var(--gold),
+          inset 0 0 20px #fff;
+
+        /* 修改：移除無限動畫，改為轉回 0 度 (正方形) */
+        transform: rotate(0deg) scale(1.1);
+        animation: none;
+      }
+
+      /* 懸停時，文字也要跟著轉回 0 度，保持正立 */
+      .brand-logo:hover span {
+        color: #000;
+        text-shadow: none;
+        transform: rotate(0deg);
+      }
+
+      /* --- Logo 修改結束 --- */
+
+      .left-pane h1 {
+        font-family: 'Cinzel', serif;
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        background: linear-gradient(to right, #fff, #D4AF37, #fff);
+        -webkit-background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      }
+
+      .subtitle {
+        font-family: 'Noto Serif TC', serif;
+        letter-spacing: 2px;
+        margin-bottom: 40px;
+        color: #888;
+        font-size: 0.9rem;
+        border-left: 3px solid var(--gold-dim);
+        padding-left: 15px;
+      }
+
+      .nav-menu {
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+        padding-top: 20px;
+      }
+
+      .nav-btn {
+        display: block;
+        text-decoration: none;
+        color: #666;
+        font-family: 'Cinzel', serif;
+        font-size: 1rem;
+        margin: 18px 0;
+        transition: 0.3s;
+        letter-spacing: 2px;
+        position: relative;
+      }
+
+      .nav-btn:hover {
+        color: var(--gold);
+        padding-left: 25px;
+        text-shadow: 0 0 5px var(--gold);
+      }
+
+      .nav-btn:hover::before {
+        content: '☛';
+        position: absolute;
+        left: 0;
+        color: var(--gold);
+      }
+
+      /* 新增：導覽列項目啟動時的閃爍特效 */
+      @keyframes nav-pulse {
+
+        0%,
+        100% {
+          text-shadow: 0 0 5px var(--gold), 0 0 10px #fff;
+          color: #fff;
+        }
+
+        50% {
+          text-shadow: 0 0 2px var(--gold);
+          color: var(--gold);
+        }
+      }
+
+      /* 當 nav-btn 擁有 active class 時 */
+      .nav-btn.active {
+        padding-left: 25px;
+        animation: nav-pulse 2s infinite ease-in-out;
+      }
+
+      .nav-btn.active::before {
+        content: '☛';
+        position: absolute;
+        left: 0;
+        color: var(--gold);
+        text-shadow: 0 0 5px var(--gold);
+      }
+
+      /* --- 3. 右側：畫框與舞台 --- */
+      .right-pane-wrapper {
+        width: 75%;
+        position: relative;
+        background-color: #111;
+      }
+
+      .frame-bar {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: var(--frame-height);
+        background: linear-gradient(90deg, #0f0f0f, #1a1a1a, #0f0f0f);
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 2px solid var(--gold);
+        border-bottom: 2px solid var(--gold);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      }
+
+      .frame-top {
+        top: 0;
+        border-top: none;
+        border-bottom: 3px solid var(--gold);
+      }
+
+      .frame-bottom {
+        bottom: 0;
+        border-bottom: none;
+        border-top: 3px solid var(--gold);
+      }
+
+      .frame-deco {
+        color: var(--gold);
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        opacity: 0.9;
+        text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+      }
+
+      .scroll-stage {
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+      }
+
+      section {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        scroll-snap-align: start;
+        padding: 80px 5%;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .watermark {
+        position: absolute;
+        font-family: 'Cinzel', serif;
+        font-size: 15rem;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.03);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+        white-space: nowrap;
+      }
+
+      .main-content {
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+        align-items: center;
+        gap: 50px;
+        z-index: 2;
+        margin-bottom: 30px;
+        height: 45%;
+        transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      /* 動態佈局樣式 */
+      .main-content.layout-reverse {
+        flex-direction: row-reverse;
+      }
+
+      .main-content.layout-wide .img-showcase {
+        flex: 1.6;
+      }
+
+      .main-content.layout-wide .text-box {
+        flex: 0.8;
+      }
+
+      .text-box,
+      .img-showcase {
+        transition: opacity 0.4s ease, transform 0.4s ease, flex 0.4s ease;
+      }
+
+      .text-box {
+        flex: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      }
+
+      .text-box h2 {
+        font-family: 'Noto Serif TC', serif;
+        font-size: 2.8rem;
+        margin-bottom: 1.5rem;
+        color: #e0e0e0;
+        border-bottom: 1px solid var(--gold-dim);
+        padding-bottom: 10px;
+        display: inline-block;
+      }
+
+      .text-box p {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #aaa;
+        text-align: justify;
+      }
+
+      .img-showcase {
+        flex: 1;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        border: 2px solid var(--gold-dim);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        position: relative;
+      }
+
+      .img-showcase::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+      }
+
+      .h-scroll-label {
+        width: 100%;
+        max-width: 1200px;
+        font-size: 0.8rem;
+        color: var(--gold);
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        font-family: 'Noto Serif TC', serif;
+        border-left: 2px solid var(--gold);
+        padding-left: 10px;
+      }
+
+      .horizontal-gallery {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+        max-width: 1200px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 15px;
+        z-index: 5;
+        height: 240px;
+      }
+
+      .h-card {
+        flex: 0 0 320px;
+        height: 100%;
+        background-color: #1a1a1a;
+        scroll-snap-align: center;
+        position: relative;
+        border: 1px solid #333;
+        transition: transform 0.3s;
+        cursor: pointer;
+      }
+
+      .h-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+      }
+
+      .h-card img {
+        width: 100%;
+        height: 75%;
+        object-fit: cover;
+        opacity: 0.8;
+        transition: 0.3s;
+        pointer-events: none;
+      }
+
+      .h-card:hover img {
+        opacity: 1;
+      }
+
+      .h-card span {
+        display: block;
+        padding: 12px;
+        font-size: 0.95rem;
+        font-family: 'Noto Serif TC', serif;
+        color: #ccc;
+        border-top: 1px solid #333;
+        pointer-events: none;
+      }
+
+      .arrow-btn {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid var(--gold);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        cursor: pointer;
+        z-index: 25;
+        transition: all 0.3s ease;
+      }
+
+      .arrow-btn:hover {
+        background-color: var(--gold);
+        transform: translateX(-50%) scale(1.1);
+        box-shadow: 0 0 25px var(--gold);
+      }
+
+      .arrow-icon {
+        width: 24px;
+        height: 24px;
+        fill: var(--gold);
+        transition: fill 0.3s;
+      }
+
+      .arrow-btn:hover .arrow-icon {
+        fill: #000;
+      }
+
+      .btn-top {
+        top: 90px;
+        animation: float-up 3s infinite ease-in-out;
+      }
+
+      .btn-bottom {
+        bottom: 90px;
+        animation: float-down 3s infinite ease-in-out;
+      }
+
+      .rotate-up {
+        transform: rotate(180deg);
+      }
+
+      @keyframes float-down {
+
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+
+        50% {
+          transform: translateX(-50%) translateY(10px);
+        }
+      }
+
+      @keyframes float-up {
+
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+
+        50% {
+          transform: translateX(-50%) translateY(-10px);
+        }
+      }
+
+      /* --- 背景主題設定 (全部改為明亮柔和風格) --- */
+
+      /* 1. 起源 (明亮水晶) */
+      .bg-origin {
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      }
+
+      /* 2. 蒸汽/機械 (改為：冷冽雪原白) */
+      .bg-steam {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      }
+
+      /* 3. 賽博 (改為：生命之流淡綠) */
+      .bg-cyber {
+        background: linear-gradient(135deg, #e0fff4 0%, #b2ebf2 100%);
+      }
+
+      /* 4. 重生 (改為：乙太水晶淺紫) */
+      .bg-aether {
+        background: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
+      }
 
 
-  /* 左側標題樣式 */
-  .left-pane h1 { 
-    font-size: 3rem; 
-    margin-bottom: 10px; 
-    text-transform: uppercase; 
-    letter-spacing: 5px;
-    background: linear-gradient(to right, #D4AF37, #F2E3B6, #D4AF37);
-    -webkit-background-clip: text;
-    color: transparent; 
-  }
+      /* --- 明亮主題共用樣式覆蓋 --- */
+      /* 將這四個背景類別群組起來，統一設定深色文字與白底卡片 */
+      .bg-origin .text-box h2,
+      .bg-steam .text-box h2,
+      .bg-cyber .text-box h2,
+      .bg-aether .text-box h2 {
+        color: #222;
+        border-bottom: 2px solid var(--gold);
+      }
 
-  .nav-btn {
-    display: block;
-    text-decoration: none;
-    color: #666;
-    font-family: sans-serif;
-    font-size: 0.9rem;
-    margin: 15px 0;
-    transition: 0.3s;
-    letter-spacing: 2px;
-  }
-  .nav-btn:hover { color: var(--gold); padding-left: 10px; }
+      .bg-origin .text-box p,
+      .bg-steam .text-box p,
+      .bg-cyber .text-box p,
+      .bg-aether .text-box p {
+        color: #444;
+        font-weight: 500;
+        text-shadow: none;
+      }
 
-  /* --- 3. 右側：畫框與舞台 --- */
-  .right-pane-wrapper { width: 75%; position: relative; background-color: #222; }
+      .bg-origin .watermark,
+      .bg-steam .watermark,
+      .bg-cyber .watermark,
+      .bg-aether .watermark {
+        color: rgba(0, 0, 0, 0.05);
+      }
 
-  /* 畫框 */
-  .frame-bar {
-    position: absolute; left: 0; width: 100%; height: var(--frame-height);
-    background: #0f0f0f; z-index: 20; display: flex; align-items: center; justify-content: center;
-    border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.15); 
-  }
-  .frame-top { top: 0; border-top: none; border-bottom: 4px double var(--gold); }
-  .frame-bottom { bottom: 0; border-bottom: none; border-top: 4px double var(--gold); }
-  .frame-deco { color: var(--gold); font-size: 0.8rem; letter-spacing: 8px; text-transform: uppercase; opacity: 0.8; }
+      .bg-origin .h-scroll-label,
+      .bg-steam .h-scroll-label,
+      .bg-cyber .h-scroll-label,
+      .bg-aether .h-scroll-label {
+        color: #555;
+        font-weight: bold;
+        border-left-color: var(--gold);
+      }
 
-  /* 滾動舞台 */
-  .scroll-stage { width: 100%; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+      /* 亮色背景下的卡片樣式 */
+      .bg-origin .h-card,
+      .bg-steam .h-card,
+      .bg-cyber .h-card,
+      .bg-aether .h-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
 
-  /* 章節 */
-  section {
-    height: 100vh; width: 100%; display: flex; flex-direction: column; 
-    align-items: center; justify-content: center; scroll-snap-align: start; 
-    padding: 80px 5%; position: relative; overflow: hidden;
-  }
+      .bg-origin .h-card span,
+      .bg-steam .h-card span,
+      .bg-cyber .h-card span,
+      .bg-aether .h-card span {
+        color: #333;
+        border-top: 1px solid #eee;
+        font-weight: 600;
+      }
 
-  .watermark {
-    position: absolute; font-size: 20rem; font-weight: bold; color: rgba(0,0,0,0.03);
-    top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
-  }
+      .bg-origin .h-card:hover,
+      .bg-steam .h-card:hover,
+      .bg-cyber .h-card:hover,
+      .bg-aether .h-card:hover {
+        border-color: var(--gold);
+        background-color: #fff;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
 
-  .main-content {
-    display: flex; width: 100%; max-width: 1200px; align-items: center; gap: 40px; z-index: 2;
-    margin-bottom: 30px; height: 40%; 
-  }
+      /* 亮色背景下的箭頭按鈕 */
+      .bg-origin .arrow-btn,
+      .bg-steam .arrow-btn,
+      .bg-cyber .arrow-btn,
+      .bg-aether .arrow-btn {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: var(--gold);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-  .text-box { flex: 1; }
-  .text-box h2 { font-size: 2.5rem; margin-bottom: 1rem; color: #222; }
-  .text-box p { font-size: 1rem; line-height: 1.6; color: #555; font-family: sans-serif; }
-  
-  .img-showcase {
-    flex: 1; height: 100%; background-size: cover; background-position: center;
-    border: 1px solid rgba(0,0,0,0.1); box-shadow: 10px 10px 0 rgba(212, 175, 55, 0.2); 
-  }
+      .bg-origin .arrow-btn .arrow-icon,
+      .bg-steam .arrow-btn .arrow-icon,
+      .bg-cyber .arrow-btn .arrow-icon,
+      .bg-aether .arrow-btn .arrow-icon {
+        fill: #8a7020;
+      }
 
-  /* 橫向捲動 */
-  .h-scroll-label {
-    width: 100%; max-width: 1200px; font-size: 0.8rem; color: var(--gold-dim); letter-spacing: 2px;
-    margin-bottom: 10px; font-family: sans-serif;
-  }
-  .horizontal-gallery {
-    display: flex; gap: 20px; width: 100%; max-width: 1200px; overflow-x: auto; 
-    scroll-snap-type: x mandatory; padding-bottom: 10px; z-index: 5; height: 250px; 
-  }
-  .h-card {
-    flex: 0 0 300px; height: 100%; background-color: #fff; scroll-snap-align: center;
-    position: relative; border-radius: 4px; overflow: hidden; transition: transform 0.3s;
-    border: 1px solid #ddd;
-  }
-  .h-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-  .h-card img { width: 100%; height: 70%; object-fit: cover; }
-  .h-card span { display: block; padding: 10px; font-size: 0.9rem; font-family: sans-serif; color: #333; }
+      .bg-origin .arrow-btn:hover,
+      .bg-steam .arrow-btn:hover,
+      .bg-cyber .arrow-btn:hover,
+      .bg-aether .arrow-btn:hover {
+        background: var(--gold);
+      }
 
-  /* 箭頭按鈕 */
-  .arrow-btn {
-    position: absolute; left: 50%; transform: translateX(-50%); width: 60px; height: 60px;
-    background-color: var(--gold); border-radius: 50%; display: flex; justify-content: center;
-    align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 25; 
-    border: 2px solid #fff; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .arrow-btn:hover { background-color: #fff; border-color: var(--gold); transform: translateX(-50%) scale(1.1); }
-  .arrow-icon { width: 30px; height: 30px; fill: #fff; transition: fill 0.3s; }
-  .arrow-btn:hover .arrow-icon { fill: var(--gold); }
-  .btn-top { top: 90px; animation: pulse-up 2s infinite; }
-  .btn-bottom { bottom: 90px; animation: pulse-down 2s infinite; }
-  .rotate-up { transform: rotate(180deg); }
-  @keyframes pulse-down { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
-  @keyframes pulse-up { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-10px); } }
+      .bg-origin .arrow-btn:hover .arrow-icon,
+      .bg-steam .arrow-btn:hover .arrow-icon,
+      .bg-cyber .arrow-btn:hover .arrow-icon,
+      .bg-aether .arrow-btn:hover .arrow-icon {
+        fill: #fff;
+      }
 
-  .bg-light { background: #fdfdfd; }
-  .bg-dark { background: #f4f4f4; }
-  .reverse .main-content { flex-direction: row-reverse; }
+      .reverse .main-content {
+        flex-direction: row-reverse;
+      }
+    </style>
+  </head>
 
-</style>
-</head>
-<body>
+  <body>
 
-<div class="split-container">
-  
-  <aside class="left-pane">
-    
-    <div class="logo-wrapper">
-      <a href="../index.html" class="brand-logo" title="Back to Index">
-        <span>M</span>
-      </a>
+    <div class="split-container">
+
+      <aside class="left-pane">
+        <div class="logo-wrapper">
+          <a href="#" class="brand-logo" title="小組首頁">
+            <span>FF</span>
+          </a>
+        </div>
+        <h1>FINAL FANTASY</h1>
+        <p class="subtitle">THE CRYSTAL CHRONICLES</p>
+        <nav class="nav-menu">
+          <a href="#sec1" class="nav-btn">ORIGINS (起源)</a>
+          <a href="#sec2" class="nav-btn">MAGITEK (魔導)</a>
+          <a href="#sec3" class="nav-btn">REVOLUTION (革命)</a>
+          <a href="#sec4" class="nav-btn">REBORN (重生)</a>
+        </nav>
+      </aside>
+
+      <main class="right-pane-wrapper">
+        <div class="frame-bar frame-top">
+          <span class="frame-deco">⚜ PRELUDE TO FANTASY ⚜</span>
+        </div>
+        <div class="frame-bar frame-bottom">
+          <span class="frame-deco">⚜ EXPLORE THE HISTORY ⚜</span>
+        </div>
+
+        <div class="scroll-stage">
+
+          <!-- 第一章：起源 (FF1) -->
+          <section id="sec1" class="bg-origin">
+            <div class="watermark">ORIGIN</div>
+            <div class="main-content">
+              <div class="text-box">
+                <h2>水晶傳說的起點</h2>
+                <p>　　Final
+                  Fantasy（日語：ファイナルファンタジー，台灣舊譯「太空戰士」），由史克威爾開發。為奇幻科技的RPG作品，首部遊戲於1987年發行，在瀕臨破產之際，將最後希望寄託於這部作品，將其命名為「最終幻想」。這款遊戲奠定了日式RPG基礎：光之戰士、水晶、飛空艇，以及劍與魔法世界觀。從最初的像素點陣圖，到宏大世界地圖，這不僅是一個系列的開始，更是一段三十年傳奇的序章。
+                </p>
+              </div>
+              <!-- 初始圖片 -->
+              <div class="img-showcase" style="background-image: url('media/p3-1-1.jpg');"></div>
+            </div>
+            <div class="horizontal-gallery">
+              <div class="h-card" data-title="元素水晶的召喚"
+                data-desc="故事的核心圍繞著風、火、土、水四顆元素水晶。當世界被黑暗籠罩，水晶失去了光輝，玩家必須踏上旅程，擊敗四元素的混沌，讓水晶重現光芒，恢復世界的平衡。"
+                data-img="media/p3-1-2.jpg" data-layout="normal">
+                <img src="media/p3-1-2.jpg" alt="">
+                <span>水晶 (The Crystal)</span>
+              </div>
+
+              <div class="h-card" data-title="被選中的光之戰士"
+                data-desc="玩家操控四位沒有預設名字與背景的戰士。從戰士、盜賊、黑魔導士到白魔導士，玩家可以自由組建隊伍。轉職系統的引入，讓戰士能晉升為騎士，開啟了系列作職業系統的先河。"
+                data-img="media/p3-1-3.jpg" data-layout="reverse">
+                <img src="media/p3-1-3.jpg" alt="">
+                <span>光之戰士 (Warrior)</span>
+              </div>
+
+              <div class="h-card" data-title="宏大的冒險舞台"
+                data-desc="踏出柯尼利亞城的那一刻，廣闊的世界地圖搭配著經典的「Main Theme」配樂，展現在玩家眼前。飛空艇的取得更讓探索範圍拓展至天空與北地，這種從線性敘事到自由探索的轉變，帶來了前所未有的冒險感。"
+                data-img="media/p3-1-4.jpg" data-layout="wide">
+                <img src="media/p3-1-4.jpg" alt="">
+                <span>世界地圖 (World Map)</span>
+              </div>
+            </div>
+            <a href="#sec2" class="arrow-btn btn-bottom">
+              <svg class="arrow-icon" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+          </section>
+
+          <!-- 第二章：魔導與幻獸 (FF6) -->
+          <section id="sec2" class="bg-steam reverse">
+            <div class="watermark">MAGITEK</div>
+            <a href="#sec1" class="arrow-btn btn-top">
+              <svg class="arrow-icon rotate-up" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+            <div class="main-content">
+              <div class="text-box">
+                <h2>魔導與機械的交響</h2>
+                <p>SFC時代的巔峰之作。故事不再單純圍繞水晶，而是探討了魔法消失後，機械文明與古老幻獸的衝突。蒂娜與魔導機甲在雪原中前行的孤寂身影，成為了遊戲史上最令人難忘的開場之一。</p>
+              </div>
+              <div class="img-showcase" style="background-image: url('media/p3-2-1.jpg');"></div>
+            </div>
+
+            <div class="horizontal-gallery">
+              <div class="h-card" data-title="魔導機甲的威脅"
+                data-desc="加斯特拉帝國開發的戰鬥兵器，融合了機械與魔導之力。它們是魔法消失後力量的象徵，也是蒂娜悲劇命運的開始。在納爾謝的雪原上，三架魔導機甲留下的足跡，至今仍是玩家心中的經典。"
+                data-img="media/p3-2-2.jpg" data-layout="normal">
+                <img src="media/p3-2-2.jpg" alt="">
+                <span>魔導機甲 (Magitek Armor)</span>
+              </div>
+              <div class="h-card" data-title="迷失的魔導少女"
+                data-desc="蒂娜，一位天生擁有魔導之力的少女。她在被帝國操控的兵器與尋找自我的普通女孩之間掙扎。她的故事探討了「愛」與「存在」的意義，是群像劇中最耀眼的一顆星。"
+                data-img="media/p3-2-3.jpg" data-layout="reverse">
+                <img src="media/p3-2-3.jpg" alt="">
+                <span>迷失少女 (Terra)</span>
+              </div>
+              <div class="h-card" data-title="永遠的瑪麗亞"
+                data-desc="為了獲得飛空艇，賽麗絲化身為歌劇女伶瑪麗亞。經典的「Aria di Mezzo Carattere」在此響起，這場戲中戲不僅是遊戲技術的突破，更是一段淒美愛情的見證。"
+                data-img="media/p3-2-4.jpg" data-layout="wide">
+                <img src="media/p3-2-4.jpg" alt="">
+                <span>歌劇院 (The Opera)</span>
+              </div>
+            </div>
+            <a href="#sec3" class="arrow-btn btn-bottom">
+              <svg class="arrow-icon" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+          </section>
+
+          <!-- 第三章：3D革命 (FF7) -->
+          <section id="sec3" class="bg-cyber">
+            <div class="watermark">METEOR</div>
+            <a href="#sec2" class="arrow-btn btn-top">
+              <svg class="arrow-icon rotate-up" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+            <div class="main-content">
+              <div class="text-box">
+                <h2>星之命運的變革</h2>
+                <p>1997年，米德加的魔晄爐與手持破壞劍的金髮傭兵，徹底改變了RPG的歷史。3D CG技術的引入帶來了電影級的視覺衝擊，將電子遊戲提升至藝術的高度。</p>
+              </div>
+              <div class="img-showcase" style="background-image: url('media/p3-3-1.jpg');"></div>
+            </div>
+            <div class="horizontal-gallery">
+              <div class="h-card" data-title="魔晄都市米德加"
+                data-desc="神羅公司掌控的巨大圓盤都市，也是一切故事的起點。在這裡，科技與貧民窟共存，魔晄爐日夜不息地抽取著星球的生命能源。這座鋼鐵叢林象徵著工業文明對自然的過度掠奪。"
+                data-img="media/p3-3-2.jpg" data-layout="wide">
+                <img src="media/p3-3-2.jpg" alt="">
+                <span>魔晄都市 (Midgar)</span>
+              </div>
+              <div class="h-card" data-title="榮耀的破壞劍"
+                data-desc="這把巨劍不僅是武器，更是夢想與榮耀的傳承。從安吉爾到札克斯，最後交到了克勞德手中。它見證了戰士的悲劇與成長，是系列作最具代表性的圖騰。"
+                data-img="media/p3-3-3.jpg" data-layout="reverse">
+                <img src="media/p3-3-3.jpg" alt="">
+                <span>破壞劍 (Buster Sword)</span>
+              </div>
+              <div class="h-card" data-title="絕望的隕石"
+                data-desc="薩菲羅斯為了成為神而召喚的究極黑魔法。懸掛在天際的紅色隕石，是整個星球面臨的終極威脅，也迫使主角們在絕望中尋找發動神聖魔法「白」的可能性。"
+                data-img="media/p3-3-4.jpg" data-layout="normal">
+                <img src="media/p3-3-4.jpg" alt="">
+                <span>隕石 (Meteor)</span>
+              </div>
+            </div>
+            <a href="#sec4" class="arrow-btn btn-bottom">
+              <svg class="arrow-icon" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+          </section>
+
+          <!-- 第四章：重生之境 (FF14) -->
+          <section id="sec4" class="bg-aether reverse">
+            <div class="watermark">REBORN</div>
+            <a href="#sec3" class="arrow-btn btn-top">
+              <svg class="arrow-icon rotate-up" viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+            </a>
+            <div class="main-content">
+              <div class="text-box">
+                <h2>毀滅後的重生傳奇</h2>
+                <p>這是一個關於失敗與救贖的故事。曾經失敗的1.0版本，在製作人吉田直樹的帶領下，以「將世界毀滅」作為重啟的契機。2.0版本《重生之境》的成功不僅挽救了這款遊戲，更使其成為全球最受歡迎的MMORPG之一。
+                </p>
+              </div>
+              <div class="img-showcase" style="background-image: url('media/p3-4-1.jpg');"></div>
+            </div>
+            <div class="horizontal-gallery">
+              <div class="h-card" data-title="水晶塔的召喚"
+                data-desc="古代亞拉戈帝國遺留的技術奇蹟，高聳入雲的水晶巨塔。它不僅是艾歐澤亞的地標，更是連接第一世界與原初世界的關鍵，見證了跨越時空的守護與約定。"
+                data-img="media/p3-4-2.jpg" data-layout="normal">
+                <img src="media/p3-4-2.jpg" alt="">
+                <span>水晶塔 (Crystal Tower)</span>
+              </div>
+              <div class="h-card" data-title="蒼穹之禁城"
+                data-desc="人與龍長達千年的戰爭，隱藏在雪國伊修加德的歷史真相。光之戰士在此介入，揭開了被掩蓋的謊言，試圖斬斷仇恨的連鎖。這段旅程被譽為系列作敘事的高峰之一。"
+                data-img="media/p3-4-3.jpg" data-layout="reverse">
+                <img src="media/p3-4-3.jpg" alt="">
+                <span>龍詩戰爭 (Heavensward)</span>
+              </div>
+              <div class="h-card" data-title="曉月之終焉"
+                data-desc="海德林與佐迪亞克篇章的完結。光之戰士為了對抗「絕望」，一路前往宇宙的邊緣。在這場星際之旅中，探討了生命的意義與存在的價值，為長達十年的故事畫下完美句點。"
+                data-img="media/p3-4-4.jpg" data-layout="wide">
+                <img src="media/p3-4-4.jpg" alt="">
+                <span>終焉之戰 (Endwalker)</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </main>
     </div>
 
-    <h1>LOUVRE</h1>
-    <p style="letter-spacing: 2px; margin-bottom: 40px; color: #888;">THE ROYAL COLLECTION</p>
-    
-    <nav class="nav-menu">
-      <a href="#sec1" class="nav-btn">I. RENAISSANCE</a>
-      <a href="#sec2" class="nav-btn">II. IMPRESSIONISM</a>
-      <a href="#sec3" class="nav-btn">III. MODERNISM</a>
-      <a href="#sec4" class="nav-btn">IV. FUTURISM</a>
-    </nav>
-  </aside>
+    <!-- 互動邏輯 -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // 1. 初始化：儲存每個區塊的初始狀態
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+          const h2 = section.querySelector('.text-box h2');
+          const p = section.querySelector('.text-box p');
+          const showcase = section.querySelector('.img-showcase');
 
-  <main class="right-pane-wrapper">
-    
-    <div class="frame-bar frame-top">
-      <span class="frame-deco">⚜ ROYAL GALLERY EXHIBITION ⚜</span>
-    </div>
+          if (h2 && p && showcase) {
+            section.dataset.initTitle = h2.textContent;
+            section.dataset.initDesc = p.textContent;
+            section.dataset.initImg = showcase.style.backgroundImage || window.getComputedStyle(showcase).backgroundImage;
+          }
+        });
 
-    <div class="frame-bar frame-bottom">
-      <span class="frame-deco">/// SWIPE HORIZONTALLY FOR MORE ///</span>
-    </div>
+        // 2. 卡片點擊邏輯
+        const cards = document.querySelectorAll('.h-card');
+        cards.forEach(card => {
+          card.addEventListener('click', function () {
+            if (!this.dataset.title) return;
 
-    <div class="scroll-stage">
-      
-      <section id="sec1" class="bg-light">
-        <div class="watermark">01</div>
-        <div class="main-content">
-          <div class="text-box">
-            <h2>文藝復興</h2>
-            <p>左側上方新增了一個金色的 Logo "M"。當您滑鼠移過去時，它會旋轉 45 度，但內部的文字會反向旋轉保持水平，這是一個精緻的小動畫。</p>
-          </div>
-          <div class="img-showcase" style="background-image: url('https://picsum.photos/800/600?random=1');"></div>
-        </div>
-        <div class="h-scroll-label">相關作品 (向右滑動) →</div>
-        <div class="horizontal-gallery">
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=11" alt=""><span>素描手稿 A</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=12" alt=""><span>素描手稿 B</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=13" alt=""><span>雕塑細節 C</span></div>
-        </div>
-        <a href="#sec2" class="arrow-btn btn-bottom">
-          <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-      </section>
+            const section = this.closest('section');
+            const mainContent = section.querySelector('.main-content');
+            const textBox = section.querySelector('.text-box');
+            const showcase = section.querySelector('.img-showcase');
+            const h2 = textBox.querySelector('h2');
+            const p = textBox.querySelector('p');
 
-      <section id="sec2" class="bg-dark reverse">
-        <div class="watermark">02</div>
-        <a href="#sec1" class="arrow-btn btn-top">
-          <svg class="arrow-icon rotate-up" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-        <div class="main-content">
-          <div class="text-box">
-            <h2>印象派光影</h2>
-            <p>點擊左上角的 Logo，網頁將會跳轉至 `../index.html`。這種設計符合使用者體驗，讓他們隨時能回到上一層目錄。</p>
-          </div>
-          <div class="img-showcase" style="background-image: url('https://picsum.photos/800/600?random=2');"></div>
-        </div>
-        <div class="h-scroll-label">系列收藏 (向右滑動) →</div>
-        <div class="horizontal-gallery">
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=21" alt=""><span>日出印象</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=22" alt=""><span>睡蓮池</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=23" alt=""><span>乾草堆</span></div>
-        </div>
-        <a href="#sec3" class="arrow-btn btn-bottom">
-          <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-      </section>
+            const newLayout = this.dataset.layout || 'normal';
 
-      <section id="sec3" class="bg-light">
-        <div class="watermark">03</div>
-        <a href="#sec2" class="arrow-btn btn-top">
-          <svg class="arrow-icon rotate-up" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-        <div class="main-content">
-          <div class="text-box">
-            <h2>現代主義</h2>
-            <p>畫框的金色光澤與 Logo 的配色完美呼應。請試著滑動下方的卡片區，看看橫向滾動的效果。</p>
-          </div>
-          <div class="img-showcase" style="background-image: url('https://picsum.photos/800/600?random=3');"></div>
-        </div>
-        <div class="h-scroll-label">設計草圖 (向右滑動) →</div>
-        <div class="horizontal-gallery">
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=31" alt=""><span>幾何構成 I</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=32" alt=""><span>色彩研究 II</span></div>
-        </div>
-        <a href="#sec4" class="arrow-btn btn-bottom">
-          <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-      </section>
+            // 1. 淡出
+            textBox.style.opacity = 0;
+            showcase.style.opacity = 0;
+            showcase.style.transform = 'translateY(20px)';
+            textBox.style.transform = 'translateY(20px)';
 
-      <section id="sec4" class="bg-dark reverse">
-        <div class="watermark">04</div>
-        <a href="#sec3" class="arrow-btn btn-top">
-          <svg class="arrow-icon rotate-up" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </a>
-        <div class="main-content">
-          <div class="text-box">
-            <h2>未來主義</h2>
-            <p>這就是為您量身打造的豪華畫廊網站。從結構、配色到互動細節，都展現了極高的完成度。</p>
-          </div>
-          <div class="img-showcase" style="background-image: url('https://picsum.photos/800/600?random=4');"></div>
-        </div>
-        <div class="horizontal-gallery">
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=41" alt=""><span>Cyberpunk</span></div>
-          <div class="h-card"><img src="https://picsum.photos/300/200?random=42" alt=""><span>Neon Light</span></div>
-        </div>
-      </section>
+            // 2. 更新內容與佈局
+            setTimeout(() => {
+              h2.textContent = this.dataset.title;
+              p.textContent = this.dataset.desc;
+              showcase.style.backgroundImage = `url('${this.dataset.img}')`;
 
-    </div>
-  </main>
-</div>
+              mainContent.classList.remove('layout-reverse', 'layout-wide');
 
-</body>
+              if (newLayout === 'reverse') {
+                mainContent.classList.add('layout-reverse');
+              } else if (newLayout === 'wide') {
+                mainContent.classList.add('layout-wide');
+              }
+
+              // 3. 淡入
+              textBox.style.opacity = 1;
+              showcase.style.opacity = 1;
+              showcase.style.transform = 'translateY(0)';
+              textBox.style.transform = 'translateY(0)';
+            }, 400);
+          });
+        });
+
+        // 3. 導覽列點擊邏輯：重置目標區塊
+        const navBtns = document.querySelectorAll('.nav-btn');
+        navBtns.forEach(btn => {
+          btn.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            if (targetSection) {
+              resetSection(targetSection);
+            }
+          });
+        });
+
+        // 4. Scroll Spy (滾動監聽)
+        const scrollStage = document.querySelector('.scroll-stage');
+        const observerOptions = {
+          root: scrollStage,
+          threshold: 0.5 // 50% 可見時觸發
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // 移除所有 active
+              navBtns.forEach(btn => btn.classList.remove('active'));
+
+              // 找到對應的按鈕並加上 active
+              const id = entry.target.id;
+              const activeBtn = document.querySelector(`.nav-btn[href="#${id}"]`);
+              if (activeBtn) {
+                activeBtn.classList.add('active');
+              }
+            }
+          });
+        }, observerOptions);
+
+        sections.forEach(section => {
+          observer.observe(section);
+        });
+
+        // 重置函式
+        function resetSection(section) {
+          const mainContent = section.querySelector('.main-content');
+          const textBox = section.querySelector('.text-box');
+          const showcase = section.querySelector('.img-showcase');
+          const h2 = textBox.querySelector('h2');
+          const p = textBox.querySelector('p');
+
+          // 1. 淡出
+          textBox.style.opacity = 0;
+          showcase.style.opacity = 0;
+          showcase.style.transform = 'translateY(20px)';
+          textBox.style.transform = 'translateY(20px)';
+
+          // 2. 還原內容
+          setTimeout(() => {
+            h2.textContent = section.dataset.initTitle;
+            p.textContent = section.dataset.initDesc;
+            // 注意：這裡直接使用儲存的 style string
+            showcase.style.backgroundImage = section.dataset.initImg;
+
+            // 移除所有動態佈局 class
+            mainContent.classList.remove('layout-reverse', 'layout-wide');
+
+            // 3. 淡入
+            textBox.style.opacity = 1;
+            showcase.style.opacity = 1;
+            showcase.style.transform = 'translateY(0)';
+            textBox.style.transform = 'translateY(0)';
+          }, 400);
+        }
+      });
+    </script>
+
+  </body>
+
 </html>
