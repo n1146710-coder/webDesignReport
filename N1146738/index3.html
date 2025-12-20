@@ -7,6 +7,9 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
     <script>
     tailwind.config = {
         darkMode: "class",
@@ -84,11 +87,23 @@
         width: 100%;
         height: 100%;
         background-color: #020414;
-        opacity: 0.4;
+        opacity: 0.3;
         z-index: -10;
     }
-    .map-dark-mode {
-        filter: invert(90%) hue-rotate(180deg) contrast(90%) grayscale(20%);
+    
+    /* 修正地圖容器層級 */
+    #map-container {
+        z-index: 1;
+    }
+    
+    /* 自定義 Leaflet Popup 樣式以配合深色主題 */
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: #1e293b; /* slate-800 */
+        color: #fff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+        color: #94a3b8;
     }
     </style>
 </head>
@@ -153,18 +168,11 @@
                             </div>
                             
                             <div class="relative flex flex-col overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 backdrop-blur-md">
-                                <div class="h-64 w-full relative overflow-hidden bg-slate-800 group">
-                                    <iframe 
-                                        id="mapFrame"
-                                        src="https://maps.google.com/maps?q=Taipei&t=&z=13&ie=UTF8&iwloc=&output=embed" 
-                                        class="w-full h-full border-0 map-dark-mode transition-all duration-500 group-hover:filter-none" 
-                                        allowfullscreen="" 
-                                        loading="lazy" 
-                                        referrerpolicy="no-referrer-when-downgrade">
-                                    </iframe>
+                                <div class="h-64 w-full relative bg-slate-800 group map-dark-mode" id="map-container">
+                                    <div id="osintMap" class="w-full h-full z-0"></div>
                                     
-                                    <div class="absolute top-2 right-2 pointer-events-none rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
-                                        Interactive Map
+                                    <div class="absolute top-2 right-2 z-[400] pointer-events-none rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur">
+                                        Carto Voyager Mode
                                     </div>
                                 </div>
                                 
@@ -178,19 +186,21 @@
                                         <input 
                                             type="text" 
                                             id="locationInput" 
-                                            placeholder="輸入座標 (25.03, 121.56) 或路名..." 
+                                            placeholder="輸入座標 (25.03, 121.56) 或 地點..." 
                                             class="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                                            onkeypress="if(event.key === 'Enter') searchLocation()"
                                         />
                                         <button 
+                                            onclick="searchLocation()"
                                             class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-white hover:bg-primary-dark transition-colors">
                                             <span class="material-symbols-outlined !text-lg">search</span>
                                         </button>
                                     </div>
 
-                                    <p class="text-sm text-slate-300">輸入特定座標或地址以評估周邊環境風險。</p>
+                                    <p class="text-sm text-slate-300">輸入特定座標或地址以評估周邊環境風險 (使用 Carto Maps)。</p>
                                 </div>
                             </div>
-                        </div>
+                            </div>
 
                         <div class="relative overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900/70 p-6 transition-all duration-300 hover:border-primary/50 hover:bg-slate-900/90 backdrop-blur-md h-full">
                             <div class="absolute -right-16 -bottom-16 size-48 rounded-full bg-secondary/10 blur-3xl"></div>
@@ -264,5 +274,83 @@
             </div>
         </main>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // 初始化地圖
+        // 預設位置：台北 (可自行更改)
+        const defaultLat = 25.0339;
+        const defaultLng = 121.5644;
+        
+        var map = L.map('osintMap', {
+            zoomControl: true,
+            attributionControl: false // 隱藏預設版權資訊以保持簡潔，或自行加入
+        }).setView([defaultLat, defaultLng], 13);
+
+        // ============================================
+        // 使用 Carto Voyager (質感亮色)
+        // ============================================
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        // 搜尋功能
+        function searchLocation() {
+            const query = document.getElementById('locationInput').value.trim();
+            if (!query) return;
+
+            // 判斷是否為座標格式 (簡單正則判斷：數字, 數字)
+            const coordPattern = /^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/;
+            const match = query.match(coordPattern);
+
+            if (match) {
+                // 如果是座標
+                const lat = parseFloat(match[1]);
+                const lng = parseFloat(match[3]);
+                updateMap(lat, lng, `座標: ${lat}, ${lng}`);
+            } else {
+                // 如果是地址/關鍵字，使用 Nominatim API
+                const apiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lng = parseFloat(data[0].lon);
+                            const displayName = data[0].display_name.split(',')[0]; // 只取第一段名稱
+                            updateMap(lat, lng, displayName);
+                        } else {
+                            alert('找不到該地點，請嘗試更具體的名稱或使用座標。');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('搜尋發生錯誤。');
+                    });
+            }
+        }
+
+        // 更新地圖與標記
+        function updateMap(lat, lng, popupText) {
+            // 移動地圖
+            map.flyTo([lat, lng], 16);
+
+            // 移除舊標記
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            // 新增標記
+            currentMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup(popupText)
+                .openPopup();
+        }
+    </script>
 </body>
 </html>
