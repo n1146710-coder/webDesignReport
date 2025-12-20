@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+ <html lang="zh-TW">
+
+ <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Hololive World | 精彩時刻</title>
+
+        <!-- 共用樣式 -->
+        <link rel="stylesheet" href="style.css" />
+
+        <!-- 圖示套件（FontAwesome）（僅用於顯示圖示，僅作裝飾，不影響功能） -->
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+        <style>
+            /* ==========================================================
+            導覽列樣式（固定於頂部）
+            ========================================================== */
+            .navbar-p3 {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                padding: 18px 0;
+                z-index: 999;
+                display: flex;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.07); /* 半透明背景 */
+                backdrop-filter: blur(8px); /* 毛玻璃效果 */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            }
+
+            .navbar-p3 .nav-inner {
+                width: 90%;
+                max-width: 1200px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .navbar-p3 .logo {
+                font-size: 1.4rem;
+                font-weight: 700;
+                color: #fff;
+                text-decoration: none;
+                letter-spacing: 1px;
+            }
+
+            .navbar-p3 .logo i {
+                margin-right: 6px;
+            }
+
+            .navbar-p3 ul {
+                list-style: none;
+                display: flex;
+                gap: 26px;
+                align-items: center;
+            }
+
+            .navbar-p3 .nav-link {
+                color: #fff;
+                text-decoration: none;
+                padding: 4px 0;
+                position: relative;
+            }
+
+            /* 導覽列滑動底線效果 */
+            .navbar-p3 .nav-link::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                bottom: -4px;
+                height: 2px;
+                width: 0;
+                background: #00bfff;
+                transition: 0.3s;
+            }
+
+            .navbar-p3 .nav-link:hover::after,
+            .navbar-p3 .nav-link.active::after {
+                width: 100%;
+            }
+
+            /* ==========================================================
+            瀑布流圖片區（CSS Columns 實現） 
+            ========================================================== */
+            .gallery-masonry {
+                columns: 4; /* 分為四欄 */
+                gap: 20px; /* 欄與欄間距 */
+                margin-top: 20px;
+            }
+
+            .gallery-item {
+                cursor: pointer; /* 滑鼠變手指 */
+                margin-bottom: 20px; /* 下方間距 */
+                opacity: 0; /* 預設隱藏，配合動畫 */
+                transform: translateY(20px); /* 下移，配合動畫 */
+                position: relative;
+                overflow: hidden;
+                border-radius: 12px;
+            }
+
+            .gallery-item img {
+                width: 100%;
+                border-radius: 12px;
+                display: block;
+                transition: transform 0.35s ease, filter 0.35s ease, box-shadow 0.35s ease;
+                transform-origin: center center;
+            }
+
+            @keyframes fadeInUp {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ==========================================================
+            燈箱樣式
+            ========================================================== */
+            .lightbox {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.85);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s ease;
+            }
+
+            .lightbox.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .lightbox img {
+                max-width: 90%;
+                max-height: 85%;
+                border-radius: 12px;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+                animation: fadeZoom 0.35s ease;
+            }
+
+            @keyframes fadeZoom {
+                from {
+                    transform: scale(0.85);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            /* ==========================================================
+            音樂播放區樣式
+            ========================================================== */
+            .music-player-container {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .music-item {
+                display: flex;
+                gap: 18px;
+                padding: 15px;
+                border-radius: 14px;
+                background: rgba(248, 250, 252, 0.1); /* 半透明，保留背景可見性 */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                transition: transform 0.3s, box-shadow 0.3s;
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .music-item:hover {
+                transform: scale(1.03);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .music-thumb {
+                width: 90px;
+                height: 90px;
+                border-radius: 10px;
+                object-fit: cover;
+            }
+
+            @keyframes musicFadeIn {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ==========================================================
+            ★背景漸變動畫 + 漂浮粒子
+            ========================================================== */
+            body {
+                position: relative; /* 提供粒子絕對定位參考 */
+                overflow-x: hidden; /* 避免水平滾動 */
+                background-color: #0c0c34; /* 深色基底 */
+            }
+
+            /* 新增粒子層 */
+            .particle-layer {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* 粒子 canvas */
+            canvas.particles-canvas {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+
+            /* ==========================================================
+            ★hover 效果（保持先前設定）
+            ========================================================== */
+            .gallery-item:hover img {
+                transform: translateY(-4px) scale(1.05);
+                filter: brightness(1.12);
+                box-shadow: 0 12px 28px rgba(0, 180, 255, 0.12);
+            }
+
+            .gallery-item::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: -120%;
+                width: 60%;
+                height: 100%;
+                background: linear-gradient(120deg,
+                        rgba(255, 255, 255, 0) 0%,
+                        rgba(255, 255, 255, 0.22) 50%,
+                        rgba(255, 255, 255, 0) 100%);
+                transform: skewX(-18deg);
+                transition: left 0.7s cubic-bezier(.2, .8, .2, 1);
+                pointer-events: none;
+            }
+
+            .gallery-item:hover::after {
+                left: 140%;
+            }
+
+            .gallery-item::before {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 18%;
+                background: rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(6px);
+                opacity: 0;
+                transition: opacity 0.35s ease;
+                pointer-events: none;
+            }
+
+            .gallery-item:hover::before {
+                opacity: 1;
+            }
+
+            /* 調整白色區塊透明度，保留背景動畫可見 */
+            .bg-white {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            @media (max-width: 900px) {
+                .gallery-masonry {
+                    columns: 2;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .gallery-masonry {
+                    columns: 1;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <!-- 粒子背景層 -->
+        <div class="particle-layer">
+            <canvas class="particles-canvas"></canvas> <!-- 小光點粒子 -->
+        </div>
+
+        <!-- ==========================================================
+            導覽列
+        ========================================================== -->
+        <nav class="navbar-p3">
+            <div class="nav-inner">
+                <a href="page1.html" class="logo">
+                    <i class="fa-solid fa-music"></i> HOLO<span>LIVE</span>
+                </a>
+                <ul>
+                    <li><a href="A-HoloWorld-Entrance.html" class="nav-link">首頁</a></li>
+                    <li><a href="B-HoloWorld-Cast.html" class="nav-link">成員介紹</a></li>
+                    <li><a href="https://hololive.hololivepro.com/" target="_blank" class="nav-link">官方網站</a></li> 
+                    <!-- https://hololive.hololivepro.com 屬於外部連結（純資訊的完整補充，非主要功能） -->
+                </ul>
+            </div>
+        </nav>
+
+        <!-- ==========================================================
+            瀑布流圖片展示區
+        ========================================================== -->
+        <section class="section bg-white" style="padding-top: 140px;">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-title">精彩時刻 Live Moments</h2>
+                    <p class="section-subtitle">點擊圖片即可放大觀看</p>
+                </div>
+                <div class="gallery-masonry">
+                    <div class="gallery-item"><img src="media/images/2020 Hololive Concert Event.jpg"
+                            alt="2020 Hololive Concert Event"></div>
+                    <div class="gallery-item"><img src="media/images/hololive Stage.jpg" alt="hololive Stage"></div>
+                    <div class="gallery-item"><img src="media/images/hololive_3rd.png" alt="hololive_3rd"></div>
+                    <div class="gallery-item"><img src="media/images/hololive English 2nd.jpg"
+                            alt="hololive English 2nd"></div>
+                    <div class="gallery-item"><img src="media/images/hololive SUPER EXPO 2023.jpg"
+                            alt="hololive SUPER EXPO 20235"></div>
+                    <div class="gallery-item"><img src="media/images/HoloLive 4th day.jpg" alt="HoloLive 4th day"></div>
+                    <div class="gallery-item"><img src="media/images/hololive 5th fes.jpg" alt="hololive 5th fes"></div>
+                    <div class="gallery-item"><img src="media/images/Concert.jpg" alt="Concert"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================
+            燈箱大圖區
+        ========================================================== -->
+        <div class="lightbox" id="lightbox">
+            <img id="lightbox-img" src="" />
+        </div>
+
+    <!-- ==========================================================
+        音樂播放區
+    ========================================================== -->
+    <section class="section bg-light">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">精選音樂</h2>
+                <p class="section-subtitle">一起聆聽Hololive的經典熱門歌曲</p>
+            </div>
+            <div style="max-width: 800px; margin: auto;">
+                <div class="music-player-container">
+
+                    <!-- 歌曲 1 -->
+                    <div class="music-item">
+                        <img src="media/images/miko hananoyume.png" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>花月ノ夢</h4>
+                            <p>さくらみこ</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Dream of the Flower and Moon.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 2 -->
+                    <div class="music-item">
+                        <img src="media/images/Amane Kanata.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>ソーラン節</h4>
+                            <p>天音かなた/ホロライブ4期生</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Soran Bushi.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 3 -->
+                    <div class="music-item">
+                        <img src="media/images/A Horny Money World.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>A Horny Money World ～伝説の夜～</h4>
+                            <p>宝鐘マリン</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/A Horny Money World.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 4 -->
+                    <div class="music-item">
+                        <img src="media/images/La+ Darknesss.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>バグラブ</h4>
+                            <p>ラプラス・ダークネス</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Buglab.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 5 -->
+                    <div class="music-item">
+                        <img src="media/images/FG ROADSTER.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>FG ROADSTER</h4>
+                            <p>hololive DEV_IS/FLOW GLOW</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/FLOW GLOW _ FG ROADSTER.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 6 -->
+                    <div class="music-item">
+                        <img src="media/images/Murasaki Shion.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>シオン</h4>
+                            <p>紫咲シオン</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Zion.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 7 -->
+                    <div class="music-item">
+                        <img src="media/images/ReGLOSS.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>さよーならまたいつか！</h4>
+                            <p>hololive DEV_IS/ReGLOSS</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Goodbye, see you again someday!.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 8 -->
+                    <div class="music-item">
+                        <img src="media/images/hololive.png" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>とまらないホロライブ</h4>
+                            <p>hololive IDOL PROJECT</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Shiny Smily Story.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 9 -->
+                    <div class="music-item">
+                        <img src="media/images/Minato Aqua.jpg" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>あくあ色ぱれっと</h4>
+                            <p>湊あくあ</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Aqua Color Palette.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- 歌曲 10 -->
+                    <div class="music-item">
+                        <img src="media/images/Big blast away.png" class="music-thumb" />
+                        <div style="flex: 1;">
+                            <h4>ねねねねねねねね！大爆走</h4>
+                            <p>桃鈴ねね</p>
+                            <audio controls style="width: 100%; margin-top: 10px;">
+                                <source src="media/music/Big blast away.mp3" />
+                            </audio>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+        <!-- ==========================================================
+            頁腳
+        ========================================================== -->
+        <footer class="footer">
+            <div class="container text-center">
+                <p>&copy; 2025 Hololive Fan Site.</p>
+            </div>
+        </footer>
+
+    <!-- ==========================================================
+        JavaScript：燈箱 + 滾動觸發動畫 + 粒子漂浮
+    ========================================================== -->
+    <script>
+        // -----------------------------
+        // 元素選取
+        // -----------------------------
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const musicItems = document.querySelectorAll('.music-item');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        // -----------------------------
+        // 瀑布流圖片點擊 → 燈箱放大
+        // -----------------------------
+        galleryItems.forEach(item => {
+            const img = item.querySelector('img');
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        // 點擊燈箱背景 → 關閉燈箱
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+
+        // -----------------------------
+        // 滾動觸發動畫
+        // -----------------------------
+        const observerOptions = { threshold: 0.1 };
+        const animateOnScroll = (entries, observer, animationName) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = `${animationName} 0.6s forwards`;
+                    entry.target.style.animationDelay = `${index * 0.15}s`;
+                    observer.unobserve(entry.target);
+                }
+            });
+        };
+
+        const galleryObserver = new IntersectionObserver((entries, observer) => {
+            animateOnScroll(entries, observer, 'fadeInUp');
+        }, observerOptions);
+        galleryItems.forEach(item => galleryObserver.observe(item));
+
+        const musicObserver = new IntersectionObserver((entries, observer) => {
+            animateOnScroll(entries, observer, 'musicFadeIn');
+        }, observerOptions);
+        musicItems.forEach(item => musicObserver.observe(item));
+
+        // -----------------------------
+        // 粒子漂浮效果
+        // -----------------------------
+        const canvas = document.querySelector('.particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticles(count) {
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: (Math.random() - 0.5) * 0.3,
+                    speedY: (Math.random() - 0.5) * 0.3,
+                    alpha: Math.random() * 0.6 + 0.2
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+                ctx.fill();
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                // 超出邊界回到畫面另一側
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        createParticles(120); // 小光點數量
+        animateParticles();
+
+        // -----------------------------
+        // 單一音樂播放控制（播放一首，其它自動停止 + 播放中卡片發光）
+        // -----------------------------
+        const audios = document.querySelectorAll('audio');
+
+        audios.forEach(audio => {
+            audio.addEventListener('play', () => {
+                audios.forEach(otherAudio => {
+                    const item = otherAudio.closest('.music-item');
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                        otherAudio.currentTime = 0;
+                        item.classList.remove('playing'); // 移除其他卡片高亮
+                    } else {
+                        item.classList.add('playing'); // 當前播放卡片高亮
+                    }
+                });
+            });
+
+            // 當音樂暫停或結束，也取消高亮
+            audio.addEventListener('pause', () => {
+                const item = audio.closest('.music-item');
+                item.classList.remove('playing');
+            });
+        });
+    </script>
+
+        <!-- ==========================================================
+            播放中卡片發光 CSS
+        ========================================================== -->
+        <style>
+        .music-item.playing {
+            box-shadow: 0 0 25px 3px rgba(0, 191, 255, 0.6);
+            transform: scale(1.03);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+    </style>
+
+    </body>
+    </html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 網頁標題（顯示在瀏覽器標籤上） -->
+    <title>Hololive World | 首頁</title>
+
+    <!-- 自訂 CSS 樣式表（所有版面、字體、顏色與互動效果皆本人編寫） -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome 圖示字型（僅用於顯示圖示，如 YouTube、Twitter，僅作裝飾，不影響功能） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- 導覽列 -->
+    <nav class="navbar">
+        <div class="container">
+
+            <!-- 左側 LOGO（連到 Page1） -->
+            <a href="A-HoloWorld-Entrance.html" class="logo">
+                <i class="fa-solid fa-play"></i> Holo<span>World</span>
+            </a>
+
+            <!-- 導覽連結清單 -->
+            <ul class="nav-menu">
+                <li><a href="A-HoloWorld-Entrance.html" class="nav-link active">首頁</a></li>
+                <li><a href="B-HoloWorld-Cast.html" class="nav-link">成員介紹</a></li>
+                <li><a href="C-HoloWorld-Moments.html" class="nav-link">精彩時刻</a></li>
+
+                <!-- 外部連結（純資訊的完整補充，非主要功能） -->
+                <li>
+                    <a href="https://hololive.hololivepro.com/"
+                       target="_blank"
+                       class="btn btn-primary"
+                       style="padding: 8px 20px; font-size: 0.9rem;">
+                        官方網站
+                    </a>
+                    <li>
+                    <a href="../index.html"
+                       target="_blank"
+                       class="btn btn-primary"
+                       style="padding: 8px 20px; font-size: 0.9rem;">
+                        小組首頁
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 跑馬燈區塊（公告用） -->
+    <div style="margin-top: var(--nav-height);">
+        <div class="ticker-wrap">
+            <div class="ticker">
+                🚨 重大情報：Hololive Summer 2025正式啟動！ 🌏 Hololive English 3D 演唱會即將登場！
+                🏆 粉絲互動挑戰賽週末開跑，參加抽限定周邊！
+                🔴 直播預告：今晚 20:00 寶鐘瑪琳 3D 演唱會！
+                • ✨ 星街彗星《Stellar Stellar》突破 3000 萬觀看 • 
+                🎮 Pekora 勇者鬥惡龍耐久直播中！ • 🎤 夏色まつり全新原創單曲上線！ •
+            </div>
+        </div>
+    </div>
+
+    <!-- 首頁大圖（Hero 區）含影片背景 -->
+    <header class="hero">
+
+        <!-- 🔹 背景影片（放在最底層） -->
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="media/videos/Hololive.mp4" type="video/mp4">
+        </video>
+
+        <!-- 🔹 黑色透明遮罩（讓文字更清楚） -->
+        <div class="hero-overlay"></div>
+
+        <!-- 🔹 上層的文字內容 -->
+        <div class="hero-content">
+
+            <!-- 小標（上方 badge 標籤） -->
+            <span class="hero-badge">VIRTUAL YOUTUBER PRODUCTION</span>
+
+            <!-- 大標題 -->
+            <h1 class="hero-title">
+                跨越虛擬<br><span>連結世界</span>
+            </h1>
+
+            <!-- 說明文字 -->
+            <p class="hero-desc">
+                歡迎來到 Hololive 宇宙。在這裡，我們用歌聲、歡笑與無限的創意，
+                為全球粉絲帶來最獨特的娛樂體驗。
+            </p>
+
+            <!-- 按鈕區塊 -->
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <a href="B-HoloWorld-Cast.html" class="btn btn-primary">
+                    認識成員 <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+                <a href="#video" class="btn btn-outline">
+                    <i class="fa-solid fa-play"></i> 觀看影片
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="section bg-white">
+        <div class="container">
+
+            <!-- 區塊標題 -->
+            <div class="text-center">
+                <!-- 主要標題 -->
+                <h2 class="section-title">全世界為什麼喜愛 Hololive?</h2>
+                <!-- 副標題 / 說明文字 -->
+                <p class="section-subtitle">全球數百萬粉絲喜愛的原因</p>
+            </div>
+
+            <!-- 三欄特色介紹區塊（Grid 容器） -->
+            <div class="features-grid">
+
+                <!-- ===== 卡片 1 ===== -->
+                <div class="feature-card">
+                    <!-- Badge 標籤，顯示排名或特色標記 -->
+                    <div class="feature-badge">TOP 1</div>
+                    <!-- 卡片圖示（使用 FontAwesome Icon） -->
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                    </div>
+                    <!-- 卡片標題 -->
+                    <h3>極致的偶像力</h3>
+                    <!-- 說明文字，使用 text-light 類別讓文字顏色較淡 -->
+                    <p class="text-light">從原創歌曲到大型 3D 演唱會，每位成員都是閃耀巨星，舞台表現令人動容。</p>
+                    <!-- 額外數據 / 小故事 -->
+                    <p class="feature-data">🎵 每週直播平均觀看人數超過 20 萬人</p>
+                </div>
+
+                <!-- ===== 卡片 2 ===== -->
+                <div class="feature-card">
+                    <div class="feature-badge">人氣爆笑</div>
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <h3>爆笑的遊戲魂</h3>
+                    <p class="text-light">不管是神級操作還是綜藝效果，各種遊戲實況保證讓你笑到肚子痛。</p>
+                    <p class="feature-data">😂 平均每場直播互動留言數超過 5 萬條</p>
+                </div>
+
+                <!-- ===== 卡片 3 ===== -->
+                <div class="feature-card">
+                    <div class="feature-badge">全球粉絲</div>
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-earth-americas"></i>
+                    </div>
+                    <h3>全球化社群</h3>
+                    <p class="text-light">橫跨 JP/EN/ID 粉絲社群，打破語言隔閡，與全世界粉絲同樂。</p>
+                    <p class="feature-data">🌏 粉絲遍佈 50 個國家以上</p>
+                </div>
+
+            </div> <!-- features-grid 結束 -->
+        </div> <!-- container 結束 -->
+    </section> <!-- section 結束 -->
+
+    <!-- 區塊：嵌入影片 -->
+    <section id="video" class="section bg-light">
+        <div class="container">
+
+            <div class="text-center">
+                <h2 class="section-title">精華片段</h2>
+                <p class="section-subtitle">一起來感受 Hololive Production的獨特魅力吧!</p>
+            </div>
+
+            <!-- 本地影片播放區 -->
+            <div class="video-box">
+                <div style="position: relative; padding-bottom: 56.25%; height: 0;">
+
+                    <!-- 說明：原本預計使用 YouTube 影片 iframe 嵌入，但瀏覽器在 file:// 本地模式下會因為安全性政策（Content Security Policy）而阻擋外部影音，
+                    導致無法顯示並出現錯誤 153。
+
+                    為了讓老師在任何電腦上直接開啟資料夾都能正常播放影片，
+                    因此改為將影片下載為 MP4 並以 <video> 標籤播放。
+
+                    這樣可以避免 YouTube 限制、跨來源政策問題，也能確保離線環境可正常檢視。-->
+                    <video
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
+                        controls>
+                        <source src="media/videos/Don't wake me, it's dangerous!.mp4" type="video/mp4">
+                    </video>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+    <div class="container">
+
+        <!-- 三欄 footer 網格 -->
+        <div class="footer-grid">
+            
+            <!-- 左：LOGO + 版權說明 -->
+            <div class="footer-left">
+                <div class="logo">Holo<span>World</span></div>
+                <p class="footer-text">
+                    本人製作的非官方推廣網站（網頁設計期末作業）<br>
+                    所有圖像版權歸 COVER Corp 所有。
+                </p>
+            </div>
+
+            <!-- 中：快速連結 -->
+            <div class="footer-middle">
+                <h4>快速連結</h4>
+                <ul class="footer-links">
+                    <li><a href="A-HoloWorld-Entrance.html">首頁</a></li>
+                    <li><a href="B-HoloWorld-Cast.html">成員介紹</a></li>
+                    <li><a href="C-HoloWorld-Moments.html">精彩時刻</a></li>
+                </ul>
+            </div>
+
+            <!-- 社群連結區塊：使用 Font Awesome brand icon，作為外部官方社群導向 -->
+            <div class="footer-right">
+                <h4>追蹤我們</h4>
+                <div class="footer-social">
+                    <a href="https://www.youtube.com/@hololive/featured" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+                    <a href="https://x.com/hololivetv" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-twitter"></i>
+                    </a>
+                    <a href="https://www.facebook.com/hololivetv" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div> 
+
+        <!-- 底部文字 -->
+        <div class="text-center footer-bottom">
+            &copy; 2025 Hololive Fan Site. Designed for Learning.
+        </div>
+
+    </div>
+</footer>
+
+</body>
+</html>
+
+

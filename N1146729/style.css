@@ -1,0 +1,436 @@
+    /* ============================================================
+    1. CSS 重置與全域變數（Reset & Variables）
+    備註：所有顏色與設定皆為自定義
+    ============================================================ */
+    :root {
+        --color-primary: #4a6de2;       /* 主色（按鈕、icon、標題色） */
+        --color-secondary: #00BFFF;     /* 輔助色（hover、強調效果） */
+        --color-dark: #2e4568;          /* 深色背景與文字 */
+        --color-light: #d3a6c9;         /* 淺背景色 */
+        --color-white: #ccf0f7e0;       /* 白色/半透明白色背景 */
+        --nav-height: 60px;             /* 導覽列高度 */
+    }
+
+    /* 重置預設邊距與框線模型 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;  /* 包含 padding 和 border 在內計算寬高 */
+    }
+
+    /* 全域 body 設定 */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--color-dark);
+        background-color: var(--color-white); /* 傳統頁面背景（舊版保留） */
+    }
+
+
+    /* ============================================================
+    2. 通用排版（Utilities）
+    ============================================================ */
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: auto;
+        padding: 0 20px;
+    }
+
+    .text-center { text-align: center; }
+    .bg-white  { background-color: var(--color-white); }
+    .bg-light  { background-color: var(--color-light); }
+    .text-light { color: #6b7280; }
+
+
+    /* ============================================================
+    3. 按鈕樣式（Buttons）－純 CSS
+    ============================================================ */
+    .btn {
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-primary {
+        background-color: var(--color-primary);
+        color: var(--color-white);
+        border: 2px solid var(--color-primary);
+    }
+
+    /* 按鈕 hover 動畫效果 */
+    .btn-primary:hover {
+        background-color: #e50066; 
+        transform: translateY(-3px);      /* 向上漂浮效果 */
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-outline {
+        background: none;
+        color: var(--color-dark);
+        border: 2px solid #d1d5db;
+    }
+
+    .btn-outline:hover {
+        background-color: #e5e7eb;
+        transform: translateY(-3px);
+    }
+
+
+    /* ============================================================
+    4. 導覽列（Navbar）
+    ============================================================ */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background-color: var(--color-dark);
+        color: var(--color-white);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-white);
+    }
+    .logo span {
+        color: var(--color-primary);
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+    }
+
+    .nav-link {
+        color: var(--color-white);
+        transition: color 0.3s;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+        color: var(--color-primary);
+    }
+
+
+    /* ============================================================
+    5. 跑馬燈（Ticker）－純 CSS Animation
+    ============================================================ */
+    .ticker-wrap {
+        background-color: #37bff5;
+        color: var(--color-dark);
+        overflow: hidden;
+        padding: 10px 0;
+        position: fixed;
+        top: var(--nav-height);
+        width: 100%;
+        z-index: 90;
+    }
+
+    .ticker {
+        white-space: nowrap;
+        animation: ticker-move 30s linear infinite; /* 無限跑馬燈 */
+    }
+
+    @keyframes ticker-move {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+
+
+    /* ============================================================
+    6. Hero 主視覺區（Hero Section）
+    ============================================================ */
+    .hero {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-dark);
+        color: var(--color-white);
+        padding: 150px 0 100px;
+        margin-top: calc(var(--nav-height) + 42px);
+        background-image: url('media/images/hero-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        text-align: center;
+    }
+
+    /* Hero 區文字 badge */
+    .hero-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: rgba(255,255,255,0.2);
+        border-radius: 50px;
+        margin-bottom: 15px;
+    }
+
+    /* Hero 大標題 */
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+    }
+    .hero-title span {
+        color: var(--color-primary);
+    }
+
+    /* Hero 說明文字 */
+    .hero-desc {
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto 30px;
+        color: #cbd5e1;
+    }
+
+    /* Hero 背景影片 */
+    .hero-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+    }
+
+    /* Hero 黑色半透明遮罩 */
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.45);
+        z-index: 2;
+    }
+
+    /* Hero 文字與按鈕置頂 */
+    .hero-content {
+        position: relative;
+        z-index: 3;
+    }
+
+    /* Hero 區按鈕 hover 動畫 */
+    .hero-content .btn {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .hero-content .btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+
+    /* ============================================================
+    7. 內容區塊（Sections）
+    ============================================================ */
+    .section {
+        padding: 80px 0;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--color-dark);
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 50px;
+        color: #6b7280;
+    }
+
+
+    /* ============================================================
+    8. 特色網格（Features Grid）
+    ============================================================ */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+    }
+
+    /* Feature 卡片 */
+    .feature-card {
+        padding: 30px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        border-radius: 10px;
+        transition: transform 0.3s, box-shadow 0.3s; /* hover 動畫 */
+    }
+
+    /* Feature 卡片 hover 效果 */
+    .feature-card:hover {
+        transform: translateY(-10px);                /* 向上漂浮 */
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);   /* 投影效果 */
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--color-primary);
+        margin-bottom: 15px;
+    }
+
+
+    /* ============================================================
+    9. 影片區塊（Video）
+    ============================================================ */
+    .video-box {
+        max-width: 800px;
+        margin: 30px auto 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+
+    /* ============================================================
+    10. 頁尾（Footer）
+    ============================================================ */
+    .footer {
+        background-color: var(--color-dark);
+        color: var(--color-white);
+        padding: 60px 0 30px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .footer-links a {
+        color: #94a3b8;
+        transition: color 0.3s;
+    }
+    .footer-links a:hover {
+        color: var(--color-primary);
+    }
+
+    .fa-brands {
+        color: #94a3b8;
+        transition: color 0.3s;
+    }
+    .fa-brands:hover {
+        color: var(--color-primary);
+    }
+
+
+    /* ============================================================
+    11. 響應式設計（Responsive）
+    ============================================================ */
+    @media (max-width: 768px) {
+        .navbar .container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .nav-menu {
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+        }
+    }
+    /* =========================
+    Footer 整體樣式
+    ========================= */
+    .footer {
+        background-color: #23457a; /* 深色背景 */
+        color: white;
+        padding: 60px 0 30px;
+        font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    /* Footer Grid 三欄布局 */
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+    }
+
+    /* 左欄：Logo + 文字 */
+    .footer-left .logo {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .footer-left .footer-text {
+        color: #94a3b8;
+        line-height: 1.5;
+    }
+
+    /* 中欄：快速連結 */
+    .footer-middle h4 {
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 10px;
+    }
+
+    .footer-links a {
+        color: #94a3b8;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+        color: var(--color-primary); /* 主題色 */
+    }
+
+    /* 右欄：社群連結 */
+    .footer-right h4 {
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 15px;
+        font-size: 1.5rem;
+    }
+
+    .footer-social a {
+        color: #94a3b8;
+        transition: color 0.3s;
+    }
+
+    .footer-social a:hover {
+        color: var(--color-primary);
+    }
+
+    /* 底部文字 */
+    .footer-bottom {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.85rem;
+        color: #64748b;
+        text-align: center;
+    }
+
