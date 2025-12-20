@@ -1,655 +1,699 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Portfolio Dashboard</title>
-    <style>
-      /* --- 歸零與基礎設定 --- */
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Portfolio Dashboard</title>
+  <style>
+    /* --- 歸零與基礎設定 --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-      /* 核心容器 */
-      .container {
-        display: grid;
-        height: 100vh;
-        width: 100%;
-        grid-template-columns: 210px 1fr;
-        grid-template-rows: 70px 1fr;
-        gap: 10px;
-        padding: 10px;
-        background-color: #1a1a1a;
-        overflow: hidden;
-      }
+    /* 核心容器 */
+    .container {
+      display: grid;
+      height: 100vh;
+      width: 100%;
+      grid-template-columns: 210px 1fr;
+      grid-template-rows: 70px 1fr;
+      gap: 10px;
+      padding: 10px;
+      background-color: #0f172a; /* 改為稍微深一點的藍黑色襯底 */
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-      /* 通用區塊樣式 */
-      .box {
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-        height: 100%;
-      }
+    /* 通用區塊樣式 */
+    .box {
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      height: 100%;
+    }
 
-      /* --- 1. 上方區塊 (Header) --- */
-      .main-top {
-        grid-column: 1 / -1;
-        grid-row: 1;
-        position: relative;
+    /* --- 1. 上方區塊 (Header) --- */
+    .main-top {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      position: relative;
+      /* 頂部保留深色科技感漸層 */
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      
+      /* 網點紋理 */
+      background-image: 
+          radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      background-size: 20px 20px, 100% 100%;
 
-        /* ▼▼▼ 修改：更換為程式設計風格背景圖，並使用深色遮罩 ▼▼▼ */
-        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url('media/p1-0');
-        /* ▲▲▲ 修改結束 ▲▲▲ */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px;
+    }
 
-        background-size: cover;
-        background-position: center;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0 20px;
-      }
+    .main-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
 
-      .main-title {
-        font-size: 1.8rem;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      }
+    .class-name-text {
+      position: absolute;
+      left: 30px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      background: rgba(0,0,0,0.2);
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
 
-      .class-name-text {
+    .instructor-text {
+      position: absolute;
+      right: 30px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+      letter-spacing: 1px;
+    }
+
+    /* --- 2. 左下區塊 (Sidebar) --- */
+    .sidebar {
+      grid-row: 2;
+      grid-column: 1;
+      background: linear-gradient(160deg, #000428 0%, #004e92 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 15px 10px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      z-index: 5;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 15px;
+      border-bottom: 2px solid #4facfe;
+      padding-bottom: 8px;
+      font-size: 1.1rem;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    details {
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    details:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #4facfe;
+    }
+
+    details[open] {
+      background: rgba(0, 180, 255, 0.2);
+      border: 1px solid #4facfe;
+    }
+
+    summary {
+      padding: 10px 10px;
+      font-weight: bold;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      outline: none;
+      font-size: 0.9rem;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    summary::after {
+      content: '❯';
+      font-size: 0.8em;
+      transition: transform 0.3s;
+      color: #4facfe;
+      margin-left: 5px;
+    }
+
+    details[open] summary::after {
+      transform: rotate(90deg);
+    }
+
+    .sub-list {
+      list-style: none;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px;
+      margin: 0 5px 5px 5px;
+      border-radius: 6px;
+    }
+
+    .sub-list li {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      color: #cfd9df;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+    }
+
+    .sub-list li:last-child {
+      border-bottom: none;
+    }
+
+    .sub-list li::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background-color: #4facfe;
+      margin-right: 8px;
+      transform: rotate(45deg);
+    }
+
+    .sub-list li:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .sub-list a {
+      color: inherit;
+      text-decoration: none;
+      width: 100%;
+      display: block;
+    }
+
+    /* --- 3. 右下區塊 (Main Bottom) 修改核心 --- */
+    .main-bottom {
+      grid-row: 2;
+      grid-column: 2;
+      position: relative;
+      
+      /* Level 2: 基礎深色背景 (作為光暈的畫布) */
+      background-color: #111827; 
+      /* 稍微加入一點徑向漸層，讓中間亮一點點 */
+      background-image: radial-gradient(circle at 50% 50%, #1f2937 0%, #111827 100%);
+      
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      overflow: hidden; /* 重要：防止光暈溢出 */
+    }
+
+    /* Level 2: 光暈動畫與樣式 
+       這裡定義了三個光暈球的樣式與動畫
+    */
+    @keyframes floatBlob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+
+    .bg-blob {
         position: absolute;
-        left: 30px;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1rem;
-        font-weight: bold;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-        letter-spacing: 1px;
-      }
+        border-radius: 50%;
+        filter: blur(80px); /* 極度模糊產生光暈感 */
+        opacity: 0.4;       /* 半透明 */
+        animation: floatBlob 10s infinite ease-in-out; /* 呼吸動畫 */
+        z-index: 0;         /* 放在最底層 */
+        pointer-events: none; /* 不干擾點擊 */
+    }
 
-      .instructor-text {
-        position: absolute;
-        right: 30px;
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1rem;
-        font-weight: bold;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-        letter-spacing: 1px;
-      }
+    .blob-1 {
+        top: -10%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        background: #7c3aed; /* 紫色 */
+    }
 
-      /* --- 2. 左下區塊 (Sidebar) --- */
-      .sidebar {
-        grid-row: 2;
-        grid-column: 1;
-        background: linear-gradient(160deg, #000428 0%, #004e92 100%);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        padding: 15px 10px;
-        overflow-y: auto;
-        scroll-behavior: smooth;
-      }
+    .blob-2 {
+        bottom: -10%;
+        right: -10%;
+        width: 450px;
+        height: 450px;
+        background: #2563eb; /* 藍色 */
+        animation-delay: 2s;
+    }
 
-      .sidebar h3 {
-        margin-bottom: 15px;
-        border-bottom: 2px solid #4facfe;
-        padding-bottom: 8px;
-        font-size: 1.1rem;
-        text-align: center;
-        letter-spacing: 1px;
-      }
+    .blob-3 {
+        bottom: 20%;
+        left: 30%;
+        width: 300px;
+        height: 300px;
+        background: #db2777; /* 粉紅點綴 */
+        opacity: 0.25;
+        animation-delay: 4s;
+    }
 
-      details {
-        margin-bottom: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-      }
+    /* 內容層級設定：確保文字在光暈之上 */
+    .portfolio-header,
+    .portfolio-list,
+    .overview-grid {
+      position: relative;
+      z-index: 2; /* 提高層級 */
+    }
 
-      details:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: #4facfe;
-      }
+    /* 原本的遮罩層 (不需要變動) */
+    .main-bottom::before {
+      display: none; /* 移除原本的純黑遮罩，改用光暈 */
+    }
 
-      details[open] {
-        background: rgba(0, 180, 255, 0.2);
-        border: 1px solid #4facfe;
-      }
+    .portfolio-header {
+      margin-bottom: 15px;
+      border-left: 4px solid #4facfe;
+      padding-left: 15px;
+      flex-shrink: 0;
+      /* 增加文字底板，確保在光暈上清晰可見 */
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
 
-      summary {
-        padding: 10px 10px;
-        font-weight: bold;
-        list-style: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        outline: none;
-        font-size: 0.9rem;
-        color: #fff;
-        cursor: pointer;
-        white-space: nowrap;
-      }
+    .portfolio-header h2 {
+      color: white;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
 
-      summary::after {
-        content: '❯';
-        font-size: 0.8em;
-        transition: transform 0.3s;
-        color: #4facfe;
-        margin-left: 5px;
-      }
+    .portfolio-header p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
 
-      details[open] summary::after {
-        transform: rotate(90deg);
-      }
+    /* --- 預覽遮罩層 --- */
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      backdrop-filter: blur(8px);
 
-      .sub-list {
-        list-style: none;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 5px;
-        margin: 0 5px 5px 5px;
-        border-radius: 6px;
-      }
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
 
-      .sub-list li {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-        color: #cfd9df;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        display: flex;
-        align-items: center;
-      }
+    .preview-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
 
-      .sub-list li:last-child {
-        border-bottom: none;
-      }
+    .preview-img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      object-fit: contain;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform: scale(0.92);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-      .sub-list li::before {
-        content: '';
-        display: inline-block;
-        width: 4px;
-        height: 4px;
-        background-color: #4facfe;
-        margin-right: 8px;
-        transform: rotate(45deg);
-      }
+    .preview-overlay.active .preview-img {
+      transform: scale(1);
+    }
 
-      .sub-list li:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: white;
-      }
+    .preview-hint {
+      margin-top: 15px;
+      color: #4facfe;
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease 0.1s;
+    }
 
-      .sub-list a {
-        color: inherit;
-        text-decoration: none;
-        width: 100%;
-        display: block;
-      }
+    .preview-overlay.active .preview-hint {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-      /* --- 3. 右下區塊 (Main Bottom) --- */
-      .main-bottom {
-        grid-row: 2;
-        grid-column: 2;
-        background-color: #333;
-        background-size: cover;
-        background-position: center;
-        transition: background-image 0.5s ease-in-out;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        padding: 15px;
-        overflow: hidden;
-        position: relative;
-      }
+    /* --- A. 詳細模式 --- */
+    .portfolio-list {
+      display: none;
+      gap: 30px;
+      height: 100%;
+      padding-bottom: 10px;
+      overflow-y: auto;
+    }
 
-      .main-bottom::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 0;
-        pointer-events: none;
-      }
+    /* --- B. 總覽模式 (Dashboard) --- */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 15px;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+    }
 
-      .portfolio-header,
-      .portfolio-list,
-      .overview-grid {
-        position: relative;
-        z-index: 1;
-      }
+    /* 卡片樣式優化：搭配新背景 */
+    .member-card {
+      background: rgba(255, 255, 255, 0.03); /* 極淡的白底，增加可讀性 */
+      border: 1px solid rgba(255, 255, 255, 0.05); /* 極細邊框 */
+      box-shadow: none;
+      backdrop-filter: blur(2px); /* 微毛玻璃 */
 
-      .portfolio-header {
-        margin-bottom: 10px;
-        border-left: 4px solid #4facfe;
-        padding-left: 10px;
-        flex-shrink: 0;
-      }
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s, background 0.3s;
+      min-height: 0;
+    }
 
-      .portfolio-header h2 {
-        color: white;
-        font-size: 1.2rem;
-        margin-bottom: 2px;
-      }
+    .member-card:hover {
+      background: rgba(255, 255, 255, 0.08); /* Hover 時稍微變亮 */
+      transform: translateY(-5px);
+      border-color: rgba(79, 172, 254, 0.3); /* Hover 時邊框帶藍色 */
+    }
 
-      .portfolio-header p {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.8rem;
-      }
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: none;
+      padding-bottom: 0;
+      flex-shrink: 0;
+    }
 
-      /* --- 預覽遮罩層 --- */
-      .preview-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 50;
-        backdrop-filter: blur(8px);
+    .card-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
 
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transition: opacity 0.4s ease, visibility 0.4s ease;
-      }
+    .card-thumbs-area {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      height: 100%;
+      flex: 1;
+      min-height: 0;
+    }
 
-      .preview-overlay.active {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-      }
+    .mini-thumb {
+      flex: 1;
+      background-color: #222;
+      background-size: cover;
+      background-position: top center;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1); /* 增加邊框 */
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 
-      .preview-img {
-        max-width: 90%;
-        max-height: 80%;
-        border-radius: 8px;
-        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-        object-fit: contain;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transform: scale(0.92);
-        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      height: 100%;
+      min-height: 0;
+      position: relative;
+    }
 
-      .preview-overlay.active .preview-img {
-        transform: scale(1);
-      }
+    .mini-thumb:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      border-color: #4facfe;
+      z-index: 10;
+    }
 
-      .preview-hint {
-        margin-top: 15px;
-        color: #4facfe;
-        font-size: 1.1rem;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.4s ease 0.1s;
-      }
+    .mini-thumb::after {
+      content: attr(title);
+      position: absolute;
+      bottom: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 10px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      opacity: 0;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      z-index: 20;
+    }
 
-      .preview-overlay.active .preview-hint {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .mini-thumb:hover::after {
+      opacity: 1;
+    }
+  </style>
+</head>
 
-      /* --- A. 詳細模式 --- */
-      .portfolio-list {
-        display: none;
-        gap: 30px;
-        height: 100%;
-        padding-bottom: 10px;
-        overflow-y: auto;
-      }
+<body>
 
-      /* --- B. 總覽模式 (Dashboard) --- */
-      .overview-grid {
-        display: grid;
-        /* 2 欄模式 */
-        grid-template-columns: repeat(2, 1fr);
-        /* 3 列模式 */
-        grid-template-rows: repeat(3, 1fr);
-        gap: 15px;
-        width: 100%;
-        flex: 1;
-        min-height: 0;
-      }
+  <div class="container">
 
-      /* ▼▼▼ 修改重點：完全隱形化容器 ▼▼▼ */
-      .member-card {
-        /* 1. 背景完全透明 */
-        background: transparent;
+    <header class="box main-top" id="main-top-box">
+      <div class="class-name-text">進二技資管一甲</div>
+      <h1 class="main-title" id="main-title-text">網站應用程式設計-期末報告</h1>
+      <div class="instructor-text">授課老師：劉先章</div>
+    </header>
 
-        /* 2. 移除所有邊框與陰影 */
-        border: none;
-        box-shadow: none;
-        backdrop-filter: none;
-        /* 移除玻璃特效 */
+    <aside class="box sidebar">
+      <h3>小組名單</h3>
+      <!-- 側邊選單保持不變 -->
+      <details id="details-A" name="team-group">
+        <summary>陳柏維</summary>
+        <ul class="sub-list">
+          <li>小組首頁</li>
+          <li><a href="N1146710/p2.html">銀河帝國</a></li>
+          <li><a href="N1146710/p3.html">最終幻想</a></li>
+        </ul>
+      </details>
 
-        border-radius: 12px;
-        padding: 5px;
-        /* 稍微減少內距，讓內容更緊湊 */
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: transform 0.3s;
-        /* 只保留位移特效 */
-        min-height: 0;
-      }
+      <details id="details-B" name="team-group">
+        <summary>王中平</summary>
+        <ul class="sub-list">
+          <li><a href="N1146712/心情與美食推薦.html">心情與美食推薦</a></li>
+          <li><a href="N1146712/花家烹飪教室.html">花家烹飪教室</a></li>
+          <li><a href="N1146712/迪士尼玩偶.html">迪士尼玩偶</a></li>
+        </ul>
+      </details>
 
-      .member-card:hover {
-        /* Hover 時也不顯示背景，只做輕微上浮 */
-        background: transparent;
-        transform: translateY(-5px);
-      }
+      <details id="details-C" name="team-group">
+        <summary>楊凱文</summary>
+        <ul class="sub-list">
+          <li><a href="N1146717/index.html">故事場景</a></li>
+          <li><a href="N1146717/page2.html">職階介紹</a></li>
+          <li><a href="N1146717/page3.html">從者情報</a></li>
+        </ul>
+      </details>
 
-      .card-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        border-bottom: none;
-        padding-bottom: 0;
-        flex-shrink: 0;
-      }
+      <details id="details-D" name="team-group">
+        <summary>黃威融</summary>
+        <ul class="sub-list">
+          <li><a href="N1146729/A-HoloWorld-Entrance.html">跨越虛擬</a></li>
+          <li><a href="N1146729/B-HoloWorld-Cast.html">成員介紹</a></li>
+          <li><a href="N1146729/C-HoloWorld-Moments.html">精彩時刻</a></li>
+        </ul>
+      </details>
 
-      .card-title {
-        font-size: 1rem;
-        font-weight: bold;
-        color: white;
-        /* 加強文字陰影，確保在任何背景都清晰 */
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-      }
+      <details id="details-E" name="team-group">
+        <summary>高士捷</summary>
+        <ul class="sub-list">
+          <li><a href="N1146738/index1.html">威脅概覽</a></li>
+          <li><a href="N1146738/index2.html">攻擊鍊詳解</a></li>
+          <li><a href="N1146738/index3.html">防禦與工具</a></li>
+        </ul>
+      </details>
 
-      .card-thumbs-area {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        height: 100%;
-        flex: 1;
-        min-height: 0;
-      }
+      <details id="details-F" name="team-group">
+        <summary>林彥勳</summary>
+        <ul class="sub-list">
+          <li><a href="N1146747/智慧生活.html">智慧生活</a></li>
+          <li><a href="N1146747/晨光美食.html">晨光美食</a></li>
+          <li><a href="N1146747/輕奢探索之旅.html">輕奢探索之旅</a></li>
+        </ul>
+      </details>
+    </aside>
 
-      .mini-thumb {
-        flex: 1;
-        background-color: #222;
-        background-size: cover;
-        background-position: top center;
-        border-radius: 8px;
-        border: none;
-        /* 加強縮圖陰影，讓它們從背景浮出來 */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    <div class="box main-bottom" id="main-bottom-box">
+      <!-- 
+           新增：背景光暈層 
+           這些 div 會在背景中飄動
+      -->
+      <div class="bg-blob blob-1"></div>
+      <div class="bg-blob blob-2"></div>
+      <div class="bg-blob blob-3"></div>
 
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
-        min-height: 0;
-        position: relative;
-      }
-
-      .mini-thumb:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-        z-index: 2;
-      }
-
-      .mini-thumb::after {
-        content: attr(title);
-        position: absolute;
-        bottom: -22px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        font-size: 10px;
-        padding: 2px 4px;
-        border-radius: 3px;
-        opacity: 0;
-        pointer-events: none;
-        white-space: nowrap;
-        transition: opacity 0.2s;
-      }
-
-      .mini-thumb:hover::after {
-        opacity: 1;
-      }
-    </style>
-  </head>
-
-  <body>
-
-    <div class="container">
-
-      <header class="box main-top" id="main-top-box">
-        <div class="class-name-text">進二技資管一甲</div>
-        <h1 class="main-title" id="main-title-text">網站應用程式設計-期末報告</h1>
-        <div class="instructor-text">授課老師：劉先章</div>
-      </header>
-
-      <aside class="box sidebar">
-        <h3>小組名單</h3>
-
-        <details id="details-A" name="team-group">
-          <summary>陳柏維</summary>
-          <ul class="sub-list">
-            <li>小組首頁</li>
-            <li><a href="N1146710/p2.html">銀河帝國</a></li>
-            <li><a href="N1146710/p3.html">最終幻想</a></li>
-          </ul>
-        </details>
-
-        <details id="details-B" name="team-group">
-          <summary>王中平</summary>
-          <ul class="sub-list">
-            <li><a href="N1146712/心情與美食推薦.html">心情與美食推薦</a></li>
-            <li><a href="N1146712/花家烹飪教室.html">花家烹飪教室</a></li>
-            <li><a href="N1146712/迪士尼玩偶.html">迪士尼玩偶</a></li>
-          </ul>
-        </details>
-
-        <details id="details-C" name="team-group">
-          <summary>楊凱文</summary>
-          <ul class="sub-list">
-            <li><a href="N1146717/index.html">故事場景</a></li>
-            <li><a href="N1146717/page2.html">職階介紹</a></li>
-            <li><a href="N1146717/page3.html">從者情報</a></li>
-          </ul>
-        </details>
-
-        <details id="details-D" name="team-group">
-          <summary>黃威融</summary>
-          <ul class="sub-list">
-            <li><a href="N1146729/page1.html">跨越虛擬</a></li>
-            <li><a href="N1146729/page2.html">成員介紹</a></li>
-            <li><a href="N1146729/page3.html">精彩時刻</a></li>
-          </ul>
-        </details>
-
-        <details id="details-E" name="team-group">
-          <summary>高士捷</summary>
-          <ul class="sub-list">
-            <li><a href="N1146738/index1.html">威脅概覽</a></li>
-            <li><a href="N1146738/index2.html">攻擊鍊詳解</a></li>
-            <li><a href="N1146738/index3.html">防禦與工具</a></li>
-          </ul>
-        </details>
-
-        <details id="details-F" name="team-group">
-          <summary>林彥勳</summary>
-          <ul class="sub-list">
-            <li><a href="N1146747/智慧生活.html">智慧生活</a></li>
-            <li><a href="N1146747/晨光美食.html">晨光美食</a></li>
-            <li><a href="N1146747/輕奢探索之旅.html">輕奢探索之旅</a></li>
-          </ul>
-        </details>
-      </aside>
-
-      <div class="box main-bottom" id="main-bottom-box">
-
-        <div class="portfolio-header">
-          <h2 id="bottom-title">期末成果總覽</h2>
-          <p id="bottom-desc">點選卡片內的縮圖可直接前往頁面，或點擊左側查看詳細連結</p>
-        </div>
-
-        <div id="overview-grid" class="overview-grid">
-        </div>
-
-        <div id="preview-overlay" class="preview-overlay">
-          <img id="preview-image" src="" alt="預覽圖" class="preview-img">
-          <div class="preview-hint">頁面預覽</div>
-        </div>
-
-        <div id="portfolio-list" class="portfolio-list">
-        </div>
-
+      <div class="portfolio-header">
+        <h2 id="bottom-title">期末成果總覽</h2>
+        <p id="bottom-desc">點選卡片內的縮圖可直接前往頁面，或點擊左側查看</p>
       </div>
+
+      <div id="overview-grid" class="overview-grid"></div>
+
+      <div id="preview-overlay" class="preview-overlay">
+        <img id="preview-image" src="" alt="預覽圖" class="preview-img">
+        <div class="preview-hint">頁面預覽</div>
+      </div>
+
+      <div id="portfolio-list" class="portfolio-list">
+      </div>
+
     </div>
+  </div>
 
-    <script>
-      // 資料庫
-      const memberData = {
-        'A': {
-          name: "陳柏維 (N1146710)", subtitle: "組長",
-          bg: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "小組首頁", tag: "p1", img: "N1146710/media/n1146710-1.jpg", desc: "小組首頁", link: "#" },
-            { title: "銀河帝國", tag: "P2", img: "N1146710/media/n1146710-2.jpg", desc: "銀河帝國", link: "N1146710/p2.html" },
-            { title: "最終幻想", tag: "P3", img: "N1146710/media/n1146710-3.jpg", desc: "最終幻想", link: "N1146710/p3.html" }
-          ]
-        },
-        'B': {
-          name: "王中平 (N1146712)", subtitle: "組員",
-          bg: "https://images.unsplash.com/photo-1550439062-609e1531270e?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "心情美食", tag: "P1", img: "N1146710/media/n1146712-1.jpg", desc: "心情美食", link: "N1146712/心情與美食推薦.html" },
-            { title: "烹飪教室", tag: "P2", img: "N1146710/media/n1146712-2.jpg", desc: "UI 烹飪教室", link: "N1146712/花家烹飪教室.html" },
-            { title: "迪士尼玩偶", tag: "P3", img: "N1146710/media/n1146712-3.jpg", desc: "DOM 迪士尼玩偶", link: "N1146712/迪士尼玩偶.html" }
-          ]
-        },
-        'C': {
-          name: "楊凱文 (N1146717)", subtitle: "組員",
-          bg: "https://images.unsplash.com/photo-1558494949-ef526b0042a0?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "故事場景", tag: "P1", img: "N1146710/media/n1146717-1.jpg", desc: "故事場景", link: "N1146717/index.html" },
-            { title: "職階介紹", tag: "P1", img: "N1146710/media/n1146717-2.jpg", desc: "職階介紹", link: "N1146717/page2.html" },
-            { title: "從者情報", tag: "P1", img: "N1146710/media/n1146717-3.jpg", desc: "從者情報", link: "N1146717/page3.html" },
-          ]
-        },
-        'D': {
-          name: "黃威融 (N1146729)", subtitle: "組員",
-          bg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "跨越虛擬", tag: "P1", img: "N1146710/media/n1146729-1.jpg", desc: "跨越虛擬", link: "N1146729/page1.html" },
-            { title: "成員介紹", tag: "P2", img: "N1146710/media/n1146729-2.jpg", desc: "成員介紹", link: "N1146729/page2.html" },
-            { title: "精彩時刻", tag: "P3", img: "https://images.unsplash.com/photo-1542744094-24638eff58bb0?auto=format&fit=crop&w=500&q=60", desc: "頁面三特效", link: "N1146729/page3.html" }
-          ]
-        },
-        'E': {
-          name: "高士捷 (N1146738)", subtitle: "組員",
-          bg: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "威脅概覽", tag: "P1", img: "N1146710/media/n1146738-1.jpg", desc: "威脅概覽", link: "N1146738/index1.html" },
-            { title: "攻擊鍊詳解", tag: "P2", img: "N1146710/media/n1146738-2.jpg", desc: "攻擊鍊詳解", link: "N1146738/index2.html" },
-            { title: "防禦與工具", tag: "P3", img: "N1146710/media/n1146738-3.jpg", desc: "防禦與工具", link: "N1146738/index3.html" }
-          ]
-        },
-        'F': {
-          name: "林彥勳 (N1146747)", subtitle: "組員",
-          bg: "https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&w=1350&q=80",
-          works: [
-            { title: "智慧生活", tag: "P1", img: "N1146710/media/n1146747-1.jpg", desc: "智慧生活", link: "N1146747/智慧生活.html" },
-            { title: "晨光美食", tag: "P2", img: "N1146710/media/n1146747-2.jpg", desc: "晨光美食", link: "N1146747/晨光美食.html" },
-            { title: "輕奢探索", tag: "P3", img: "N1146710/media/n1146747-3.jpg", desc: "輕奢探索", link: "N1146747/輕奢探索之旅.html" }
-          ]
-        }
-      };
+  <script>
+    // 資料庫
+    const memberData = {
+      'A': {
+        name: "陳柏維 (N1146710)", subtitle: "組長",
+        works: [
+          { title: "小組首頁", tag: "p1", img: "N1146710/media/n1146710-1.jpg", desc: "小組首頁", link: "#" },
+          { title: "銀河帝國", tag: "P2", img: "N1146710/media/n1146710-2.jpg", desc: "銀河帝國", link: "N1146710/p2.html" },
+          { title: "最終幻想", tag: "P3", img: "N1146710/media/n1146710-3.jpg", desc: "最終幻想", link: "N1146710/p3.html" }
+        ]
+      },
+      'B': {
+        name: "王中平 (N1146712)", subtitle: "組員",
+        works: [
+          { title: "心情美食", tag: "P1", img: "N1146710/media/n1146712-1.jpg", desc: "心情美食", link: "N1146712/心情與美食推薦.html" },
+          { title: "烹飪教室", tag: "P2", img: "N1146710/media/n1146712-2.jpg", desc: "UI 烹飪教室", link: "N1146712/花家烹飪教室.html" },
+          { title: "迪士尼玩偶", tag: "P3", img: "N1146710/media/n1146712-3.jpg", desc: "DOM 迪士尼玩偶", link: "N1146712/迪士尼玩偶.html" }
+        ]
+      },
+      'C': {
+        name: "楊凱文 (N1146717)", subtitle: "組員",
+        works: [
+          { title: "故事場景", tag: "P1", img: "N1146710/media/n1146717-1.jpg", desc: "故事場景", link: "N1146717/index.html" },
+          { title: "職階介紹", tag: "P1", img: "N1146710/media/n1146717-2.jpg", desc: "職階介紹", link: "N1146717/page2.html" },
+          { title: "從者情報", tag: "P1", img: "N1146710/media/n1146717-3.jpg", desc: "從者情報", link: "N1146717/page3.html" },
+        ]
+      },
+      'D': {
+        name: "黃威融 (N1146729)", subtitle: "組員",
+        works: [
+          { title: "跨越虛擬", tag: "P1", img: "N1146710/media/n1146729-1.jpg", desc: "跨越虛擬", link: "N1146729/A-HoloWorld-Entrance.html" },
+          { title: "成員介紹", tag: "P2", img: "N1146710/media/n1146729-2.jpg", desc: "成員介紹", link: "N1146729/B-HoloWorld-Cast.html" },
+          { title: "精彩時刻", tag: "P3", img: "N1146710/media/n1146729-3.jpg", desc: "精彩時刻", link: "N1146729/C-HoloWorld-Moments.html" }
+        ]
+      },
+      'E': {
+        name: "高士捷 (N1146738)", subtitle: "組員",
+        works: [
+          { title: "威脅概覽", tag: "P1", img: "N1146710/media/n1146738-1.jpg", desc: "威脅概覽", link: "N1146738/index1.html" },
+          { title: "攻擊鍊詳解", tag: "P2", img: "N1146710/media/n1146738-2.jpg", desc: "攻擊鍊詳解", link: "N1146738/index2.html" },
+          { title: "防禦與工具", tag: "P3", img: "N1146710/media/n1146738-3.jpg", desc: "防禦與工具", link: "N1146738/index3.html" }
+        ]
+      },
+      'F': {
+        name: "林彥勳 (N1146747)", subtitle: "組員",
+        works: [
+          { title: "智慧生活", tag: "P1", img: "N1146710/media/n1146747-1.jpg", desc: "智慧生活", link: "N1146747/智慧生活.html" },
+          { title: "晨光美食", tag: "P2", img: "N1146710/media/n1146747-2.jpg", desc: "晨光美食", link: "N1146747/晨光美食.html" },
+          { title: "輕奢探索", tag: "P3", img: "N1146710/media/n1146747-3.jpg", desc: "輕奢探索", link: "N1146747/輕奢探索之旅.html" }
+        ]
+      }
+    };
 
-      const topBox = document.getElementById('main-top-box');
-      const bottomBox = document.getElementById('main-bottom-box');
-      const bottomTitle = document.getElementById('bottom-title');
-      const bottomDesc = document.getElementById('bottom-desc');
-      const overviewGrid = document.getElementById('overview-grid');
+    const topBox = document.getElementById('main-top-box');
+    const bottomBox = document.getElementById('main-bottom-box');
+    const bottomTitle = document.getElementById('bottom-title');
+    const bottomDesc = document.getElementById('bottom-desc');
+    const overviewGrid = document.getElementById('overview-grid');
 
-      function showOverview() {
-        overviewGrid.style.display = 'grid';
-        bottomTitle.textContent = "期末成果總覽";
-        bottomDesc.textContent = "點選卡片內的縮圖可直接前往頁面，或點擊左側查看詳細連結";
-        // 這裡的背景圖也同步更新為深色程式碼風格
-        topBox.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')`;
-        bottomBox.style.backgroundImage = `none`;
-        bottomBox.style.backgroundColor = `#333`;
+    function showOverview() {
+      overviewGrid.style.display = 'grid';
+      bottomTitle.textContent = "期末成果總覽";
+      bottomDesc.textContent = "點選卡片內的縮圖可直接前往頁面，或點擊左側查看詳細連結";
+      
+      // 確保容器是空的，解決原本因註解導致 innerHTML 不為空而不生成內容的問題
+      overviewGrid.innerHTML = "";
 
-        if (overviewGrid.innerHTML.trim() !== "") return;
+      const memberIds = ['A', 'B', 'C', 'D', 'E', 'F'];
+      let html = '';
 
-        const memberIds = ['A', 'B', 'C', 'D', 'E', 'F'];
-        let html = '';
-
-        memberIds.forEach(id => {
-          const m = memberData[id];
-          let thumbsHtml = '';
-          for (let i = 0; i < 3; i++) {
-            if (m.works[i]) {
-              const link = m.works[i].link;
-              const title = m.works[i].title;
-              const img = m.works[i].img;
-              const onclickAttr = (link && link !== '#') ? `onclick="location.href='${link}'"` : '';
-              const titleAttr = (link && link !== '#') ? `title="${title} (點擊前往)"` : `title="${title} "`;
-              thumbsHtml += `<div class="mini-thumb" style="background-image: url('${img}');" ${onclickAttr} ${titleAttr}></div>`;
-            } else {
-              thumbsHtml += `<div class="mini-thumb" style="background: rgba(255,255,255,0.05); cursor: default;"></div>`;
-            }
+      memberIds.forEach(id => {
+        const m = memberData[id];
+        let thumbsHtml = '';
+        for (let i = 0; i < 3; i++) {
+          if (m.works[i]) {
+            const link = m.works[i].link;
+            const title = m.works[i].title;
+            const img = m.works[i].img;
+            const onclickAttr = (link && link !== '#') ? `onclick="location.href='${link}'"` : '';
+            const titleAttr = (link && link !== '#') ? `title="${title} (點擊前往)"` : `title="${title} "`;
+            thumbsHtml += `<div class="mini-thumb" style="background-image: url('${img}');" ${onclickAttr} ${titleAttr}></div>`;
+          } else {
+            thumbsHtml += `<div class="mini-thumb" style="background: rgba(255,255,255,0.05); cursor: default;"></div>`;
           }
-          html += `
+        }
+        html += `
         <div class="member-card">
           <div class="card-header"><span class="card-title">${m.name}</span></div>
           <div class="card-thumbs-area">${thumbsHtml}</div>
         </div>
       `;
-        });
-        overviewGrid.innerHTML = html;
-      }
+      });
+      overviewGrid.innerHTML = html;
+    }
 
-      window.onload = function () {
-        showOverview();
+    window.onload = function () {
+      showOverview();
 
-        const sidebarLinks = document.querySelectorAll('.sub-list a');
-        const previewOverlay = document.getElementById('preview-overlay');
-        const previewImage = document.getElementById('preview-image');
+      const sidebarLinks = document.querySelectorAll('.sub-list a');
+      const previewOverlay = document.getElementById('preview-overlay');
+      const previewImage = document.getElementById('preview-image');
 
-        sidebarLinks.forEach(link => {
-          link.addEventListener('mouseenter', function () {
-            const href = this.getAttribute('href');
-            let foundImg = null;
+      sidebarLinks.forEach(link => {
+        link.addEventListener('mouseenter', function () {
+          const href = this.getAttribute('href');
+          let foundImg = null;
 
-            Object.values(memberData).forEach(member => {
-              member.works.forEach(work => {
-                if (work.link === href && work.img) {
-                  foundImg = work.img;
-                }
-              });
+          Object.values(memberData).forEach(member => {
+            member.works.forEach(work => {
+              if (work.link === href && work.img) {
+                foundImg = work.img;
+              }
             });
-
-            if (foundImg) {
-              previewImage.src = foundImg;
-              previewOverlay.classList.add('active');
-            }
           });
 
-          link.addEventListener('mouseleave', function () {
-            previewOverlay.classList.remove('active');
-          });
+          if (foundImg) {
+            previewImage.src = foundImg;
+            previewOverlay.classList.add('active');
+          }
         });
-      };
-    </script>
 
-  </body>
+        link.addEventListener('mouseleave', function () {
+          previewOverlay.classList.remove('active');
+        });
+      });
+    };
+  </script>
+
+</body>
 
 </html>
