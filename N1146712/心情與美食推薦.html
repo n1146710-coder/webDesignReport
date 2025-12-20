@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>心情與美食推薦</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <style>
+            body {
+                background-color: #fff9c4; /* 背景色 */
+                color:            #333;    /* 字體顏色 */
+                line-height:      1.6;       /* 行高 */
+                font-weight:      bold;      /* 字體加粗 */
+                
+                /* 黏性頁尾 + 垂直居中思想的結合 (Flexbox) */
+                margin:           0;       /* 移除外邊距 */
+                display:          flex;    /* 設定為 Flex 容器 */
+                flex-direction:   column;  /* 垂直堆疊 */
+                min-height:       100vh;   /* 最小高度為視窗高度，確保黏性頁尾 */
+                height:           100vh;   /* 確保高度等於視窗高度 */
+                overflow:         hidden;  /* 隱藏溢出內容，防止滾動條出現 */
+            }
+
+            /* 頁首 (#header) */
+            #header {
+                background-color: #f3d45d;        /* 背景色 */
+                border-bottom:    1px solid #663; /* 底部邊線 */
+                display:          flex;           /* 設定為 Flex 容器 */
+                justify-content:  space-between;   /* 左右對齊 (Logo 和 導覽) */
+                align-items:      center;         /* 垂直置中對齊 */
+                height:           100px;          /* 保持原高度 */
+                padding:          0 20px;         /* 左右內邊距 */
+                box-shadow:       0 2px 5px rgba(0, 0, 0, 0.1); /* 設定陰影 */
+                flex-shrink:      0;              /* 不允許收縮 */
+                
+                /* 固定定位，覆蓋 Flex 容器的 Flow，確保固定在頂部 */
+                position:         fixed;          /* 固定定位 */
+                top:              0;              /* 位於頁面頂部 */
+                left:             0;              /* 位於頁面左側 */
+                width:            100%;           /* 寬度佔滿 */
+                z-index:          100;            /* 疊放層級較高 */
+            }
+            
+            #header ul { 
+                list-style-type:  none;    /* 移除列表標記 */
+                margin:           20px;       /* 外邊距 */
+                padding:          20px;       /* 內邊距 */
+                display:          flex;    /* 啟用 Flex 排列，使選單項目水平排列 */
+            }
+            
+            #header li a {
+                color:            #380596;         /* 字體顏色 */
+                background-color: #fff9c4;        /* 背景色 */
+                text-decoration:  none;           /* 移除預設底線 */
+                border:           1px #663 solid; /* 邊框 */
+                margin-left:      10px;           /* 左側間距 */
+                padding:          8px 15px;       /* 內邊距 */
+                font-weight:      bold;           /* 字體加粗 */
+                border-radius:    15px;            /* 圓角弧度 */
+            }
+            
+            #header li a:hover {
+                background-color: #eee;        /*  滑鼠指到時變色 */
+            }
+
+            /* 頁尾 BMI  */
+            #bmi-calc {
+                background-color: #70b3e6;        /* 背景色 */
+                color:            #222;           /* 字體顏色 */
+                height:           100px;          /* 保持原高度 */
+                display:          flex;           /* 設定為 Flex 容器 */
+                justify-content:  space-around;   /* 平均分佈空間 */
+                align-items:      center;         /* 垂直置中對齊 */
+                box-sizing:       border-box;     /* 邊框盒模型 */
+                padding:          0 20px;         /* 左右內邊距 */
+                flex-shrink:      0;              /* 不允許收縮 */
+                
+                /* 固定定位，確保固定在底部 */
+                position:         fixed;          /* 固定定位 */
+                bottom:           0;              /* 頁面底部 */
+                left:             0;              /* 頁面左側 */
+                width:            100%;           /* 寬度佔滿 */
+                z-index:          100;            /* 疊放層級較高 */
+            }
+            
+            #bmi-calc input[type="number"] { 
+                width:   100px;  /* 輸入框寬度 */
+                padding: 5px;   /* 輸入框內邊距 */
+            }
+            
+            #bmi-calc p { 
+                margin: 5px 0;  /* 調整段落上下外邊距 */
+            }
+            
+            /* 主要內容區 (#main-wrap) - 負責心情選擇區塊的垂直居中 */
+            #main-wrap {
+                display:         flex;    /* 設定為 Flex 容器 */
+                justify-content: center;  /* 水平置中對齊 */
+                align-items:     center;  /* 垂直置中對齊 */
+                flex-grow:       1;       /* 佔據 Flex 容器剩餘的垂直空間 */
+                width:           100%;    /* 寬度佔滿 */
+                box-sizing:      border-box; /* 邊框盒模型 */
+                padding-top:     100px;   /* 為避開頂部 Header 挪出空間 */
+                padding-bottom:  100px;   /* 為避開底部 BMI 挪出空間 */
+                overflow:        auto;    /* 確保內容超出時可以滾動 */
+            }
+            
+
+            /*心情選擇區塊 (Mood Select)*/
+
+            #mood-select {
+                background-color: #ffffff;      /* 背景色 */
+                display:          flex;         /* 設定為 Flex 容器 */
+                flex-direction:   column;       /* 垂直堆疊子元素 */
+                align-items:      center;       /* 垂直置中對齊 */
+                text-align:       center;       /* 文字置中 */
+                min-width:        400px;        /* 最小寬度 */
+                border-radius:    10px;         /* 設定圓角 */
+                box-shadow:       0 4px 15px rgba(0, 0, 0, 0.1); /* 設定陰影 */
+                padding:          40px;         /* 設定內邊距 */
+            }
+            
+            /* 選擇器正中央的調整區塊 */
+            #h3 { 
+                color:           rgb(119, 115, 13); /* 字體顏色 */
+                font-size:       3.5em;            /* 字體大小 */
+                margin-bottom:   5px;              /* 標題底部外邊距 */
+            }
+            
+            #p { 
+                color:           #176d14;        /* 字體顏色 */
+                font-size:       1.2em;            /* 字體大小 */
+                margin-top:      5px;              /* 頂部外邊距 */
+                margin-bottom:   30px;             /* 底部外邊距 */
+            }
+            
+            #mood-icons { 
+                display:         flex;    /* 設定為 Flex 容器 */
+                gap:             30px;    /* 設定子元素間的間距 */
+                margin-bottom:   30px;    /* 設定底部外邊距 */
+            }
+            
+            .mood-image {
+                width:           300px;   /* 圖片寬度 */
+                height:          300px;   /* 圖片高度 */
+                border:          3px solid black; /* 預設邊框 */
+            }
+            
+            #happyImage { 
+                cursor: pointer; /* 點擊圖示，鼠標變為指標 */
+            } 
+            
+            #sadImage { 
+                cursor: default; /* 不可點擊圖示，鼠標為預設 */
+            } 
+            /*類似遊戲傳奇裝備特效*/
+            .mood-image.selected { 
+                border:     5px solid #ff9800;                 /* 邊框顏色 */
+                box-shadow: 0 0 10px 5px rgba(255, 235, 59, 0.8); /* 陰影 */
+            }
+
+
+            /* ---      JS模態視窗 (Modal)        --- */
+
+            #food-modal {
+                background-color: rgba(56, 56, 34, 0.6); /* 設定背景顏色 */
+                display:          none;             /*預設隱藏 */
+                position:         fixed;            /* 固定定位 */
+                top:              0;                /* 頁面頂部 */
+                left:             0;                /* 頁面左側 */
+                width:            100%;             /* 寬度佔滿 */
+                height:           100%;             /* 高度佔滿 */
+                z-index:          9527;             /* 疊放層級 */
+            }
+
+            .modal-content {
+                background-color: #fefefe;                        /* 模態框背景色 */
+                border:           1px solid #888;                 /* 模態框邊框 */
+                width:            800px;                            /* 模態框寬度 */
+                margin:           auto;                             /* 自動外邊距 (與 Flex 配合實現居中) */
+                border-radius:    30px;                             /* 圓角 */
+                box-shadow:       0 10px 30px rgba(0, 0, 0, 0.5); /* 陰影 */
+                padding:          20px;                             /* 內邊距 */
+            }
+            /* 設定 'X' 按鈕 */
+            .close-btn { 
+                color:       #000000;     /* 按鈕顏色 */
+                font-size:   40px;     /* 按鈕大小 */
+                font-weight: bold;     /* 按鈕字體加粗 */
+                cursor:      pointer;  /* 鼠標變為指標 */
+                float:       right;    /* 靠右浮動 */
+            } 
+            
+            .close-btn:hover, .close-btn:focus { 
+                color:           #8500f1;          /* 滑鼠指到時變色 */
+                text-decoration: none;          /* 移除底線 */
+                cursor:          pointer;       /* 鼠標變為指標 */
+            }
+
+            /* 設定菜單 */
+
+            .menu-grid { 
+                display:               grid;           /* 設定為 Grid 網格容器 */
+                grid-template-columns: repeat(3, 1fr); /* 設定每行3格 */
+                gap:                   15px;           /* 設定網格間距 */
+                margin-top:            20px;           /* 設定頂部外邊距 */
+            }
+                    /*菜單標題*/
+            #menu-title { 
+                color:         #d35400;   /* 設定標題顏色 */
+                font-size:     3em;         /* 設定標題字體大小 */
+                text-align:    center;      /* 文字置中 */
+                margin-bottom: 20px;        /* 設定底部外邊距 */
+            }
+            /*菜單圖片*/
+            .menu-item img {
+                width:           100%;           /* 圖片寬度佔滿父容器 */
+                height:          180px;          /* 圖片高度 */
+                object-fit:      contain;        /* 保持圖片比例並完整顯示 */
+                margin-bottom:   5px;             /* 設定底部外邊距 */
+            }
+            /*菜單名子*/
+            .food-name { 
+                color:      #333;        /* 字體顏色  */
+                font-size: 1em;            /* 字體大小 */
+                font-weight:  bold;        /* 字體加粗 */
+                margin:    0;              /* 移除外邊距 */
+                text-align: center;        /* 文字置中 */
+            }
+            /*菜單註記區*/
+            #menu-note { 
+                background-color: #ffe600a2; /* 背景色  */
+                font-size:        0.9em;   /* 字體大小 */
+                margin-top:       15px;    /* 頂部外邊距 */
+                padding:          10px;    /* 內邊距 */
+                border-radius:    30px;     /* 圓角 */
+            }
+
+        </style>
+
+        <script>
+    /* 預先準備好所有的菜單 HTML 內容。*/
+    const allMenu = `
+        <div id="menu-list">
+            <h3 id="menu-title">美味餐點</h3>
+            <div class="menu-grid">
+                <div class="menu-item"><img src="./media/food1.jpg" alt="香滷雞腿便當"><p class="food-name">香滷雞腿便當</p></div>
+                <div class="menu-item"><img src="./media/food2.jpg" alt="舒肥雞沙拉"><p class="food-name">舒肥雞沙拉</p></div>
+                <div class="menu-item"><img src="./media/food3.jpg" alt="厚切嫩牛漢堡"><p class="food-name">厚切嫩牛漢堡</p></div>
+                <div class="menu-item"><img src="./media/food4.jpg" alt="清滷牛腱便當"><p class="food-name">清滷牛腱便當</p></div>
+                <div class="menu-item"><img src="./media/food5.jpg" alt="起司奶奶鍋"><p class="food-name">起司奶奶鍋</p></div>
+                <div class="menu-item"><img src="./media/food6.jpg" alt="速食"><p class="food-name">快樂速食</p></div>
+            </div>
+            <div id="menu-note">
+                <p>今日特別推薦菜色說明：香滷雞腿便當、舒肥雞沙拉、厚切嫩牛漢堡、清滷牛腱便當、起司奶奶鍋、快樂速食。</p>
+            </div>
+        </div>
+    `;
+
+    // 宣告一個函式 (function)，功能是「關閉彈跳視窗」。
+    function closeModal() {
+        document.getElementById('food-modal').style.display = 'none';
+    }
+
+
+    /*心情選擇及模態視窗顯示*/
+
+    function selectMood(moodValue) {
+        const happyImg = document.getElementById('happyImage');
+        const sadImg = document.getElementById('sadImage');
+        const modal = document.getElementById('food-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+
+        // 1. 重設所有選中狀態
+        happyImg.classList.remove('selected');
+        sadImg.classList.remove('selected'); 
+        
+        // 2. 'happy' 點擊事件
+        if (moodValue === 'happy') {
+            happyImg.classList.add('selected'); 
+            
+            modalTitle.innerHTML = "🎉 心情愉悅！ 推薦高能量餐點"; 
+            modalBody.innerHTML = allMenu;                             
+            
+            modal.style.display = 'flex'; // 顯示彈窗。
+        } else {
+            closeModal();
+        }
+    }
+
+
+    /*監聽器*/
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const sadImg = document.getElementById('sadImage');
+
+        /*  悲傷圖跟梗圖的滑鼠互動 */
+        sadImg.addEventListener('mouseover', function() { 
+            this.src = './media/small.jpg'; 
+        }); 
+        sadImg.addEventListener('mouseout', function() { 
+            this.src = './media/sad.jpg'; 
+        }); 
+    });
+
+
+    /*BMI 計算功能*/
+
+    function calculateBMI(){
+        var height = parseFloat(document.getElementById("height").value);
+        var weight = parseFloat(document.getElementById("weight").value);
+        var bmiStatusElement = document.getElementById("bmi-msg"); 
+        var bmiDisplay = document.getElementById("BMI");
+
+        if(isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+            bmiDisplay.innerHTML = "0";
+            if (bmiStatusElement) {
+                bmiStatusElement.innerHTML = "請輸入有效數值";
+                bmiStatusElement.style.color = "black";
+            }
+            return;
+        }
+
+        height = height / 100;
+        var bmi = weight / (height * height); 
+        bmiDisplay.innerHTML = bmi.toFixed(2);
+
+        var status = "";
+        var statusColor = "";
+
+        /*BMI體態判定並改變字體顏色*/
+
+        if (bmi < 18.5) { status = "體重過輕"; statusColor = "#2196F3"; } 
+        else if (bmi >= 18.5 && bmi < 24) { status = "正常範圍"; statusColor = "#4CAF50"; } 
+        else if (bmi >= 24 && bmi < 27) { status = "體重過重"; statusColor = "#FFC107"; } 
+        else if (bmi >= 27 && bmi < 30) { status = "輕度肥胖"; statusColor = "#FF9800"; } 
+        else { status = "中度/重度肥胖"; statusColor = "#F44336"; } 
+        
+        if (bmiStatusElement) {
+            bmiStatusElement.innerHTML = "體態判定: " + status;
+            bmiStatusElement.style.color = statusColor;
+        }
+    }
+        </script>
+    </head>
+    <body>
+        <div id="header">
+            <a href="index.html"><img id="logo" src="./media/LOGO.jpg" alt="Logo" width="80"></a> 
+            <nav>
+                <ul>
+                    <li><a href="./index.html">小組首頁</a></li>
+                    <!--
+                    <li><a href="./迪士尼玩偶.html">迪士尼玩偶</a></li>
+                    <li><a href="./花家烹飪教室.html">花家烹飪教室</a></li>
+                    -->
+                </ul>
+            </nav>
+        </div>
+
+        <div id="main-wrap"> 
+            <div id="mood-select">
+                <h3 id="h3">今天感覺如何？</h3>
+                <p id="p">我們會為你推薦適合今天心情的食物</p>
+                
+                <div id="mood-icons"> 
+                    <img id="happyImage" class="mood-image" src="./media/happy.jpg" alt="開心圖" onclick="selectMood('happy')">
+                    <img id="sadImage" class="mood-image" src="./media/sad.jpg" alt="悲傷圖">
+                </div>
+            </div>
+        </div>
+
+        <div id="bmi-calc">
+            <p>身高(公分) :<input id="height" type="number" oninput="calculateBMI()"></p>
+            <p>體重(公斤) :<input id="weight" type="number" oninput="calculateBMI()"></p>
+            <p>BMI指數 = <span id="BMI" style="font-weight: bold;">0</span></p>
+            <p id="bmi-msg" style="font-weight: bold;">請輸入身高和體重</p> 
+        </div>
+
+        <div id="food-modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span> 
+                <h3 id="modal-title" style="text-align: center; color: #333;"></h3> 
+                <hr>
+                <div id="modal-body">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

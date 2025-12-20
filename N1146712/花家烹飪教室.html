@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>花家烹飪教室</title>
+        
+        <style>
+
+            /* 使用萬用選擇器 (*) 選擇所有元素 */
+            * {
+                /* 讓 padding 和 border 不會讓元素的總寬度變大 (重要) */
+                box-sizing: border-box; 
+                /* 移除瀏覽器預設的邊界 */
+                margin: 0;
+                /* 移除瀏覽器預設的內邊距 */
+                padding: 0;
+            }
+
+            /* 設定 Body 基礎樣式 (整個網頁的底層設定) */
+            body {
+                /* 設定網頁的整體字體 */
+                font-family: '微軟正黑體', 'Helvetica Neue', Arial, sans-serif;
+                /* 設定行高，讓文字不擁擠 */
+                line-height: 1.6; 
+                /* 頁面背景色 */
+                background-color: #f4f4f4; 
+                /* 預設文字顏色 */
+                color: #333;
+
+
+                background-image: url("DO RE MI SOL.jpeg");
+
+            }
+
+            /* 設定所有超連結 (a) 的樣式 */
+            a {
+                /* 移除超連結底線 */
+                text-decoration: none; 
+                /* 繼承父元素的文字顏色 */
+                color: inherit;
+            }
+
+
+            /* 頁首 (Header) 樣式：使用 Flexbox 實現左中右排版 */
+    
+            
+            /* 頁首區 (Header) 樣式 */
+            .main-header {
+                /* 頁首背景色 */
+                background-color: #f4f4f4; 
+                padding: 10px 0;
+                /* 底部裝飾線 */
+                border-bottom: 2px solid #ddd;
+            }
+
+            /* 頁首內容容器：設定 Flexbox 佈局 (實現左、中、右排版) */
+            .header-content {
+                /* Flexbox */
+                display: flex; 
+                /* 垂直置中對齊內容 (讓按鈕和文字在同一高度) */
+                align-items: center; 
+                /* 將內容推向左右兩側 */
+                justify-content: space-between; 
+                /* 限制容器最大寬度 */
+                max-width: 1400px; 
+                /* 置中 */
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+            /* 左側區域：Logo/網站名稱 */
+            .header-left {
+                color: #cc0000;
+                font-size: 18px;
+                font-weight: bold;
+                /* 給予固定寬度，中央標題精確置中 */
+                flex-basis: 250px; 
+            }
+
+            /* 中間區域：食譜標題 H1 */
+            .header-center {
+                font-size: 24px;
+                color: #333;
+                /* 核心技巧：自動計算左右邊距，使其在 Flex 容器中置中 */
+                margin: 0 auto; 
+                text-align: center;
+            }
+
+            /*  右側區域：按鈕組容器 */
+            .header-right {
+                /* 寬度設定要和 .header-left 接近，保持置中平衡 */
+                flex-basis: 350px; 
+                /* 按鈕靠右對齊 */
+                text-align: right; 
+            }
+            .header-right a {
+                /* 深紅色背景 */
+                background-color: #1a35664b; 
+                color: white;
+                /* 移除邊框 */
+                border: none;
+                /* 內邊距 */
+                padding: 8px 12px;
+                /* 按鈕間隔 */
+                margin-left: 5px; 
+                font-weight: bold;
+                /* 滑鼠變成點擊圖案 */
+                cursor: pointer;
+                /* 輕微圓角 */
+                border-radius: 4px; 
+                font-size: 14px;
+            }
+
+            /* 滑鼠懸停在按鈕上時的樣式 */
+            .header-right a:hover {
+                /* 滑鼠懸停時變成亮紅色 */
+                background-color: #3e074eb4;
+            }
+
+
+
+
+            /* Grid 佈局設定：實現固定三欄排版 */
+            /* 目的：將左、中、右三個 DIV 排成一列 */
+
+
+            /*  Grid 佈局設定：這是包裹左中右三欄的容器 */
+            .grid-container {
+                /* Grid 佈局 */
+                display: grid; 
+                /* 定義三欄的寬度：左欄 250px | 中間欄 佔滿剩下空間 (1fr) | 右欄 200px */
+                grid-template-columns: 
+                    250px    /* 第一欄：固定寬度 250 像素 */
+                    1fr      /* 第二欄：佔用所有剩下的空間 (fr) */
+                    200px;   /* 第三欄：固定寬度 200 像素 */
+                /* 欄位之間的間距 (水平和垂直) */
+                gap: 20px; 
+                /* 限制容器最大寬度為 1400 像素 */
+                max-width: 1400px; 
+                /* 上下邊距 20px，左右邊距 auto (置中) */
+                margin: 20px auto; 
+                /* 容器內部的左右邊距 20 像素 */
+                padding: 0 20px;
+            }
+            
+            /* 讓三個欄位 (左、中、右) 看起來有區隔：共用樣式 */
+            .main-content, .left-sidebar, .right-sidebar {
+                padding: 20px;
+                border-radius: 8px; 
+                /* 輕微陰影 */
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+                /* 設定最小高度，讓三個欄位在視覺上等高 */
+                min-height: 800px; 
+            }
+
+            /* 內容與側邊欄細節樣式 */
+            
+            /* 中間主要內容區樣式 */
+            .main-content {
+                background-color: #fff;
+            }
+
+            /* 食譜內容區塊樣式 (這裡是目錄的目標區塊) */
+            .recipe-section {
+                /* 為錨點跳轉後的目標內容，留出頂部空間 */
+                padding-top: 20px; 
+                margin-bottom: 30px;
+            }
+            /* 食譜區塊標題 (h2) 樣式 */
+            .recipe-section h2 {
+                color: #b35900;
+                margin-bottom: 15px;
+                /* 標題下方淺色分隔線 */
+                border-bottom: 2px solid #3f5268 ;
+                padding-bottom: 5px;
+            }
+
+
+
+            /* 製作步驟：文字與圖片並排佈局 (Flexbox) */
+
+            .step {
+                /* 啟用 Flexbox 佈局 */
+                display: flex;
+                /* 垂直方向置中對齊 */
+                align-items: center; 
+                /* 元素之間留出間距 */
+                gap: 20px; 
+                /* 底部間距，分隔不同步驟 */
+                margin-bottom: 30px; 
+                /* 允許元素在空間不足時換行 */
+                flex-wrap: wrap; 
+                /* 確保容器內的列表符號顯示正常 */
+                padding-left: 20px; 
+            }
+
+                /* 確保圖片在 Flexbox 中佔用合理的空間 */
+            .step img {
+                /* 圖片的寬度限制在 30% (可調整) */
+                width: 30%; 
+                /* 圖片靠右對齊 (在 Flex 容器中預設靠右) */
+                order: 2; 
+                /* 確保 <li> 佔用大部分空間 */
+                flex-grow: 1; 
+                margin: 0; /* 移除通用 img 樣式中的上下 margin */
+            }
+
+                /* 讓列表 (li) 佔用剩餘空間，並且強制它在圖片左側 */
+            .step li {
+                /* 讓 li 佔用大約 60% 的空間 */
+                flex-basis: 60%; 
+                /* 確保 <li> 在圖片前面 */
+                order: 1; 
+                /* 移除通用 li 樣式中的 margin */
+                margin-bottom: 0; 
+            }
+
+
+
+
+            img {
+                /* 為錨點跳轉後的目標內容，留出頂部空間 */
+                padding-top: 20px; 
+                margin-bottom: 30px;
+                max-width: 100%
+            }
+
+            /* 左側邊條 (導航/目錄) 樣式 */
+            .left-sidebar {
+                background-color: #fcf0e5; 
+                border: 1px solid #e0c8b3;
+            }
+            /* 左側邊條標題樣式 */
+            .sidebar-title {
+                color: #a04000;
+                margin-bottom: 15px;
+                font-size: 1.2em;
+            }
+            /* 左側邊條清單 (ul) 樣式 */
+            .left-sidebar ul {
+                /* 移除列表項目符號 */
+                list-style: none; 
+            }
+            /* 清單項目 (li) 樣式 */
+            .left-sidebar li {
+                margin-bottom: 10px;
+            }
+            /* 滑鼠移到連結上時 (hover) 的樣式 */
+            .left-sidebar a:hover {
+                color: #ff8c00; 
+                font-weight: bold;
+            }
+
+            .ingredients {
+                font-size: 15px;
+                color: #1d0630;
+            }
+            /* 已被勾選、在文字中間畫一條刪除線*/
+            .ingredients input:checked + span {
+                text-decoration: line-through;
+                color: #b9b5b5;
+                transition: all 0.3s ease;
+            }
+
+            /* 右側邊條 (便利貼/紀錄) 樣式 */
+            .right-sidebar {
+                /* 模擬便利貼的淡黃色背景 */
+                background-color: #ffffc2; 
+                border: 1px solid #ffeb3b;
+            }
+
+            /* 文本輸入區域 (textarea) 樣式 */
+            .note-pad textarea {
+                /* 寬度填滿父元素 */
+                width: 100%; 
+                min-height: 150px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                margin-top: 15px;
+            /* 允許用戶垂直調整大小，不能水平調整 */
+                resize: vertical; 
+            }
+            .sidebar-title{
+                color: #413f3f;
+            }
+            .time-kcal{
+                font-size: 15px;
+                color: #ff0c0c;
+            }
+            .nutrition table {
+                width: 100%;
+                font-size: 13px;
+                color: #ac721b;
+            }
+
+
+
+        </style>
+    </head>
+    <body>
+        <header class="main-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <span>花家烹飪教室</span>
+                </div>
+                
+                <h1 class="header-center">鬆鬆軟軟的美味炒蛋</h1>
+                
+                <div class="header-right">
+                    <a href="./index.html">小組首頁</a>
+                    <!--
+                    <a href="./心情與美食推薦.html">心情與美食推薦</a>
+                    <a href="./迪士尼玩偶.html">迪士尼玩偶</a>
+                    -->
+                </div>
+            </div>
+        </header>
+
+        <div class="grid-container">
+
+            <div class="left-sidebar">
+                <h3 class="sidebar-title">食譜目錄</h3>
+                <ul>
+                    <li>
+                        <a href="#section-ingredients">→ 所需材料(Ingredients)</a>
+                        <ul class="ingredients">
+                            <li><input type="checkbox"> <span>雞蛋</span></li>
+                            <li><input type="checkbox"> <span>嫩豆腐</span></li>
+                            <li><input type="checkbox"> <span>柴魚片</span></li>
+                            <li><input type="checkbox"> <span>芝麻油</span></li>
+                            <li><input type="checkbox"> <span>醬油</span></li>
+                            <li><input type="checkbox"> <span>鹽巴</span></li>
+                            <li><input type="checkbox"> <span>蔥</span></li>
+                        </ul>
+                    </li>
+                    <li><a href="#section-steps">→ 製作步驟(Steps)</a></li>
+                    <li><a href="#section-tips">→ 烹飪小技巧</a></li>
+                </ul>
+            </div>
+
+            <div class="main-content">
+                <div id="section-ingredients" class="recipe-section">
+
+                    <div class="banner">
+                            <img src="./image2/Huajia cooking class1.jpg" alt="花家烹飪教室">
+                    </div>
+
+                    <h2>所需材料 (Ingredients)</h2>
+                    <ul>
+                        <li>材料總共四人份</li>
+                        <li>雞蛋二個、嫩豆腐一塊</li>
+                        <li>柴魚片五公克、芝麻油一大匙</li>
+                        <li>醬油二小匙、鹽巴一小匙半、蔥(切成蔥末)適量</li>
+                    </ul>
+                </div>
+
+                <hr> <div id="section-steps" class="recipe-section">
+                    <h2>製作步驟 (Steps)</h2>
+                    <ol>
+                        <div class="step">
+                            <li>首先將雞蛋打到碗裡面去然後加入鹽巴攪拌均勻。</li>
+                            <img src="./image2/Steps.jpg" alt="步驟1">
+                        </div>
+                        
+                        <div class="step">
+                            <li>接著把芝麻油倒進炒菜鍋裡面預熱。</li>
+                            <li>然後就是Do Re Mi So</li>
+                            <li>把瀝乾水分的嫩豆腐加進來。</li>
+                            <li>接著呢，一邊把豆腐稍微弄碎一點，炒到沒有水分為止</li>
+                            <img src="./image2/Steps1.jpg" alt="步驟2">
+                        </div>
+
+                        <div class="step">
+                            <li>如果沒有炒乾一點的話，裝盤以後就會看起來水水的</li>
+                            <li>接下來呢，把剛剛攪拌好的蛋汁倒進來 </li>
+                            <li>等到雞蛋開始有點硬的時候，就把醬油、柴魚片還有切碎的蔥末一起放進來</li>
+                            <img src="./image2/Steps2.jpg" alt="步驟3">
+                        </div>
+                        
+                        
+                            <li>輕輕的拌炒等到雞蛋變得鬆軟，而且也熟的時候就完成了這是一道又快又簡單又健康的料理哦</li>
+                            <img src="./image2/end.jpg" alt="食物完成照">
+                        
+
+                    </ol>
+                </div>
+
+                <hr>
+
+                <div id="section-tips" class="recipe-section">
+                    <h2>烹飪小技巧</h2>
+                    <p>💡 豆腐只要用微波爐加熱三分鐘左右，就可以很快的吸乾水份哦</p>
+                    <img src="./image2/tips.jpg" alt="小技巧">
+                </div>
+
+            </div>
+
+            <div class="right-sidebar">
+                <h3 class="sidebar-title">📝 我的烹飪筆記</h3>
+                <div class="note-pad">
+                    <textarea placeholder="紀錄您本次烹飪的修改或心得..."></textarea>
+                </div>
+
+                <div class="time-kcal">
+                    <div>⏱️ 製作時間：15 分鐘</div>
+                    <div>⭐ 難易度：簡單</div>
+                    <div>🔥 熱量：210 kcal</div>
+                </div>
+
+                <div class="nutrition">
+                    <h4>📊 營養價值 (每人份)</h4>
+                    <table>
+                        <tr>
+                            <td>蛋白質</td>
+                            <td>12g</td>
+                        </tr>
+                        <tr>
+                            <td>脂肪</td>
+                            <td>8g</td>
+                        </tr>
+                        <tr>
+                            <td>碳水化合物</td>
+                            <td>3g</td>
+                        </tr>
+                    </table>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </body>
+</html>
