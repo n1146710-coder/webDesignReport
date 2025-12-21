@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的首頁</title>
+    <style>
+/* 基本設定 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 60px 0 0;
+    background-image: url('./assets/images/background2.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* nav 主框架 */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 5px 40px;
+    z-index: 9000;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr;
+    align-items: center;
+    background-image: url(assets/images/nav-bg.jpg);
+    color: white;
+}
+
+nav img {
+    height: 60px;
+    display: block;
+}
+
+/* 中間選單 */
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* 每個 li */
+nav li {
+    flex: 1;
+    height: 100%;
+
+    display: flex;
+}
+
+/* 每個 a */
+nav li a {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* 讓 ::after 對準它 */
+    text-decoration: none;
+    font-size: 1.2em;
+    color: white;
+    height: 100%;
+}
+
+/* Hover 底部三角形 */
+nav li a::after {
+    content: '';
+    width: 20px;
+    aspect-ratio: 4/1.5;
+    background-color: rgba(255, 255, 255, 0.6);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* 滑過 li 時出現 */
+nav li:hover a::after {
+    opacity: 1;
+}
+
+/* content 區域可保持你的設定 */
+main {
+    padding: 20px;
+    margin-top: 60px;
+    width: 100%;
+    color: black;
+    font-size: 18px;
+    line-height: 2;
+    background-color: rgba(255, 255, 255, 0.6);
+    box-sizing: border-box;
+}
+
+/* Slider 主容器 */
+.slider {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    margin: 40px 0;
+    border-radius: 10px;
+}
+
+/* 全部 slides 的容器 */
+.slides {
+    display: flex;
+    width: 800%; /* 8 張圖 → 8 * 100% */
+    height: 100%;
+    transition: transform 0.6s ease;
+}
+
+/* 每張 slide */
+.slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* 左右切換按鈕 */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+    color: white;
+}
+
+.slider-btn.prev {
+    left: 10px;
+}
+
+.slider-btn.next {
+    right: 10px;
+}
+
+/* 下方圓點 */
+.dots {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.dots span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.dots .active {
+    background: white;
+}
+
+section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: calc(100vw - 40px);
+    height: 100%;
+    padding: 30px;
+    //margin-left: 0px;
+    box-sizing: border-box;
+}
+
+section .left {
+    width: 50vw;
+    color: #ffffff;
+}
+
+section h1, section h2, section h3 {
+    font-family: 'Noto Serif HK';
+    margin: 0px;
+}
+
+section p {
+    font-family: 'Noto-Sans-TC';
+    margin-left: 10px;
+}
+
+/* footer 整體 */
+.fgo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 24px 40px;
+  background-color: #2e2f31;
+  color: #9c9c9c;
+  font-size: 0.8em;
+}
+
+.footer-downloads img {
+  height: 50px;
+}
+
+/* 右側分級資訊 */
+.footer-level {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-level img {
+  width: 56px;
+  height: 56px;
+}
+
+.footer-level ul {
+  //list-style: none;     /* 移除項目符號 */
+  margin: 0;
+  padding: 0;
+}
+
+.footer-level li {
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* 最後一行不留空 */
+.footer-level li:last-child {
+  margin-bottom: 0;
+}
+
+  </style>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelector(".slides");
+    const dotsContainer = document.querySelector(".dots");
+    const totalSlides = document.querySelectorAll(".slide").length;
+    let index = 0;
+    let interval;
+
+    /* 產生圓點 */
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement("span");
+        if (i === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+
+    const dots = document.querySelectorAll(".dots span");
+
+    /* 切換 slide */
+    function goToSlide(i) {
+        index = i;
+        slides.style.transform = `translateX(-${index * 100}%)`;
+        updateDots();
+        restartAutoPlay();
+    }
+
+    /* 更新圓點 */
+    function updateDots() {
+        dots.forEach(d => d.classList.remove("active"));
+        dots[index].classList.add("active");
+    }
+
+    /* 自動播放 */
+    function autoPlay() {
+        interval = setInterval(() => {
+            index = (index + 1) % totalSlides;
+            goToSlide(index);
+        }, 3000);
+    }
+
+    function restartAutoPlay() {
+        clearInterval(interval);
+        autoPlay();
+    }
+
+    /* 左右按鈕 */
+    document.querySelector(".prev").addEventListener("click", () => {
+        index = (index - 1 + totalSlides) % totalSlides;
+        goToSlide(index);
+    });
+
+    document.querySelector(".next").addEventListener("click", () => {
+        index = (index + 1) % totalSlides;
+        goToSlide(index);
+    });
+
+    // autoPlay();
+});
+</script>
+
+  </head>
+  <body>
+    <nav>
+        <img src="./assets/images/logo.png" class="logo" alt="FGO Logo">
+        <ul>
+            <li><a onclick="">故事場景</a></li>
+            <li><a href="page2.html">職階介紹</a></li>
+            <li><a href="#">戰鬥情報</a></li>
+            <li></li><li></li>
+        </ul>
+        <div class="nav-right">回小組選單</div>
+    </nav>
+
+    <main class="content">
+
+<p>西元2015年，魔術尚成立的最後的時代。</p>
+<p>社會是由人之手構築起來的，但掌握著世界真理的，卻是魔術師。<br>
+魔術司掌著科學無法解釋的人類過去的技術，科學則累積著魔術無法達成的人類未來的技術。<br>
+這兩種決無法相容的學問之學徒，僅在某一點上是志同道合的。<br>
+無論是魔術還是科學，都是為了給鑽研的人類帶來更為長久的繁榮——也就是，守護人類歷史。</p>
+<p>然而2015年，人理延續保障機構觀測到的未來領域毫無前兆地消失，根據計算，發現——不，是證明了人類將於2018年滅絕。</p>
+<p>為什麼。怎麼會。是誰。做了什麼。面對眾多疑問，迦勒底的研究者們陷入了疑惑。</p>
+<p>就在這時，人理延續保障機構觀測到了新的異變。<br>
+西元2004年，在日本的冬木市，在這裡，出現了從未出現過的「無法觀測的領域」。</p>
+<p>迦勒底將這裡假定為人類滅絕的原因，決定執行尚處於試驗階段的第六實驗。<br>
+那就是回到過去的時間旅行。</p>
+<p>其名為聖杯探索——冠位指定（Grand Order）<br>
+這是一切為保衛人類，與人類歷史對抗，與命運作戰存在的總稱。</p>
+        <!-- p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年（國服為2016年），主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p>
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p>
+
+        <p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年（國服為2016年），主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p>
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p>
+
+        <p>遊戲開始於位於人煙絕跡標高6000公尺雪山之中的迦勒底，時間為2015年（國服為2016年），主角以某計畫所募集的48位御主最後一人的身份，來到了這裡。48位御主之中，38位來自魔術名門、具有才能的一般人則是10位。主角（玩家）則是一般人。</p -->
+        <p>主角進入研究所時接受了模擬戰測試，在結束後因為大腦尚未適應而陷入了昏睡，結果被可說是本作女主角的“瑪修”與不明生物“芙芙”所發現，在會見所長“奧爾加瑪麗·亞斯密雷特·阿尼姆斯菲亞”後，在主角因為受訓還不足而即將被人稱魔鬼的所長命令退出時，研究所要員“雷夫”替主角辯護，讓他留了下來，其後並且來到醫療區與“羅曼醫生”會面，沒想到就在此時所內發生了大爆炸。危急狀況下系統開始運轉，將傳送座標設為2004年1月30日的冬木市。在傳送發動前主角拚命地尋找生還者，好不容易發現了重傷的瑪修，然後兩人被傳送到了過去，章節開始。玩家需要參與各個章節的故事，解鎖劇情，達成遊戲目標。</p>
+       <div class="slider">
+          <div class="slides">
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第一特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+	    </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第二特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第三特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第四特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第五特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第六特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>第七特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <div class="slide">
+		<section class="text_box" style="background-image: url('./assets/images/story/chap1.jpg');">
+                   <div class="left">
+                       <h1>最終特異點</h1>
+                       <h2>邪龍百年戰爭</h2>
+                            <p>
+                                <span>第七次世界到來的衰亡時代。</span>
+                                <span>世界正面臨著「第七靈災」。</span>
+                                <span>從東面入侵而來的「加雷馬帝國」、</span>
+                                <span>由蠻族召喚而至的「蠻神」…</span>
+                                <span>成為拯救艾奧傑亞的英雄吧！</span>
+                            </p>
+                   </div>
+                </section>
+            </div>
+            <!-- div class="slide" style="background-image: url('./assets/images/scene3.jpg');">第三特異點</div>
+            <div class="slide" style="background-image: url('./assets/images/scene4.jpg');">第四特異點</div>
+            <div class="slide" style="background-image: url('./assets/images/scene5.jpg');">第五特異點</div>
+            <div class="slide" style="background-image: url('./assets/images/scene6.jpg');">第六特異點</div>
+            <div class="slide" style="background-image: url('./assets/images/scene7.jpg');">第七特異點</div>
+            <div class="slide" style="background-image: url('./assets/images/scene8.jpg');">最終特異點</div -->
+          </div>
+
+          <div class="slider-btn prev">&#8249;</div>
+          <div class="slider-btn next">&#8250;</div>
+
+          <div class="dots"></div>
+        </div>
+    </main>
+    <footer class="fgo-footer">
+    <a href="#">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on App Store">
+    </a>
+    <a href="#">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on App Store">
+    </a>
+
+  <div class="footer-level">
+    <img src="assets/images/level.svg" alt="12+ 分級" class="level-icon">
+    <ul class="level-text">
+      <li>遊戲內容涉及性、暴力、不當語言，依遊戲軟體分級管理辦法分類為輔12級。</li>
+      <li>遊戲情節純屬虛構，注意使用時間，切勿沉迷或模仿。</li>
+      <li>部分內容須另行付費，勿用他人代儲以免觸法。</li>
+    </ul>
+  </div>
+</footer>
+
+
+    </body>
+</html>

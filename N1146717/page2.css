@@ -1,0 +1,433 @@
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* 左右欄 */
+  .container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  .container div#flower {
+    background-image: url(assets/images/fgo-flower.png);
+    background-repeat: no-repeat;
+    height: 70vh;
+    z-index: 1;
+    top: auto;
+    right: 5vw;
+    width: 15vw;
+    margin-top: 35vh;
+    background-size: 100% auto;
+    pointer-events: none;
+    position: fixed;
+}
+
+
+.container div#servantBg {
+    background-repeat: no-repeat;
+    z-index: 1;
+    top: 48vh;
+    left: calc(67vw - 30vh);
+    height: 50vh;
+    width: 30vh;
+    position: fixed;
+    opacity: 0.4;
+    background-size: contain;
+    transition: background-image 0.5s ease-in-out;
+}
+
+div#servantBg[data-role="Archer"] {
+    background-image: url(assets/images/icon/archer.jpg);
+}
+
+div#servantBg[data-role="Saber"] {
+    background-image: url(assets/images/icon/saber.jpg);
+}
+
+div#servantBg[data-role="Lancer"] {
+    background-image: url(assets/images/icon/lancer.jpg);
+}
+
+div#servantBg[data-role="Rider"] {
+    background-image: url(assets/images/icon/rider.jpg);
+}
+
+div#servantBg[data-role="Caster"] {
+    background-image: url(assets/images/icon/caster.jpg);
+}
+
+div#servantBg[data-role="Assassin"] {
+    background-image: url(assets/images/icon/assassin.jpg);
+}
+
+div#servantBg[data-role="Berserker"] {
+    background-image: url(assets/images/icon/berserker.jpg);
+}
+
+
+.left {
+    flex: 7;
+    background-color: #222;
+    padding: 10px 20px 20px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    min-width: 560px;
+}
+
+.right {
+    flex: 3;
+    background-color: #1a1a1a;
+    padding: 10px 20px 20px;
+    box-sizing: border-box;
+    display: block;
+    overflow-y: auto;
+}
+
+.right .servantList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    gap: 0px 15px;
+}
+
+.servantList > h3, .servantList > h2 {
+    flex-basis: 100%;
+    margin: 10px 0 0;
+}
+
+.servant span {
+    display: block;
+}
+
+  /* H1 上方的職階切換列 */
+.class-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 70px;
+    width: 70px;
+    padding: 0 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    border-bottom-right-radius: 20px;
+    transition: width 0.6s ease;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+  .class-bar:not(.blocking):hover {
+    width: 100%; /* 展開整條欄 */
+  }
+
+.class-bar img {
+    width: 50px;
+    height: 50px;
+    margin: 0px;
+    cursor: pointer;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+  .class-bar img[data-class]:hover {
+    transform: rotateY(360deg);
+  }
+  
+  h1 {
+      height: 60px;
+      margin: 0px;
+      text-align: center;
+  }
+
+  /* 左右欄淡入淡出動畫 */
+  .fade {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .fade.show {
+    opacity: 1;
+  }
+
+  /* 從者頭像 */
+  .servant {
+    width: max-content;
+    text-align: center;
+    font-size: 0.8em;
+  }
+
+.servant img {
+    width: 80px;
+    border-radius: 50%;
+    border: 2px solid gold;
+    box-sizing: border-box;
+}
+.class-icons {
+    margin: 0 20px;
+    display: flex;
+    flex: 1;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-10px);
+    max-width: max-content;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.class-bar:hover .class-icons {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* 淡出+滑動動畫 */
+.fade-slide {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: all 0.5s ease;
+}
+
+.fade-slide.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* =====================================================
+   牛皮紙最終版主題（Aged Parchment Theme）
+   ===================================================== */
+
+:root {
+  --paper-bg-light: #f8efd8;
+  --paper-bg: #f3e7c9;
+  --paper-bg-dark: #e4d3a3;
+  --paper-bg-deep: #d2bf8c;
+
+  --ink-main: #3b2f1e;
+  --ink-soft: #6b5a3a;
+
+  --accent-gold: #a4832a;
+  --accent-gold-soft: #c9b27c;
+}
+
+/* ===== 全站背景 ===== */
+body {
+  background:
+    radial-gradient(
+      circle at top center,
+      rgba(255,255,255,0.65),
+      rgba(210,191,140,0.55)
+    ),
+    linear-gradient(
+      to bottom,
+      #f8efd8,
+      #e4d3a3
+    );
+  color: var(--ink-main);
+  font-family: "Noto Serif TC", "Times New Roman", serif;
+}
+
+/* ===== 容器與紙張紋理 ===== */
+.container {
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(120,90,40,0.05),
+      rgba(120,90,40,0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* ===== 左右欄 ===== */
+.left {
+  background:
+    linear-gradient(
+      180deg,
+      var(--paper-bg-light) 0%,
+      var(--paper-bg) 60%,
+      var(--paper-bg-dark) 100%
+    );
+  box-shadow:
+    inset 0 0 30px rgba(120,90,40,0.25);
+}
+
+.right {
+  background:
+    linear-gradient(
+      180deg,
+      var(--paper-bg),
+      var(--paper-bg-deep)
+    );
+  border-left: 2px solid rgba(120,90,40,0.35);
+}
+
+/* ===== 標題與文字 ===== */
+h1, h2, h3 {
+  color: var(--ink-main);
+  letter-spacing: 0.05em;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.5),
+    0 -1px 0 rgba(0,0,0,0.15);
+}
+
+p, li, dd, span {
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ===== 職階敘事區塊 ===== */
+section {
+    padding: 0 20px;
+}
+
+section header {
+  text-align: right;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(120,90,40,0.4);
+}
+
+section article p {
+  margin-bottom: 0.8em;
+}
+
+/* ===== Class Bar（書籤／木框感） ===== */
+.class-bar {
+  background:
+    linear-gradient(
+      to bottom,
+      #d8c089,
+      #bfa76a
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.5),
+    inset 0 -2px 0 rgba(90,60,20,0.45),
+    0 6px 18px rgba(90,60,20,0.35);
+}
+
+.class-bar img {
+  filter: sepia(30%) saturate(80%);
+}
+
+/* ===== 從者清單 ===== */
+.servantList > h2,
+.servantList > h3 {
+  color: var(--ink-main);
+  border-bottom: 1px dashed rgba(120,90,40,0.4);
+  padding-bottom: 4px;
+}
+
+.servant {
+  margin: 6px 0;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.8em;
+}
+
+/* ===== 從者頭像（舊金邊） ===== */
+.servant img {
+  width: 80px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--paper-bg), var(--paper-bg)) padding-box,
+    linear-gradient(
+      135deg,
+      #8e6f2f,
+      #e6d8b5,
+      #a4832a
+    ) border-box;
+  border-radius: 50%;
+  box-shadow:
+    0 2px 6px rgba(90,60,20,0.35);
+}
+
+/* ===== 淡入動畫調整（柔和） ===== */
+.fade,
+.fade-slide {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* ===== 滾動區塊視覺優化 ===== */
+.right::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right::-webkit-scrollbar-thumb {
+  background: rgba(120,90,40,0.4);
+  border-radius: 4px;
+}
+
+.right::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ===== 全頁粗糙紙紋層（Aged Paper Grain） ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAAAAACo4kLRAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfjARkKHRc9XZ4kAAAAiklEQVQY02XPTQ7CQAiG4RfQGOMBvP/BXBlXTWblTxNLccF06rSsvjyEAOLKrlTmnbnKTt2UrbqhbNQNlF7dSPxTNxZE5APA21gRORaIcq4DUWt8+N1rbhiv23eJ7cko16HdsHSHKcZSs0T2nheByU+5NnE65NhsK+bNTbUzRL3ialW1t1SJ3oCYf40hZgEACY7UAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE5LTAxLTI1VDEwOjI5OjIzKzA4OjAwIpqW9AAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxOS0wMS0yNVQxMDoyOToyMyswODowMFPHLkgAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAAElFTkSuQmCC);
+  background-size: 1.04167% auto;
+  opacity: 0.18;
+  mix-blend-mode: multiply;
+  all: unset;
+}
+
+/* 右側固定書籤按鈕 */
+#sideTab {
+    position: fixed;
+    right: 0;
+    bottom: 20px;
+    width: 30px;
+    min-height: 120px;
+    background: linear-gradient(
+    to left,
+    #bfa76a,
+    #d8c089
+  );
+    padding: 10px 0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -2px 0 6px rgba(90,60,20,0.4);
+    cursor: pointer;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-rl;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #3b2f1e;
+    transition: width 0.6s ease;
+}
+
+/* 滑入一點點，像書籤被拉出 */
+#sideTab:hover {
+  width: 40px;
+}

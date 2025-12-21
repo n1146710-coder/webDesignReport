@@ -1,0 +1,757 @@
+
+#story-frame {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: black;
+    height: 100vh;
+    overflow: clip;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    opacity: 1;
+    transition: opacity 2s ease;
+}
+
+#scroll-container {
+    width: 60%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+#story-text {
+    position: absolute;
+    bottom: -130%;
+    width: 100%;
+    font-size: 20px;
+    color: #f2f2f2;
+    line-height: 1.7;
+    animation: scrollUp 20s linear forwards;
+}
+
+@keyframes scrollUp {
+    from { bottom: -130%; }
+    to { bottom: 105%; }
+}
+
+
+
+<!-- 暗角（Vignette）  -->
+.vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
+    z-index: 5;
+}
+
+<!--  電影粒子（Film Grain） -->
+.grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: url("data:image/svg+xml;utf8,\
+    <svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>\
+    <filter id='n'>\
+        <feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/>\
+    </filter>\
+    <rect width='100%' height='100%' filter='url(%23n)'/>\
+    </svg>");
+    opacity: 0.15;
+    animation: grainMove 1s steps(8) infinite;
+    z-index: 4;
+}
+
+@keyframes grainMove {
+    0%, 100% { transform: translate(0,0); }
+    10% { transform: translate(-2%, -1%); }
+    20% { transform: translate(1%, -2%); }
+    30% { transform: translate(-1%, 2%); }
+    40% { transform: translate(2%, 1%); }
+}
+
+<!-- 漂浮光點（Dust Particles）  -->
+.dust {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.15) 2px, transparent 3px);
+    background-size: 5px 5px;
+    animation: dustFloat 40s linear infinite;
+    opacity: 0.12;
+    z-index: 3;
+}
+
+@keyframes dustFloat {
+    from { transform: translate(0,0); }
+    to { transform: translate(-300px, -600px); }
+}
+
+<!-- Main content -->
+#main-content {
+    display: none;
+    padding: 30px;
+    background: white;
+    color: #111;
+}
+#skip-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 100;
+    border-radius: 5px;
+}
+
+#skip-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 60px 0 0;
+    margin: 70px 0 0;
+    background-image: url('./assets/images/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* nav 主框架 */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 5px 60px;
+    z-index: 9000;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr;
+    align-items: center;
+    background-image: url(assets/images/nav-bg.jpg);
+    color: white;
+}
+
+nav img {
+    height: 60px;
+    display: block;
+}
+
+/* 中間選單 */
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* 每個 li */
+nav li {
+    flex: 1;
+    height: 100%;
+
+    display: flex;
+}
+
+/* 每個 a */
+nav li a {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* 讓 ::after 對準它 */
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 400;
+    color: white;
+    height: 100%;
+}
+
+/* Hover 底部三角形 */
+nav li a::after {
+    content: '';
+    width: 20px;
+    aspect-ratio: 4/1.5;
+    background-color: rgba(255, 255, 255, 0.6);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* 滑過 li 時出現 */
+nav li:hover a::after {
+    opacity: 1;
+}
+
+nav div#right {
+    padding: 5px;
+    border: 3px solid cadetblue;
+    text-align: center;
+    border-radius: 10px;
+}
+
+button#right {
+    min-width: 160px;
+    /* height: 56px; */
+    padding: 10px 15px;
+    font-family: 'Noto Serif HK';
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: white;
+    background: linear-gradient(135deg, #fff2c2 0%,
+    #e6c26e 25%, #c9a24d 50%, #e6c26e 75%, #fff2c2 100%);
+    border: 1px solid #b08b38;
+    border-radius: 10px;
+    cursor: pointer;
+    /* position: relative; */
+    /* overflow: hidden; */
+    box-shadow: 0 2px 4px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.6);
+    /* transition: all .3s ease; */
+}
+
+nav div#right:hover {
+    background-color: cadetblue;
+    transform: scale(1.1);
+}
+
+/* content 區域可保持你的設定 */
+main {
+    padding: 0 20px 40px;
+    margin-top: 70px;
+    width: 100%;
+    color: black;
+    font-size: 18px;
+    line-height: 2;
+    background-color: rgba(255, 255, 255, 0.6);
+    box-sizing: border-box;
+}
+
+/* 整體區塊、冬木背景 */
+.story-intro {
+  position: relative;
+  //padding: 40px 0;
+  color: #e6e6e6;
+  overflow: hidden;
+  background-image: url('./assets/images/jpcity.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: calc(100vh - 70px);
+  box-sizing: border-box;
+  align-items: center;
+  display: inline-flex;
+  width: 100%;
+}
+
+/* 深色遮罩（關鍵） */
+.story-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.75) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.2) 100%
+  );
+  z-index: 1;
+}
+
+/* 內容容器 */
+.story-inner {
+  position: relative;
+  z-index: 2;
+
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* 文字區 */
+.story-content {
+  max-width: 560px;
+}
+
+/* PROLOGUE */
+.story-label {
+  display: inline-block;
+  font-size: 0.8em;
+  letter-spacing: 0.25em;
+  color: #c8a25a;
+  //margin-bottom: 14px;
+}
+
+/* 主標 */
+.story-content h1 {
+  font-family: 'Noto Serif HK', serif;
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+/* 副標 */
+.story-content h2 {
+  font-size: 18px;
+  font-weight: normal;
+  color: #b8b8b8;
+  margin-bottom: 18px;
+}
+
+/* 內文 */
+.story-content p {
+  font-size: 16px;
+  line-height: 1.9;
+  margin-bottom: 18px;
+  color: #dddddd;
+}
+
+/* 強調句（很官網） */
+.story-emphasis {
+  margin-top: 24px;
+  font-style: italic;
+  color: #cfcfcf;
+}
+
+
+/* Slider 主容器 */
+.slider {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 260px);
+    overflow: hidden;
+    margin: 40px 0 0;
+    border-radius: 10px;
+    scroll-margin-top: calc(70px + (100vh - 470px) / 2);
+    scroll-margin-top: 110px;
+    transition: all;
+}
+
+/* 全部 slides 的容器 */
+.slides {
+    display: flex;
+    width: 800%; /* 8 張圖 → 8 * 100% */
+    height: 100%;
+    transition: transform 0.6s ease;
+}
+
+/* 每張 slide */
+.slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* 左右切換按鈕 */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    color: rgba(10,10,10,0.7);
+    color: gray;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+}
+
+.slider-btn.prev {
+    left: 10px;
+}
+
+.slider-btn.next {
+    right: 10px;
+}
+
+/* 下方圓點 */
+.dots {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.dots span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.dots .active {
+    background: white;
+}
+
+div.slide section {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-blend-mode: multiply;
+    width: calc(100vw - 40px);
+    height: 100%;
+    padding: 30px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+div.slide section#story1 {
+    background-image: url('./assets/images/story/chap1.png');
+    background-color: rgba(0, 0, 0, .3);
+}
+
+div.slide section#story2 {
+    background-image: url('./assets/images/story/chap2.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story3 {
+    background-image: url('./assets/images/story/chap3.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story4 {
+    background-image: url('./assets/images/story/chap4.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story5 {
+    background-image: url('./assets/images/story/chap5.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story6 {
+    background-image: url('./assets/images/story/chap6.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story7 {
+    background-image: url('./assets/images/story/chap7.png');
+    background-color: rgba(0, 0, 0, .45);
+}
+
+div.slide section#story8 {
+    background-image: url('./assets/images/story/chap8.png');
+    background-color: rgba(0, 0, 0, .3);
+}
+
+div.slide:nth-of-type(even) section {
+  flex-direction: row-reverse;
+}
+
+section .right {
+    width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+nav button, section button {
+    min-width: 180px;
+    height: 40px;
+    padding: 0 32px;
+    font-family: 'Noto Serif HK';
+    font-size: 1.3em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: #2a1c00;
+    background: linear-gradient(135deg, #fff2c2 0%,
+    #e6c26e 25%, #c9a24d 50%, #e6c26e 75%, #fff2c2 100%);
+    border: 1px solid #b08b38;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.6);
+    transition: all .3s ease;
+}
+
+section button {
+    height: 56px;
+}
+
+section button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,.5),
+    transparent
+  );
+  transition: left .6s ease;
+}
+
+section button:hover::before {
+  left: 0;
+}
+
+section button:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.4),
+    inset 0 2px 6px rgba(0,0,0,.2);
+}
+
+
+section .left {
+    width: 40%;
+    color: #ffffff;
+    text-align: left;
+}
+
+div.slide:nth-of-type(even) section .left {
+  text-align: right;
+}
+
+section h1, section h2 {
+    font-family: 'Noto Serif HK';
+    margin: 0 0 0 20px;
+}
+
+div.slide:nth-of-type(even) h1,
+div.slide:nth-of-type(even) h2 {
+    font-family: 'Noto Serif HK';
+    margin: 0 20px 0 0;
+}
+
+section p {
+    font-family: 'Noto-Sans-TC';
+    margin-left: 40px;
+    line-height: 1.5;
+}
+
+div.slide:nth-of-type(even) section p {
+    margin-right: 40px;
+}
+
+/* footer 整體 */
+.fgo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 24px 40px;
+  background-color: #2e2f31;
+  color: #9c9c9c;
+  font-size: 0.8em;
+}
+
+footer a img {
+  height: 50px;
+  display: block;
+}
+
+/* 右側分級資訊 */
+.footer-level {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-level img {
+  width: 62px;
+  height: 62px;
+  display: block;
+}
+
+.footer-level ul {
+  margin: 0;
+  padding: 0;
+}
+
+.footer-level li {
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+/* 最後一行不留空 */
+.footer-level li:last-child {
+  margin-bottom: 0;
+}
+
+/* model 元件 */
+.modal {
+  position: fixed;
+  inset: 0;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  display: none; /* 預設隱藏 */
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.8)), rgba(255, 255, 255, 0.08);
+}
+
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 1000px);
+  height: min(80vh, 700px);
+  margin: auto;
+  margin-top: 10vh;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+
+.modal-content {
+  padding: 60px 80px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background-color: whitesmoke;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-content {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.modal-top {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.modal-text {
+  flex: 0 0 55%;
+}
+
+.modal-video {
+  flex: 0 0 45%;
+  display: flex;
+  align-items: center;
+}
+
+.modal-video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding-right: 40px;
+  border: none;
+}
+.modal-servants h3 {
+  margin-bottom: 16px;
+}
+
+.servant-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+
+.servant-list li {
+  white-space: nowrap;
+}
+
+.modal-servants {
+  margin-top: 40px;
+}
+
+.modal-servants h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.servant-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.servant-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.servant {
+    display: inline-grid;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center;
+    font-size: 0.8em;
+    width: 80px;
+}
+
+.servant > span {
+    padding: 0 3px;
+    width: var(--icon-width);
+    white-space: nowrap;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.servant > img {
+    width: 86px;
+    height: 86px;
+    border-radius: 10px;
+    padding: 4px;
+    box-sizing: border-box;
+    border: 0;
+    vertical-align: middle;
+}
+
+
+@media (max-width: 768px) {
+  .modal-top {
+    flex-direction: column;
+  }
+
+  .modal-text,
+  .modal-video {
+    flex: 1;
+  }
+}
+
