@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本手遊 Fate/Grand Order 冠位指定介紹網站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200..900&display=swap" rel="stylesheet">
+    <link href="./assets/css/servant-name.css" type="text/css" rel="stylesheet">
+    <link href="index.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="./assets/js/index-main.js"></script>
+</head>
+<body>
+    <div id="story-frame">
+        <!-- 黑幕 + 字幕 -->
+        <div class="vignette"></div>
+        <div class="grain"></div>
+        <div id="scroll-container">
+            <div id="story-text">
+                <p>西元2015年，魔術尚成立的最後的時代。</p>
+                <p>社會是由人之手構築起來的，但掌握著世界真理的，卻是魔術師。<br>魔術司掌著科學無法解釋的人類過去的技術，科學則累積著魔術無法達成的人類未來的技術。<br>這兩種決無法相容的學問之學徒，僅在某一點上是志同道合的。<br>無論是魔術還是科學，都是為了給鑽研的人類帶來更為長久的繁榮——也就是，守護人類歷史。</p>
+                <p>然而2015年，人理延續保障機構觀測到的未來領域毫無前兆地消失，根據計算，發現——不，是證明了人類將於2018年滅絕。</p>
+                <p>為什麼。怎麼會。是誰。做了什麼。面對眾多疑問，迦勒底的研究者們陷入了疑惑。</p>
+                <p>就在這時，人理延續保障機構觀測到了新的異變。<br>西元2004年，在日本的冬木市，在這裡，出現了從未出現過的「無法觀測的領域」。</p>
+                <p>迦勒底將這裡假定為人類滅絕的原因，決定執行尚處於試驗階段的第六實驗。<br>那就是回到過去的時間旅行。</p>
+                <p>其名為聖杯探索——冠位指定（Grand Order）<br>這是一切為保衛人類，與人類歷史對抗，與命運作戰存在的總稱。</p>
+            </div>
+        </div>
+        <button id="skip-button">跳過動畫</button>
+    </div>
+    <nav>
+        <img src="./assets/images/logo.png" class="logo" alt="FGO Logo">
+        <ul>
+            <li><a onclick="scrollToStory()">故事場景</a></li>
+            <li><a href="page2.html">職階介紹</a></li>
+            <li><a href="page3.html">從者情報</a></li>
+            <li></li>
+            <li></li>
+        </ul>
+        <button onclick="leaveSite()">回小組選單</button>
+    </nav>
+    <main class="content" style="display:none">
+        <script>if (location.search.length > 0) {
+            document.getElementById("story-frame").remove();
+            document.querySelector("main.content").removeAttribute("style");}
+        </script>
+        <div class="story-intro fuyuki-bg">
+            <div class="story-overlay"></div>
+            <div class="story-inner">
+                <div class="story-content">
+                    <span class="story-label">序章</span>
+                    <h1>炎上汙染都市・冬木</h1>
+                    <h2>人理燒卻的起點</h2>
+                    <p>公元 2004 年 1 月 30 日，日本・冬木市。原本應存在於歷史中的城市，卻因不明原因被完全燃燒殆盡，成為人理遭受干涉後所產生的最初特異點。</p>
+                    <p>主角與瑪修・基利艾拉特在此首次進行靈子轉移，面對失控的從者與無數骷髏兵，並在火海之中確認了「修復人理」的使命。</p>
+                    <p class="story-emphasis">—— 冬木市，既是終焉的象徵，也是旅程的起點。</p>
+                </div>
+            </div>
+        </div>
+        <div id="story" class="slider">
+            <div class="slides">
+                <div class="slide">
+                    <section class="text_box" id="story1">
+                        <div class="left">
+                            <h1>第一特異點</h1>
+                            <h2>邪龍百年戰爭 奧爾良</h2>
+                            <p>被扭曲的百年戰爭歷史，<br>法蘭西大地陷入烈焰與混亂。<br>黑化的聖女現身，<br>率領邪龍大軍蹂躪世界。<br><br>御主啊，阻止失控的歷史，<br>修復人理的第一步由此開始。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="1">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story2">
+                        <div class="left">
+                            <h1>第二特異點</h1>
+                            <h2>永續瘋狂帝國 七丘之城</h2>
+                            <p>羅馬帝國本該迎來終焉，<br>卻在此刻停滯不前。<br>不朽的皇帝統御一切，<br>歷史的流動被強行固定。<br><br>在七丘之城，你將面對永恆的榮光，<br>以及被扭曲的霸道。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="2">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story3">
+                        <div class="left">
+                            <h1>第三特異點</h1>
+                            <h2>封鎖終局四海 俄刻阿諾斯</h2>
+                            <p>在無盡的海洋彼端，<br>人理被徹底封鎖。<br>群雄割據、海盜橫行，<br>命運在浪濤中彼此交錯。<br><br>跨越大海，<br>迎向尚未被書寫的結局。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="3">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story4">
+                        <div class="left">
+                            <h1>第四特異點</h1>
+                            <h2>死界魔霧都市 倫敦</h2>
+                            <p>濃霧籠罩的工業都市，<br>魔術與機械相互交織。<br>倫敦的夜晚不再安眠，<br>死亡在街道中蔓延。<br><br>揭開霧的真相，<br>阻止文明的崩壞。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="4">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story5">
+                        <div class="left">
+                            <h1>第五特異點</h1>
+                            <h2>北美神話大戰 合眾為一</h2>
+                            <p>神與英雄分據大地，<br>人類被迫選邊而戰。<br>文明、信仰與暴力，<br>在戰火中彼此衝突。<br><br>於神話的戰場之上，<br>抉擇人類的未來。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="5">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story6">
+                        <div class="left">
+                            <h1>第六特異點</h1>
+                            <h2>神聖圓桌領域 卡美洛</h2>
+                            <p>被聖光統治的砂之國度，<br>人理遭到裁決。<br>理想化的秩序之下，<br>無數犧牲被視為必然。<br><br>在絕對的正義面前，<br>你是否仍能堅守人性。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="6">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story7">
+                        <div class="left">
+                            <h1>第七特異點</h1>
+                            <h2>絕對魔獸戰線 巴比倫尼亞</h2>
+                            <p>神代的黃昏降臨，<br>人類文明瀕臨終焉。<br>古老的神明甦醒，<br>魔獸越過最後防線。<br><br>為了生存，<br>人類必須迎戰神明。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="7">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+                <div class="slide">
+                    <section class="text_box" id="story8">
+                        <div class="left">
+                            <h1>最終特異點</h1>
+                            <h2>冠位時間神殿 所羅門</h2>
+                            <p>一切特異點的源頭，<br>終於顯現。<br>跨越無數犧牲與旅程，<br>決戰的時刻已然到來。<br><br>此戰，<br>將決定人理的存亡。</p>
+                        </div>
+                        <div class="right">
+                            <button data-chapter="8">劇情介紹</button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="slider-btn prev">&#8249;</div>
+            <div class="slider-btn next">&#8250;</div>
+            <div class="dots"></div>
+        </div>
+    </main>
+    <footer class="fgo-footer">
+        <a href="https://apps.apple.com/tw/app/apple-store/id1225867328"><img src="assets/images/icon/appleStoreBadge.svg" alt="Download on App Store"></a>
+        <a href="https://play.google.com/store/apps/details?id=com.xiaomeng.fategrandorder"><img src="assets/images/icon/googleStoreBadge.svg" alt="Download on Google Play"></a>
+        <div class="footer-level">
+            <img src="assets/images/level.svg" alt="12+ 分級" class="level-icon">
+            <ul class="level-text">
+                <li>遊戲內容涉及性、暴力、不當語言，依遊戲軟體分級管理辦法分類為輔12級。</li>
+                <li>遊戲情節純屬虛構，注意使用時間，切勿沉迷或模仿。</li>
+                <li>部分內容須另行付費，勿用他人代儲以免觸法。</li>
+            </ul>
+        </div>
+    </footer>
+    <div class="modal" id="modal-story">
+        <!-- 章節介紹視窗 -->
+        <div class="modal-backdrop"></div>
+        <div class="modal-panel">
+            <button class="modal-close" aria-label="關閉">✕</button>
+            <div class="modal-content">
+                <!-- 上半部：文字 + 影片 -->
+                <div class="modal-top">
+                    <div class="modal-text" id="chapter-story"></div>
+                    <div class="modal-video">
+                        <iframe src="" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <!-- 下半部：登場從者 -->
+                <div class="modal-servants">
+                    <h3>登場從者</h3>
+                    <div class="servant-grid" id="role-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (location.search.length > 0) return initPage();
+
+        const storyFrame = document.getElementById("story-frame");
+        const mainContent = document.getElementsByTagName("main")[0];
+        const storyText = document.getElementById("story-text");
+        const skipButton = document.getElementById("skip-button");
+        const pageTransition = function (e) {
+            function showPage () {
+                mainContent.removeAttribute('style');
+                storyFrame.style.opacity = 0;
+                setTimeout(() => {
+                    storyFrame.style.display = "none";
+                    initPage();
+                }, 2000);
+            }
+            // 點跳過按鈕，就移除事件監聽
+            if (e.srcElement.tagName == "BUTTON") storyText.removeEventListener("animationend", pageTransition);
+            setTimeout(showPage, e.srcElement.tagName == "BUTTON" ? 100 : 2000);
+        };
+
+        skipButton.addEventListener("click", pageTransition);
+        storyText.addEventListener("animationend", pageTransition);
+    });
+    </script>
+</body>
+</html>
