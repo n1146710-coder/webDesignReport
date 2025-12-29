@@ -1,343 +1,860 @@
 <!DOCTYPE html>
-<html class="dark scroll-smooth" lang="zh-Hant">
+<html lang="zh-Hant" class="scroll-smooth">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>OSINT 攻擊鍊詳解</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<style type="text/tailwindcss">
-        @layer utilities {
-            .glow-border {
-                position: relative;
-            }
-            .glow-border::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                border-radius: inherit; 
-                padding: 1px; 
-                background: linear-gradient(135deg, var(--glow-start), var(--glow-end)); 
-                -webkit-mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                mask: 
-                    linear-gradient(#fff 0 0) content-box, 
-                    linear-gradient(#fff 0 0);
-                -webkit-mask-composite: xor;
-                mask-composite: exclude;
-                pointer-events: none;
-            }
-        }
-    </style>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "primary": {
-                DEFAULT: "#4361EE", 
-                light: "#4CC9F0",   
-                dark: "#3A0CA3",    
-              },
-              "background-light": "#f0f2f5",
-              "background-dark": "#03045E", 
-              "surface": "#023E8A",     
-            },
-            fontFamily: {
-              "display": ["Inter", "sans-serif"]
-            },
-            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-            boxShadow: {
-              'glow': '0 0 15px 0 rgba(76, 201, 240, 0.4), 0 0 5px 0 rgba(67, 97, 238, 0.3)',
-            }
-          },
-        },
-      }
-    </script>
 <style>
-        .material-symbols-outlined {
-            font-variation-settings:
-            'FILL' 0,
-            'wght' 300,
-            'GRAD' 0,
-            'opsz' 24
+    /* --- 1. 設計系統 (Design Tokens) --- */
+    :root {
+        /* 色票系統 (源自 Tailwind Config) */
+        --color-primary: #4361EE;
+        --color-primary-light: #4CC9F0;
+        --color-primary-dark: #3A0CA3;
+        --color-bg-dark: #03045E;
+        --color-surface: #023E8A;
+        --color-text-white: #ffffff;
+        --color-text-muted: rgba(255, 255, 255, 0.7);
+        --color-border: rgba(255, 255, 255, 0.1);
+
+        /* 特效參數 */
+        --glow-start: #4CC9F0;
+        --glow-end: #4361EE;
+        --shadow-glow: 0 0 15px 0 rgba(76, 201, 240, 0.4), 0 0 5px 0 rgba(67, 97, 238, 0.3);
+        
+        /* 尺寸 */
+        --header-height: 64px;
+        --container-width: 1152px; /* max-w-6xl */
+        --radius-lg: 0.5rem;
+        --radius-xl: 0.75rem;
+    }
+
+    /* --- 2. 基礎重置 (Reset) --- */
+    *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth; /* smooth scrolling */
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+        background-color: var(--color-bg-dark);
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.5;
+        overflow-x: hidden;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    /* --- 3. 通用工具類 (Utilities) --- */
+    .w-full { width: 100%; }
+    .h-full { height: 100%; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 1rem; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .z-50 { z-index: 50; }
+    
+    /* 背景特效 */
+    .bg-grid-pattern {
+        background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 32px 32px;
+        z-index: -1;
+    }
+    
+    .bg-glow-spot {
+        background: radial-gradient(circle 500px at 50% 200px, rgba(67,97,238,0.2), transparent);
+        z-index: -1;
+    }
+
+    /* --- 4. 佈局元件 (Layout) --- */
+    .wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container {
+        width: 100%;
+        max-width: var(--container-width);
+        padding: 0 1.5rem; /* px-6 */
+        margin: 0 auto;
+    }
+
+    /* --- 5. Header --- */
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background-color: rgba(3, 4, 94, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--color-primary-light);
+    }
+
+    .logo-text {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-text-white);
+        letter-spacing: -0.015em;
+    }
+
+    .nav-menu {
+        display: none; /* Mobile default hidden */
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .nav-link {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+    }
+
+    .nav-link:hover { color: var(--color-text-white); }
+
+    .nav-link.active {
+        color: var(--color-primary-light);
+        position: relative;
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--color-primary-light);
+        border-radius: 99px;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .mobile-menu-btn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: block;
+    }
+
+    @media (min-width: 768px) {
+        .nav-menu { display: flex; }
+        .mobile-menu-btn { display: none; }
+        .header { padding: 0.75rem 2rem; }
+    }
+
+    /* --- 6. Hero Section --- */
+    .main-content {
+        padding: 4rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-card {
+        position: relative;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border);
+        background-color: rgba(2, 62, 138, 0.5); /* surface/50 */
+        overflow: hidden;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 6rem;
+    }
+
+    .hero-bg-img {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhVJiAmdQGj-AX3XnJDkJ3ygdqr-z7QNoG_QciNtA0s7YbZoZQa5fybEBiGa0VAtKfUEKvYiVAL7a7FfteMkzfDkWZ9Ba9mhhAABnogOsTdKU_27J76UePKy4mJXKeirPnIgH7bMXk5bt3XX0mxSAh1iRMyuJu1zUFhcdWpFx5rQT4doqXfpRECQEur94zZASzQZ3xaOEp5vvHFw0CtanjPupetB-5TvTZSpvThakuaCK7PG1G7_NYDmri0qEC-ipmJ5w0O91qqEwq");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.2;
+    }
+
+    .hero-gradient-overlay {
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        height: 50%;
+        background: linear-gradient(to top, var(--color-bg-dark), transparent);
+        z-index: 0;
+    }
+
+    .hero-text-content {
+        z-index: 10;
+        position: relative;
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.05em;
+        margin-bottom: 1rem;
+    }
+
+    .hero-desc {
+        color: rgba(255,255,255,0.8);
+        font-size: 1rem;
+        line-height: 1.6;
+        max-width: 48rem;
+        margin: 0 auto;
+    }
+
+    @media (min-width: 640px) {
+        .hero-title { font-size: 3rem; }
+        .hero-desc { font-size: 1.125rem; }
+    }
+    @media (min-width: 768px) {
+        .hero-title { font-size: 3.75rem; }
+    }
+
+    /* --- 7. Interactive Chain (Flowchart) --- */
+    .chain-section {
+        margin-bottom: 6rem;
+        position: relative;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 1.875rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 1.125rem;
+        margin-bottom: 4rem;
+    }
+
+    .chain-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    /* Desktop Connecting Line */
+    .desktop-line {
+        display: none;
+        position: absolute;
+        top: 24px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, rgba(76, 201, 240, 0.3), transparent);
+        z-index: -1;
+    }
+
+    /* Mobile Vertical Line */
+    .mobile-line {
+        width: 1px;
+        height: 2rem;
+        background-color: rgba(76, 201, 240, 0.3);
+    }
+
+    .chain-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+        group: true; /* mimic group logic */
+    }
+
+    .step-icon-circle {
+        width: 3rem; /* 12 * 0.25rem */
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        transition: all 0.3s ease;
+        
+        /* Default State */
+        background-color: var(--color-surface);
+        border: 2px solid rgba(67, 97, 238, 0.5);
+        color: rgba(76, 201, 240, 0.8);
+    }
+    
+    /* First item active style mimic */
+    .chain-step:first-child .step-icon-circle {
+        background-color: var(--color-primary-light);
+        color: var(--color-bg-dark);
+        box-shadow: var(--shadow-glow);
+        border: 4px solid rgba(76, 201, 240, 0.2);
+    }
+
+    /* Hover Effects */
+    .chain-step:hover .step-icon-circle {
+        transform: scale(1.1);
+        background-color: var(--color-primary-light);
+        color: var(--color-bg-dark);
+        border-color: var(--color-primary-light);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .chain-step:first-child:hover .step-icon-circle {
+        background-color: white;
+        box-shadow: 0 0 20px rgba(255,255,255,0.6);
+    }
+
+    .step-label {
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        transition: color 0.3s ease;
+    }
+
+    .chain-step:hover .step-label {
+        color: var(--color-primary-light);
+    }
+
+    .chain-step:first-child .step-label {
+        font-weight: 700;
+        color: white;
+    }
+
+    @media (min-width: 768px) {
+        .chain-container {
+            flex-direction: row;
+            justify-content: center;
+            gap: 1rem;
         }
-        :root {
-            --glow-start: #4CC9F0;
-            --glow-end: #4361EE;
+        .desktop-line { display: block; }
+        .mobile-line { display: none; }
+    }
+
+    /* --- 8. Phase Details (Cards) --- */
+    .phase-details-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4rem; /* space-y-16 */
+    }
+
+    .phase-card {
+        scroll-margin-top: 8rem; /* scroll-mt-32 */
+        position: relative;
+        background-color: rgba(2, 62, 138, 0.5);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        backdrop-filter: blur(4px);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    /* Glow Border Effect Implementation */
+    .glow-border::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, var(--glow-start), var(--glow-end));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+    @media (min-width: 768px) {
+        .phase-card {
+            grid-template-columns: 1fr 2fr; /* md:grid-cols-3 (1:2 ratio) */
+            padding: 2rem;
         }
-    </style>
+    }
+
+    .phase-meta {
+        grid-column: span 1;
+    }
+
+    .phase-tag {
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-primary-light);
+    }
+
+    .phase-title {
+        margin-top: 0.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .phase-intro {
+        margin-top: 1rem;
+        font-size: 1rem;
+        color: var(--color-text-muted);
+        line-height: 1.6;
+    }
+
+    .phase-content {
+        grid-column: span 1;
+    }
+    
+    @media (min-width: 768px) {
+        .phase-content { grid-column: span 2; }
+    }
+
+    .content-label {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Methods Grid */
+    .methods-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    @media (min-width: 640px) {
+        .methods-list { grid-template-columns: 1fr 1fr; }
+    }
+
+    .method-item {
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+    }
+
+    .method-icon {
+        color: rgba(76, 201, 240, 0.8);
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+    }
+    
+    .method-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+    .method-text h4 {
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+    }
+
+    .method-text p {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 0.25rem;
+    }
+
+    /* Bullet Lists */
+    .bullet-list {
+        list-style-position: inside;
+        list-style-type: disc;
+        color: var(--color-text-muted);
+        margin-top: 0.5rem;
+    }
+    .bullet-list li { margin-bottom: 0.5rem; }
+    .bullet-list strong { color: rgba(255,255,255,0.8); font-weight: 500; }
+
+    /* Case Study Box */
+    .case-study {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border);
+    }
+    
+    .case-title {
+        font-weight: 600;
+        color: rgba(76, 201, 240, 0.9);
+        font-size: 1rem;
+    }
+    
+    .case-text {
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+
+    /* --- 9. Risk Assessment Section --- */
+    .risk-card {
+        background-color: var(--color-surface);
+        padding: 2rem;
+        border-radius: var(--radius-xl);
+    }
+
+    @media (min-width: 768px) {
+        .risk-card { padding: 3rem; }
+    }
+
+    .risk-grid {
+        margin-top: 3rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .risk-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .risk-box {
+        background-color: rgba(3, 4, 94, 0.5);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+    }
+
+    .risk-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .risk-icon {
+        font-size: 1.875rem;
+        color: var(--color-primary-light);
+        width: 32px;
+        height: 32px;
+    }
+    .risk-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+    .risk-box h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    /* Utility to hide/show */
+    .md-hidden { display: block; }
+    .md-flex { display: none; }
+    
+    @media (min-width: 768px) {
+        .md-hidden { display: none; }
+        .md-flex { display: flex; }
+    }
+
+</style>
 </head>
-<body class="bg-background-dark font-display text-white/90">
-<div class="relative flex min-h-screen w-full flex-col">
-<div class="absolute inset-0 z-[-1] bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-<div class="absolute inset-0 z-[-1] bg-[radial-gradient(circle_500px_at_50%_200px,rgba(67,97,238,0.2),transparent)]"></div>
+<body>
 
-<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-background-dark/80 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
-<div class="flex flex-1 items-center gap-10">
-<a href="index1.html" class="flex items-center gap-4 text-white hover:opacity-80 transition-opacity">
-<div class="size-6 text-primary-light">
-<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
-</svg>
-</div>
-<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">OSINT Attack Chain</h2>
-</a>
+<div class="wrapper relative">
+    <div class="absolute inset-0 bg-grid-pattern"></div>
+    <div class="absolute inset-0 bg-glow-spot"></div>
 
-<nav class="hidden items-center gap-8 md:flex">
-<a class="text-sm font-medium leading-normal text-white/70 transition-colors hover:text-white" href="index1.html">首頁：威脅概覽</a>
-<a class="relative text-sm font-medium leading-normal text-primary-light after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-primary-light after:shadow-glow" href="#">攻擊鍊詳解</a>
-<a class="text-sm font-medium leading-normal text-white/70 transition-colors hover:text-white" href="index3.html">防禦與工具</a>
-</nav>
-</div>
-<button class="md:hidden text-white">
-<span class="material-symbols-outlined">menu</span>
-</button>
-</header>
+    <header class="header">
+        <div class="logo-area">
+            <a href="index1.html" class="flex items-center gap-4" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo-icon">
+                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <h2 class="logo-text">OSINT Attack Chain</h2>
+            </a>
+            
+            <nav class="nav-menu">
+                <a class="nav-link" href="index1.html">首頁：威脅概覽</a>
+                <a class="nav-link active" href="#">攻擊鍊詳解</a>
+                <a class="nav-link" href="index3.html">防禦與工具</a>
+            </nav>
+        </div>
+        
+        <button class="mobile-menu-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+    </header>
 
-<main class="flex flex-col items-center px-4 py-16 sm:px-6 lg:px-8">
-<div class="w-full max-w-6xl">
-<section class="mb-24 text-center">
-<div class="relative flex min-h-[400px] flex-col items-center justify-center gap-6 overflow-hidden rounded-xl border border-white/10 bg-surface/50 p-8 md:min-h-[400px]">
-<div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhVJiAmdQGj-AX3XnJDkJ3ygdqr-z7QNoG_QciNtA0s7YbZoZQa5fybEBiGa0VAtKfUEKvYiVAL7a7FfteMkzfDkWZ9Ba9mhhAABnogOsTdKU_27J76UePKy4mJXKeirPnIgH7bMXk5bt3XX0mxSAh1iRMyuJu1zUFhcdWpFx5rQT4doqXfpRECQEur94zZASzQZ3xaOEp5vvHFw0CtanjPupetB-5TvTZSpvThakuaCK7PG1G7_NYDmri0qEC-ipmJ5w0O91qqEwq");'></div>
-<div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background-dark to-transparent"></div>
-<div class="z-10 flex flex-col gap-4">
-<h1 class="text-4xl font-black leading-tight tracking-tighter text-white sm:text-5xl md:text-6xl">
-                                OSINT 攻擊鍊詳解
-                            </h1>
-<p class="mx-auto max-w-3xl text-base font-normal leading-relaxed text-white/80 sm:text-lg">
-                                OSINT（公開來源情報）攻擊鍊是一套系統性的流程，攻擊者藉此蒐集、分析並利用公開資訊來達成其目標。這個流程從被動的資訊蒐集開始，逐步演變為主動的攻擊行動。了解其運作方式，是建立有效防禦策略、保護數位資產免於威脅的關鍵第一步。
-                            </p>
-</div>
-</div>
-</section>
+    <main class="main-content">
+        <div class="container" style="max-width: 1152px;"> <section class="hero-card">
+                <div class="hero-bg-img"></div>
+                <div class="hero-gradient-overlay"></div>
+                
+                <div class="hero-text-content">
+                    <h1 class="hero-title">OSINT 攻擊鍊詳解</h1>
+                    <p class="hero-desc">
+                        OSINT（公開來源情報）攻擊鍊是一套系統性的流程，攻擊者藉此蒐集、分析並利用公開資訊來達成其目標。這個流程從被動的資訊蒐集開始，逐步演變為主動的攻擊行動。了解其運作方式，是建立有效防禦策略、保護數位資產免於威脅的關鍵第一步。
+                    </p>
+                </div>
+            </section>
 
-<section class="relative mb-24">
-<h2 class="text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">互動式攻擊流程</h2>
-<p class="mt-4 text-center text-lg text-white/70">點擊下方階段，深入了解各步驟的詳細資訊。</p>
-<div class="relative mt-16 flex flex-col items-center justify-center gap-y-8 md:flex-row md:gap-x-4">
-<div class="absolute top-6 left-0 -z-10 hidden h-0.5 w-full bg-gradient-to-r from-transparent via-primary-light/30 to-transparent md:block"></div>
-<a href="#phase-01" class="flex flex-col items-center text-center group cursor-pointer">
-<div class="flex size-12 items-center justify-center rounded-full bg-primary-light text-background-dark shadow-glow ring-4 ring-primary-light/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-white group-hover:shadow-[0_0_20px_rgba(255,255,255,0.6)]">
-<span class="material-symbols-outlined">travel_explore</span>
-</div>
-<p class="mt-3 text-sm font-bold text-white group-hover:text-primary-light transition-colors duration-300">情報蒐集</p>
-</a>
+            <section class="chain-section">
+                <h2 class="section-title text-white">互動式攻擊流程</h2>
+                <p class="section-subtitle">點擊下方階段，深入了解各步驟的詳細資訊。</p>
+                
+                <div class="chain-container">
+                    <div class="desktop-line"></div>
+                    
+                    <a href="#phase-01" class="chain-step">
+                        <div class="step-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/></svg>
+                        </div>
+                        <p class="step-label">情報蒐集</p>
+                    </a>
 
-<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+                    <div class="mobile-line md-hidden"></div>
 
-<a href="#phase-02" class="flex flex-col items-center text-center group cursor-pointer">
-<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
-<span class="material-symbols-outlined">person_search</span>
-</div>
-<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">目標分析</p>
-</a>
+                    <a href="#phase-02" class="chain-step">
+                        <div class="step-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        </div>
+                        <p class="step-label">目標分析</p>
+                    </a>
 
-<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+                    <div class="mobile-line md-hidden"></div>
 
-<a href="#phase-03" class="flex flex-col items-center text-center group cursor-pointer">
-<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
-<span class="material-symbols-outlined">policy</span>
-</div>
-<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">漏洞識別</p>
-</a>
+                    <a href="#phase-03" class="chain-step">
+                        <div class="step-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        </div>
+                        <p class="step-label">漏洞識別</p>
+                    </a>
 
-<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+                    <div class="mobile-line md-hidden"></div>
 
-<a href="#phase-04" class="flex flex-col items-center text-center group cursor-pointer">
-<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
-<span class="material-symbols-outlined">bolt</span>
-</div>
-<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">攻擊利用</p>
-</a>
+                    <a href="#phase-04" class="chain-step">
+                        <div class="step-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>
+                        </div>
+                        <p class="step-label">攻擊利用</p>
+                    </a>
 
-<div class="h-8 w-px bg-primary-light/30 md:hidden"></div>
+                    <div class="mobile-line md-hidden"></div>
 
-<a href="#phase-05" class="flex flex-col items-center text-center group cursor-pointer">
-<div class="flex size-12 items-center justify-center rounded-full border-2 border-primary/50 bg-surface text-primary-light/80 transition-all duration-300 group-hover:scale-110 group-hover:border-primary-light group-hover:bg-primary-light group-hover:text-background-dark group-hover:shadow-glow">
-<span class="material-symbols-outlined">task_alt</span>
-</div>
-<p class="mt-3 text-sm font-medium text-white/70 group-hover:text-primary-light transition-colors duration-300">達成目標</p>
-</a>
-</div>
-</section>
+                    <a href="#phase-05" class="chain-step">
+                        <div class="step-icon-circle">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <p class="step-label">達成目標</p>
+                    </a>
+                </div>
+            </section>
 
-<section class="mb-24">
-<h2 class="mb-12 text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">各階段詳細剖析</h2>
-<div class="space-y-16">
-<div id="phase-01" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
-<div class="md:col-span-1">
-<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 01</p>
-<h3 class="mt-2 text-2xl font-bold leading-normal text-white">情報蒐集 (Reconnaissance)</h3>
-<p class="mt-4 font-semibold text-white/90">目的與重要性</p>
-<p class="mt-1 text-base font-normal leading-relaxed text-white/70">此階段是 OSINT 攻擊鍊的基石。其核心目標是在不與目標直接互動的情況下，廣泛蒐集所有可用的公開資訊。這一步驟建立的資訊基礎，將決定後續攻擊的精準度和成功率。一個全面的情報蒐集可以揭露目標的數位足跡、組織架構、技術弱點與人員習性。</p>
-</div>
-<div class="md:col-span-2 space-y-6">
-<div>
-<p class="font-semibold text-white/90">常用方法</p>
-<ul class="mt-2 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">public</span>
-<div>
-<h4 class="font-medium text-white/80">網站與社群媒體分析</h4>
-<p class="text-sm text-white/60">分析公開個人資料、貼文、關聯網路。</p>
-</div>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">storage</span>
-<div>
-<h4 class="font-medium text-white/80">公共資料庫查詢</h4>
-<p class="text-sm text-white/60">查詢 WHOIS、DNS 紀錄、政府公開資料。</p>
-</div>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">search</span>
-<div>
-<h4 class="font-medium text-white/80">搜尋引擎進階語法</h4>
-<p class="text-sm text-white/60">使用 Google Hacking 挖掘敏感文件與路徑。</p>
-</div>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined mt-1 text-lg text-primary-light/80">code</span>
-<div>
-<h4 class="font-medium text-white/80">開源程式碼庫檢視</h4>
-<p class="text-sm text-white/60">在 GitHub 等平台尋找洩漏的憑證或程式碼缺陷。</p>
-</div>
-</li>
-</ul>
-</div>
-<div>
-<p class="font-semibold text-white/90">資料類型</p>
-<p class="mt-2 text-sm text-white/70">蒐集到的資料涵蓋範圍極廣，包括：<strong class="font-medium text-white/80">個人身分資訊</strong> (姓名、郵件、電話)、<strong class="font-medium text-white/80">組織結構</strong> (部門、員工、職位)、<strong class="font-medium text-white/80">技術堆疊</strong> (伺服器、框架、軟體版本) 及 <strong class="font-medium text-white/80">實體位置</strong> (辦公地點、IP 地理位置) 等。</p>
-</div>
-<div class="mt-4 border-t border-white/10 pt-4">
-<p class="font-semibold text-primary-light/90">案例分析</p>
-<p class="mt-1 text-sm text-white/70">攻擊者透過目標公司在徵才網站上發布的職缺，得知其內部使用特定版本的 VPN 軟體。接著，利用搜尋引擎進階語法，找到該版本軟體的已知遠端執行漏洞 (CVE)。最終，結合從 WHOIS 查到的公司 IP 段，成功鎖定潛在的攻擊入口點，為後續滲透鋪平了道路。</p>
-</div>
-</div>
-</div>
+            <section class="phase-details-container">
+                <h2 class="section-title text-white">各階段詳細剖析</h2>
+                
+                <div id="phase-01" class="phase-card glow-border">
+                    <div class="phase-meta">
+                        <p class="phase-tag">Phase 01</p>
+                        <h3 class="phase-title">情報蒐集 (Reconnaissance)</h3>
+                        <p class="content-label" style="margin-top: 1.5rem;">目的與重要性</p>
+                        <p class="phase-intro" style="margin-top: 0.25rem;">此階段是 OSINT 攻擊鍊的基石。其核心目標是在不與目標直接互動的情況下，廣泛蒐集所有可用的公開資訊。這一步驟建立的資訊基礎，將決定後續攻擊的精準度和成功率。</p>
+                    </div>
+                    <div class="phase-content">
+                        <div>
+                            <p class="content-label">常用方法</p>
+                            <ul class="methods-list">
+                                <li class="method-item">
+                                    <div class="method-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                                    </div>
+                                    <div class="method-text">
+                                        <h4>網站與社群媒體分析</h4>
+                                        <p>分析公開個人資料、貼文、關聯網路。</p>
+                                    </div>
+                                </li>
+                                <li class="method-item">
+                                    <div class="method-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg>
+                                    </div>
+                                    <div class="method-text">
+                                        <h4>公共資料庫查詢</h4>
+                                        <p>查詢 WHOIS、DNS 紀錄、政府公開資料。</p>
+                                    </div>
+                                </li>
+                                <li class="method-item">
+                                    <div class="method-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                                    </div>
+                                    <div class="method-text">
+                                        <h4>搜尋引擎進階語法</h4>
+                                        <p>使用 Google Hacking 挖掘敏感文件。</p>
+                                    </div>
+                                </li>
+                                <li class="method-item">
+                                    <div class="method-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+                                    </div>
+                                    <div class="method-text">
+                                        <h4>開源程式碼庫檢視</h4>
+                                        <p>在 GitHub 尋找洩漏的憑證或缺陷。</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 1.5rem;">
+                            <p class="content-label">資料類型</p>
+                            <p style="font-size: 0.875rem; color: var(--color-text-muted);">蒐集到的資料涵蓋範圍極廣，包括：<strong>個人身分資訊</strong> (姓名、郵件)、<strong>組織結構</strong>、<strong>技術堆疊</strong> 及 <strong>實體位置</strong> 等。</p>
+                        </div>
+                        <div class="case-study">
+                            <p class="case-title">案例分析</p>
+                            <p class="case-text">攻擊者透過目標公司在徵才網站上發布的職缺，得知其內部使用特定版本的 VPN 軟體。接著，利用搜尋引擎進階語法，找到該版本軟體的已知遠端執行漏洞 (CVE)。</p>
+                        </div>
+                    </div>
+                </div>
 
-<div id="phase-02" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
-<div class="md:col-span-1">
-<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 02</p>
-<h3 class="mt-2 text-2xl font-bold leading-normal text-white">目標分析 (Target Analysis)</h3>
-<p class="mt-2 text-base font-normal leading-relaxed text-white/70">將蒐集到的雜亂資訊進行整理與分析，識別出目標的關鍵人物、使用的技術、組織架構以及潛在的弱點。</p>
-</div>
-<div class="md:col-span-2">
-<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
-<ul class="list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-medium text-white/80">關係鏈分析:</strong> 利用 Maltego 視覺化人員、組織與基礎設施之間的關聯。</li>
-<li><strong class="font-medium text-white/80">技術堆疊識別:</strong> 透過 Wappalyzer 或 BuiltWith 確定目標網站使用的 CMS、伺服器軟體和框架。</li>
-<li><strong class="font-medium text-white/80">人員模式分析:</strong> 觀察目標在社交媒體上的活躍時間、興趣偏好，為社交工程做準備。</li>
-</ul>
-<div class="mt-6 border-t border-white/10 pt-4">
-<p class="font-semibold text-primary-light/90">案例示意</p>
-<p class="mt-1 text-sm text-white/70">分析發現目標公司正在招聘熟悉特定版本 WordPress 的開發人員，暗示其網站可能使用該版本，進而搜尋相關漏洞。</p>
-</div>
-</div>
-</div>
+                <div id="phase-02" class="phase-card glow-border">
+                    <div class="phase-meta">
+                        <p class="phase-tag">Phase 02</p>
+                        <h3 class="phase-title">目標分析 (Target Analysis)</h3>
+                        <p class="phase-intro">將蒐集到的雜亂資訊進行整理與分析，識別出目標的關鍵人物、使用的技術、組織架構以及潛在的弱點。</p>
+                    </div>
+                    <div class="phase-content">
+                        <p class="content-label">關鍵活動、方法與工具：</p>
+                        <ul class="bullet-list">
+                            <li><strong>關係鏈分析:</strong> 利用 Maltego 視覺化人員、組織與基礎設施之間的關聯。</li>
+                            <li><strong>技術堆疊識別:</strong> 透過 Wappalyzer 或 BuiltWith 確定目標網站使用的 CMS、伺服器軟體和框架。</li>
+                            <li><strong>人員模式分析:</strong> 觀察目標在社交媒體上的活躍時間、興趣偏好，為社交工程做準備。</li>
+                        </ul>
+                        <div class="case-study">
+                            <p class="case-title">案例示意</p>
+                            <p class="case-text">分析發現目標公司正在招聘熟悉特定版本 WordPress 的開發人員，暗示其網站可能使用該版本，進而搜尋相關漏洞。</p>
+                        </div>
+                    </div>
+                </div>
 
-<div id="phase-03" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
-<div class="md:col-span-1">
-<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 03</p>
-<h3 class="mt-2 text-2xl font-bold leading-normal text-white">漏洞識別 (Vulnerability Identification)</h3>
-<p class="mt-2 text-base font-normal leading-relaxed text-white/70">基於分析結果，主動搜尋目標在技術、人員或流程上存在的具體安全漏洞，這些漏洞將成為攻擊的切入點。</p>
-</div>
-<div class="md:col-span-2">
-<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
-<ul class="list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-medium text-white/80">已知漏洞匹配:</strong> 將識別出的軟體版本與 CVE（通用漏洞披露）資料庫進行比對。</li>
-<li><strong class="font-medium text-white/80">配置錯誤偵測:</strong> 使用 Shodan 尋找暴露在外的資料庫、管理介面或未受保護的雲端儲存。</li>
-<li><strong class="font-medium text-white/80">人員弱點評估:</strong> 分析員工在論壇或社交媒體的發言，尋找可能洩漏內部資訊或容易受釣魚攻擊的跡象。</li>
-</ul>
-<div class="mt-6 border-t border-white/10 pt-4">
-<p class="font-semibold text-primary-light/90">案例示意</p>
-<p class="mt-1 text-sm text-white/70">攻擊者在 GitHub 上發現一名目標公司員工公開的程式碼庫中，硬編碼了 AWS 的存取金鑰，構成了嚴重安全漏洞。</p>
-</div>
-</div>
-</div>
+                <div id="phase-03" class="phase-card glow-border">
+                    <div class="phase-meta">
+                        <p class="phase-tag">Phase 03</p>
+                        <h3 class="phase-title">漏洞識別 (Vulnerability Identification)</h3>
+                        <p class="phase-intro">基於分析結果，主動搜尋目標在技術、人員或流程上存在的具體安全漏洞，這些漏洞將成為攻擊的切入點。</p>
+                    </div>
+                    <div class="phase-content">
+                        <p class="content-label">關鍵活動、方法與工具：</p>
+                        <ul class="bullet-list">
+                            <li><strong>已知漏洞匹配:</strong> 將識別出的軟體版本與 CVE（通用漏洞披露）資料庫進行比對。</li>
+                            <li><strong>配置錯誤偵測:</strong> 使用 Shodan 尋找暴露在外的資料庫、管理介面或未受保護的雲端儲存。</li>
+                            <li><strong>人員弱點評估:</strong> 分析員工在論壇或社交媒體的發言，尋找可能洩漏內部資訊或容易受釣魚攻擊的跡象。</li>
+                        </ul>
+                        <div class="case-study">
+                            <p class="case-title">案例示意</p>
+                            <p class="case-text">攻擊者在 GitHub 上發現一名目標公司員工公開的程式碼庫中，硬編碼了 AWS 的存取金鑰，構成了嚴重安全漏洞。</p>
+                        </div>
+                    </div>
+                </div>
 
-<div id="phase-04" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
-<div class="md:col-span-1">
-<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 04</p>
-<h3 class="mt-2 text-2xl font-bold leading-normal text-white">攻擊利用 (Exploitation)</h3>
-<p class="mt-2 text-base font-normal leading-relaxed text-white/70">此階段是將情報付諸行動的關鍵時刻。攻擊者利用已識別的漏洞，透過社交工程、惡意軟體或其他手段，嘗試獲取系統存取權限。</p>
-</div>
-<div class="md:col-span-2">
-<p class="mb-2 font-semibold text-white/90">關鍵活動、方法與工具：</p>
-<ul class="list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-medium text-white/80">魚叉式釣魚:</strong> 根據蒐集到的個人興趣，製作高度客製化的釣魚郵件，誘導點擊惡意連結。</li>
-<li><strong class="font-medium text-white/80">公開漏洞利用:</strong> 使用 Metasploit 等工具，對已知的軟體漏洞發動攻擊。</li>
-<li><strong class="font-medium text-white/80">憑證填充:</strong> 利用在其他資料外洩事件中洩漏的帳號密碼，嘗試登入目標系統。</li>
-</ul>
-<div class="mt-6 border-t border-white/10 pt-4">
-<p class="font-semibold text-primary-light/90">案例示意</p>
-<p class="mt-1 text-sm text-white/70">攻擊者向目標員工發送一封偽裝成 HR 部門的郵件，內容關於「年度績效評估」，附件是一個含有惡意宏的 Word 文件。</p>
-</div>
-</div>
-</div>
+                <div id="phase-04" class="phase-card glow-border">
+                    <div class="phase-meta">
+                        <p class="phase-tag">Phase 04</p>
+                        <h3 class="phase-title">攻擊利用 (Exploitation)</h3>
+                        <p class="phase-intro">此階段是將情報付諸行動的關鍵時刻。攻擊者利用已識別的漏洞，透過社交工程、惡意軟體或其他手段，嘗試獲取系統存取權限。</p>
+                    </div>
+                    <div class="phase-content">
+                        <p class="content-label">關鍵活動、方法與工具：</p>
+                        <ul class="bullet-list">
+                            <li><strong>魚叉式釣魚:</strong> 根據蒐集到的個人興趣，製作高度客製化的釣魚郵件，誘導點擊惡意連結。</li>
+                            <li><strong>公開漏洞利用:</strong> 使用 Metasploit 等工具，對已知的軟體漏洞發動攻擊。</li>
+                            <li><strong>憑證填充:</strong> 利用在其他資料外洩事件中洩漏的帳號密碼，嘗試登入目標系統。</li>
+                        </ul>
+                        <div class="case-study">
+                            <p class="case-title">案例示意</p>
+                            <p class="case-text">攻擊者向目標員工發送一封偽裝成 HR 部門的郵件，內容關於「年度績效評估」，附件是一個含有惡意宏的 Word 文件。</p>
+                        </div>
+                    </div>
+                </div>
 
-<div id="phase-05" class="scroll-mt-32 glow-border grid grid-cols-1 gap-8 rounded-xl border border-white/10 bg-surface/50 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
-<div class="md:col-span-1">
-<p class="text-sm font-medium uppercase tracking-widest text-primary-light">Phase 05</p>
-<h3 class="mt-2 text-2xl font-bold leading-normal text-white">達成目標 (Goal Achievement)</h3>
-<p class="mt-2 text-base font-normal leading-relaxed text-white/70">攻擊鍊的最終階段。攻擊者在成功滲透後，執行其預定的惡意活動，無論是竊取資料、破壞系統或是潛伏監控。</p>
-</div>
-<div class="md:col-span-2">
-<p class="mb-2 font-semibold text-white/90">關鍵活動與可能後果：</p>
-<ul class="list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-medium text-white/80">資料外洩 (Exfiltration):</strong> 將敏感數據打包並傳輸至攻擊者控制的伺服器。</li>
-<li><strong class="font-medium text-white/80">權限維持 (Persistence):</strong> 安裝後門或建立隱蔽帳號，確保未來能持續存取系統。</li>
-<li><strong class="font-medium text-white/80">勒索與破壞:</strong> 部署勒索軟體加密檔案，或破壞關鍵基礎設施導致服務中斷。</li>
-</ul>
-<div class="mt-6 border-t border-white/10 pt-4">
-<p class="font-semibold text-primary-light/90">案例示意</p>
-<p class="mt-1 text-sm text-white/70">攻擊者成功取得資料庫管理員權限後，將客戶個資表導出並上傳至暗網販售，同時刪除原始備份，並留下勒索訊息要求比特幣贖金。</p>
-</div>
-</div>
-</div>
-</div>
-</section>
+                <div id="phase-05" class="phase-card glow-border">
+                    <div class="phase-meta">
+                        <p class="phase-tag">Phase 05</p>
+                        <h3 class="phase-title">達成目標 (Goal Achievement)</h3>
+                        <p class="phase-intro">攻擊鍊的最終階段。攻擊者在成功滲透後，執行其預定的惡意活動，無論是竊取資料、破壞系統或是潛伏監控。</p>
+                    </div>
+                    <div class="phase-content">
+                        <p class="content-label">關鍵活動與可能後果：</p>
+                        <ul class="bullet-list">
+                            <li><strong>資料外洩 (Exfiltration):</strong> 將敏感數據打包並傳輸至攻擊者控制的伺服器。</li>
+                            <li><strong>權限維持 (Persistence):</strong> 安裝後門或建立隱蔽帳號，確保未來能持續存取系統。</li>
+                            <li><strong>勒索與破壞:</strong> 部署勒索軟體加密檔案，或破壞關鍵基礎設施導致服務中斷。</li>
+                        </ul>
+                        <div class="case-study">
+                            <p class="case-title">案例示意</p>
+                            <p class="case-text">攻擊者成功取得資料庫管理員權限後，將客戶個資表導出並上傳至暗網販售，同時刪除原始備份，並留下勒索訊息要求比特幣贖金。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<section class="mb-24">
-<div class="glow-border rounded-xl bg-surface p-8 md:p-12">
-<h2 class="text-center text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">潛在影響與風險評估</h2>
-<p class="mx-auto mt-4 max-w-3xl text-center text-lg text-white/70">OSINT 攻擊的影響深遠，從個人隱私洩漏到企業的重大財務損失。有效的風險評估是制定防禦策略的基礎。</p>
-<div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
-<div class="rounded-lg bg-background-dark/50 p-6">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-3xl text-primary-light">warning</span>
-<h3 class="text-xl font-bold text-white">潛在影響</h3>
-</div>
-<ul class="mt-4 list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-semibold text-white/90">資料外洩：</strong>竊取客戶資料、智慧財產權、商業機密。</li>
-<li><strong class="font-semibold text-white/90">財務損失：</strong>直接的資金盜竊、勒索軟體攻擊或詐欺。</li>
-<li><strong class="font-semibold text-white/90">聲譽損害：</strong>客戶信任度下降，品牌形象受損。</li>
-<li><strong class="font-semibold text-white/90">營運中斷：</strong>關鍵系統癱瘓，影響正常業務運作。</li>
-<li><strong class="font-semibold text-white/90">法律與合規風險：</strong>因資料保護不力而面臨罰款或訴訟。</li>
-</ul>
-</div>
-<div class="rounded-lg bg-background-dark/50 p-6">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-3xl text-primary-light">shield</span>
-<h3 class="text-xl font-bold text-white">風險評估要點</h3>
-</div>
-<ul class="mt-4 list-inside list-disc space-y-2 text-white/70">
-<li><strong class="font-semibold text-white/90">識別數位足跡：</strong>評估組織和員工在網路上暴露了多少資訊。</li>
-<li><strong class="font-semibold text-white/90">評估資訊敏感度：</strong>確定哪些公開資訊一旦被利用將造成最大損害。</li>
-<li><strong class="font-semibold text-white/90">檢視安全政策：</strong>審查員工社交媒體使用政策和資料分享規範。</li>
-<li><strong class="font-semibold text-white/90">進行攻擊模擬：</strong>定期進行紅隊演練，模擬 OSINT 攻擊，找出防禦缺口。</li>
-<li><strong class="font-semibold text-white/90">強化安全意識：</strong>對員工進行持續的教育訓練，提高對社交工程的警覺性。</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-</div>
-</main>
+            <section class="risk-card glow-border" style="margin-bottom: 6rem;">
+                <h2 class="section-title text-white">潛在影響與風險評估</h2>
+                <p class="section-subtitle">OSINT 攻擊的影響深遠，從個人隱私洩漏到企業的重大財務損失。有效的風險評估是制定防禦策略的基礎。</p>
+                
+                <div class="risk-grid">
+                    <div class="risk-box">
+                        <div class="risk-header">
+                            <div class="risk-icon">
+                                <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                            </div>
+                            <h3>潛在影響</h3>
+                        </div>
+                        <ul class="bullet-list">
+                            <li><strong class="text-white">資料外洩：</strong>竊取客戶資料、智慧財產權、商業機密。</li>
+                            <li><strong class="text-white">財務損失：</strong>直接的資金盜竊、勒索軟體攻擊或詐欺。</li>
+                            <li><strong class="text-white">聲譽損害：</strong>客戶信任度下降，品牌形象受損。</li>
+                            <li><strong class="text-white">營運中斷：</strong>關鍵系統癱瘓，影響正常業務運作。</li>
+                        </ul>
+                    </div>
+                    <div class="risk-box">
+                        <div class="risk-header">
+                            <div class="risk-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                            </div>
+                            <h3>風險評估要點</h3>
+                        </div>
+                        <ul class="bullet-list">
+                            <li><strong class="text-white">識別數位足跡：</strong>評估組織和員工在網路上暴露了多少資訊。</li>
+                            <li><strong class="text-white">評估資訊敏感度：</strong>確定哪些公開資訊一旦被利用將造成最大損害。</li>
+                            <li><strong class="text-white">檢視安全政策：</strong>審查員工社交媒體使用政策和資料分享規範。</li>
+                            <li><strong class="text-white">進行攻擊模擬：</strong>定期進行紅隊演練，模擬 OSINT 攻擊，找出防禦缺口。</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
 </div>
 </body>
 </html>

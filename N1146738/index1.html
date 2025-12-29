@@ -1,137 +1,412 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>OSINT Attack Chain - 首頁</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#4F98FF",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#0A192F",
-                        "card-dark": "#112240",
-                        "text-main-dark": "#ccd6f6",
-                        "text-secondary-dark": "#8892b0",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "Noto Sans TC", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>OSINT Attack Chain - 首頁</title>
+    
+    <style>
+        /* --- 1. 設計系統 (Design Tokens) --- */
+        :root {
+            /* 核心顏色 (源自原本的 Tailwind Config) */
+            --color-primary: #4F98FF;
+            --color-bg-dark: #0A192F;
+            --color-card-dark: #112240;
+            --color-text-main: #ccd6f6;
+            --color-text-secondary: #8892b0;
+            --color-white: #ffffff;
+            --color-border: rgba(255, 255, 255, 0.1);
+            
+            /* UI 參數 */
+            --radius-md: 0.375rem; /* 6px */
+            --radius-lg: 0.5rem;   /* 8px */
+            --container-width: 960px;
         }
-    </script>
-<style type="text/tailwindcss">
-    body {
-        font-family: 'Inter', 'Noto Sans TC', sans-serif;
-        color: #ccd6f6;
-        background-color: #0A192F;
-    }
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        font-size: inherit;
-    }
-</style>     
+
+        /* --- 2. 基礎重置 (Reset) --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* 使用系統字體堆疊，無需下載外部字體，效果極似 Inter/Noto Sans */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased; /* 讓文字在 Mac 上更清晰 */
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease;
+        }
+
+        /* --- 3. 佈局樣式 (Layout) --- */
+        .wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- 4. 頂部導航 (Header) --- */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(10, 25, 47, 0.85); /* 半透明背景 */
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--color-primary);
+        }
+
+        .brand h2 {
+            color: var(--color-white);
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .nav {
+            display: none; /* 手機版預設隱藏選單 */
+            gap: 2rem;
+        }
+
+        .nav a {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--color-primary);
+        }
+        
+        .nav a.home-link {
+            color: var(--color-white);
+        }
+
+        @media (min-width: 768px) {
+            .nav { display: flex; }
+        }
+
+        /* --- 5. 英雄區塊 (Hero) --- */
+        .hero {
+            padding: 5rem 0;
+            min-height: calc(100vh - 80px); /* 扣掉 header 高度 */
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-subtitle {
+            color: var(--color-primary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title {
+            color: var(--color-white);
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .hero-desc {
+            color: var(--color-text-secondary);
+            margin-top: 1.5rem;
+            max-width: 500px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .btn-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2.5rem;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-primary);
+            font-weight: 700;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-cta:hover {
+            background-color: rgba(79, 152, 255, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .hero-title { font-size: 3.5rem; }
+        }
+
+        /* --- 6. 內容區塊 (Features) --- */
+        .section-features {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            color: var(--color-white);
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .section-desc {
+            color: var(--color-text-secondary);
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 格線系統 */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* 卡片樣式 */
+        .card {
+            background-color: var(--color-card-dark);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        /* 列表樣式 (左側卡片) */
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(79, 152, 255, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            flex-shrink: 0;
+        }
+
+        /* SVG 圖示通用設定 */
+        .icon-box svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .item-text {
+            color: var(--color-white);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* 詳細資訊樣式 (右側卡片) */
+        .detail-item {
+            margin-bottom: 2rem;
+        }
+        .detail-item:last-child { margin-bottom: 0; }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(79, 152, 255, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+        }
+        
+        .detail-icon-box svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        .detail-title {
+            color: var(--color-white);
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .detail-desc {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* --- 7. 頁尾 (Footer) --- */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: auto;
+            border-top: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            font-size: 0.75rem;
+        }
+    </style>
 </head>
-<body class="antialiased">
-<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<div class="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 flex flex-1 justify-center py-5">
-<div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
-<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap bg-background-dark/80 backdrop-blur-sm px-10 py-4">
-<div class="flex items-center gap-4 text-primary">
-<div class="size-6">
-<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M12.0006 18.26L4.9406 22.2082L6.52248 14.2799L0.587891 8.7918L8.6146 7.84006L12.0006 0.5L15.3866 7.84006L23.4133 8.7918L17.4787 14.2799L19.0606 22.2082L12.0006 18.26Z"></path>
-</svg>
+<body>
+
+<div class="wrapper">
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.0006 18.26L4.9406 22.2082L6.52248 14.2799L0.587891 8.7918L8.6146 7.84006L12.0006 0.5L15.3866 7.84006L23.4133 8.7918L17.4787 14.2799L19.0606 22.2082L12.0006 18.26Z"/>
+                </svg>
+                <h2>OSINT Attack Chain</h2>
+            </div>
+            <nav class="nav">
+                <a href="index1.html" class="home-link">首頁：威脅概覽</a>
+                <a href="index2.html">攻擊鍊詳解</a>
+                <a href="index3.html">防禦與工具</a>
+                <a href="../index.html">小組首頁</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="container">
+            <div class="hero">
+                <div>
+                    <h1 class="hero-subtitle">歡迎來到 OSINT 世界</h1>
+                    <p class="hero-title">解構 OSINT 攻擊鍊</p>
+                    <p class="hero-title">洞悉無形戰場的威脅</p>
+                    <p class="hero-desc">
+                        深入了解公開來源情報在現代網路威脅中的關鍵作用，以及如何利用知識防禦潛在的數位攻擊。
+                    </p>
+                    <a href="index2.html" class="btn-cta">
+                        探索攻擊鍊
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="container section-features">
+            <div class="section-header">
+                <h2 class="section-title">OSINT 攻擊鍊與關鍵威脅</h2>
+                <p class="section-desc">
+                    攻擊者透過偵察、武器化、傳遞、利用及執行等階段，將公開情報轉化為實際威脅，其中以社交工程及釣魚攻擊為最常見的應用手法。
+                </p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="list-item">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        </div>
+                        <span class="item-text">偵察 (Reconnaissance)</span>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                        </div>
+                        <span class="item-text">武器化 (Weaponization)</span>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                        <span class="item-text">傳遞 (Delivery)</span>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                        </div>
+                        <span class="item-text">利用 (Exploitation)</span>
+                    </div>
+
+                    <div class="list-item">
+                        <div class="icon-box">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                        <span class="item-text">執行 (Execution)</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="detail-item">
+                        <div class="detail-header">
+                            <div class="detail-icon-box">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zM7.5 10c0-1.57-1.1-2.88-2.58-3.08-.24.78-.39 1.62-.39 2.5s.15 1.72.39 2.5c1.48-.2 2.58-1.51 2.58-3.08zm8.67-.17c.24-.78.39-1.62.39-2.5s-.15-1.72-.39-2.5C14.69 5.03 13.59 6.34 13.59 8c0 1.57 1.1 2.88 2.58 3.08z"/></svg>
+                            </div>
+                            <h4 class="detail-title">社交工程</h4>
+                        </div>
+                        <p class="detail-desc">利用心理學技巧操縱受害者，使其洩露敏感資訊或執行不安全的操作，直接攻擊人性的弱點。</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-header">
+                            <div class="detail-icon-box">
+                                <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                            </div>
+                            <h4 class="detail-title">釣魚攻擊</h4>
+                        </div>
+                        <p class="detail-desc">透過偽造的電子郵件、訊息或網站，誘騙使用者點擊惡意連結或提供個人憑證，成功率極高。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p> © 2024 OSINT Attack Chain Analysis. All rights reserved.<br/> 本網站內容僅供教育與研究目的。 </p>
+    </footer>
 </div>
-<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">OSINT Attack Chain</h2>
-</div>
-<div class="flex flex-1 justify-end">
-<nav class="hidden md:flex items-center gap-9">
-<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="../index.html">小組首頁</a>
-<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="index1.html">首頁：威脅概覽</a>
-<a class="text-text-secondary-dark text-sm font-medium leading-normal hover:text-primary transition-colors" href="index2.html">攻擊鍊詳解</a>
-<a class="text-text-secondary-dark text-sm font-medium leading-normal hover:text-primary transition-colors" href="index3.html">防禦與工具</a>
-</nav>
-</div>
-</header>
-<main class="flex-grow">
-<section class="min-h-[calc(100vh-80px)] flex flex-col items-start justify-center text-left py-16 px-4 md:px-10">
-<div class="max-w-2xl">
-<h1 class="text-primary text-base font-normal leading-normal mb-3">歡迎來到 OSINT 世界</h1>
-<p class="text-white text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">解構 OSINT 攻擊鍊</p>
-<p class="text-white mt-2 text-4xl md:text-5xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">洞悉無形戰場的威脅</p>
-<p class="text-text-secondary-dark text-base font-normal leading-relaxed mt-5 max-w-lg"> 深入了解公開來源情報在現代網路威脅中的關鍵作用，以及如何利用知識防禦潛在的數位攻擊。 </p>
-<a href="index2.html" class="mt-10 flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded h-12 px-5 bg-transparent text-primary text-base font-bold leading-normal tracking-[0.015em] border border-primary hover:bg-primary/20 transition-colors w-fit">
-<span class="truncate">探索攻擊鍊</span>
-</a>
-</div>
-</section>
-<section class="py-16 px-4 md:px-10">
-<div class="text-center mb-12">
-<h2 class="text-white text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.015em]">OSINT 攻擊鍊與關鍵威脅</h2>
-<p class="text-text-secondary-dark text-sm mt-3 max-w-2xl mx-auto">攻擊者透過偵察、武器化、傳遞、利用及執行等階段，將公開情報轉化為實際威脅，其中以社交工程及釣魚攻擊為最常見的應用手法。</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-<div class="bg-card-dark border border-white/10 rounded-lg p-6 space-y-4">
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">person_search</span></div>
-<h3 class="text-white text-base font-bold">偵察 (Reconnaissance)</h3>
-</div>
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">build_circle</span></div>
-<h3 class="text-white text-base font-bold">武器化 (Weaponization)</h3>
-</div>
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">forward_to_inbox</span></div>
-<h3 class="text-white text-base font-bold">傳遞 (Delivery)</h3>
-</div>
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">key</span></div>
-<h3 class="text-white text-base font-bold">利用 (Exploitation)</h3>
-</div>
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 text-primary rounded-md p-2 flex items-center justify-center text-2xl"><span class="material-symbols-outlined">play_arrow</span></div>
-<h3 class="text-white text-base font-bold">執行 (Execution)</h3>
-</div>
-</div>
-<div class="bg-card-dark border border-white/10 rounded-lg p-6 space-y-6">
-<div>
-<div class="flex items-center gap-4 mb-2">
-<div class="bg-primary/10 text-primary rounded-md p-3 flex items-center justify-center text-3xl"><span class="material-symbols-outlined">groups</span></div>
-<h4 class="text-white text-lg font-bold">社交工程</h4>
-</div>
-<p class="text-text-secondary-dark text-sm leading-relaxed">利用心理學技巧操縱受害者，使其洩露敏感資訊或執行不安全的操作，直接攻擊人性的弱點。</p>
-</div>
-<div>
-<div class="flex items-center gap-4 mb-2">
-<div class="bg-primary/10 text-primary rounded-md p-3 flex items-center justify-center text-3xl"><span class="material-symbols-outlined">phishing</span></div>
-<h4 class="text-white text-lg font-bold">釣魚攻擊</h4>
-</div>
-<p class="text-text-secondary-dark text-sm leading-relaxed">透過偽造的電子郵件、訊息或網站，誘騙使用者點擊惡意連結或提供個人憑證，成功率極高。</p>
-</div>
-</div>
-</div>
-</section>
-</main>
-<footer class="text-center py-8 mt-12 border-t border-white/10">
-<p class="text-text-secondary-dark text-xs"> © 2024 OSINT Attack Chain Analysis. All rights reserved.<br/> 本網站內容僅供教育與研究目的。 </p>
-</footer>
-</div>
-</div>
-</div>
-</div>
-</body></html>
+
+</body>
+</html>
